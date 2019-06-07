@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28922.388
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Forecasting.Triggers", "SFA.DAS.Forecasting.Triggers\SFA.DAS.Forecasting.Triggers.csproj", "{9F903F3C-4DB5-4326-8038-E56C8A3C2793}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9F903F3C-4DB5-4326-8038-E56C8A3C2793}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F903F3C-4DB5-4326-8038-E56C8A3C2793}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F903F3C-4DB5-4326-8038-E56C8A3C2793}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F903F3C-4DB5-4326-8038-E56C8A3C2793}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0DBE8BCD-C0BE-4CDE-AA77-E527EBA234BF}
+	EndGlobalSection
+EndGlobal
