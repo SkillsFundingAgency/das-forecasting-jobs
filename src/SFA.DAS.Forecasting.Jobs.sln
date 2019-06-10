@@ -3,13 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28922.388
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Forecasting.Triggers", "SFA.DAS.Forecasting.Triggers\SFA.DAS.Forecasting.Triggers.csproj", "{9F903F3C-4DB5-4326-8038-E56C8A3C2793}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Forecasting.Triggers", "SFA.DAS.Forecasting.Triggers\SFA.DAS.Forecasting.Triggers.csproj", "{9F903F3C-4DB5-4326-8038-E56C8A3C2793}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{71C2ED63-04B8-465E-9B4F-365D9689555C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{16EF1519-1444-417B-BC9A-AE6E0D174892}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Forecasting.Trigger.TestConsole", "SFA.DAS.Forecasting.Trigger.TestConsole\SFA.DAS.Forecasting.Trigger.TestConsole.csproj", "{5A89F654-92E5-4C68-BD74-E268C6E233D0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Forecasting.Trigger.TestConsole", "SFA.DAS.Forecasting.Trigger.TestConsole\SFA.DAS.Forecasting.Trigger.TestConsole.csproj", "{5A89F654-92E5-4C68-BD74-E268C6E233D0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Forecasting.Jobs.Infrastructure", "SFA.DAS.Forecasting.Jobs.Infrastructure\SFA.DAS.Forecasting.Jobs.Infrastructure.csproj", "{2ED022CC-D6EA-4AD8-9A4D-8E8DF9021728}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Forecasting.Domain", "SFA.DAS.Forecasting.Domain\SFA.DAS.Forecasting.Domain.csproj", "{4E97C817-FE1C-4962-99E3-C6EC00564A64}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +29,14 @@ Global
 		{5A89F654-92E5-4C68-BD74-E268C6E233D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A89F654-92E5-4C68-BD74-E268C6E233D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A89F654-92E5-4C68-BD74-E268C6E233D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2ED022CC-D6EA-4AD8-9A4D-8E8DF9021728}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2ED022CC-D6EA-4AD8-9A4D-8E8DF9021728}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2ED022CC-D6EA-4AD8-9A4D-8E8DF9021728}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2ED022CC-D6EA-4AD8-9A4D-8E8DF9021728}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E97C817-FE1C-4962-99E3-C6EC00564A64}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E97C817-FE1C-4962-99E3-C6EC00564A64}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E97C817-FE1C-4962-99E3-C6EC00564A64}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E97C817-FE1C-4962-99E3-C6EC00564A64}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
