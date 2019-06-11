@@ -9,12 +9,12 @@ using SFA.DAS.Forecasting.Triggers;
 namespace Tests
 {
     [TestFixture]
-    public class Tests
+    public class WhenRefreshEmployerLevyDataCompletedTriggered
     {
 
         [Test]
         [Category("UnitTest")]
-        public async Task Test1()
+        public async Task Then_Message_Will_Be_Handled()
         {
             //Arrange
             var handler = new Mock<ILevyCompleteTriggerHandler>();
