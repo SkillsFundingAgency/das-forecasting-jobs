@@ -30,14 +30,14 @@ steps:
   displayName: 'Build'
   inputs:
     projects: 'src/**/*.sln'
-    arguments: '/p:Configuration=$(BuildConfiguration)'
+    arguments: '/p:Configuration=$(BuildConfiguration) --no-restore'
 
 - task: DotNetCoreCLI@2
   displayName: Test
   inputs:
     command: test
     projects: '**/*UnitTests/*.csproj'
-    arguments: '--configuration $(BuildConfiguration)'
+    arguments: '--configuration $(BuildConfiguration) --no-build'
 
 - task: DotNetCoreCLI@2
   displayName: 'Publish'
@@ -45,12 +45,12 @@ steps:
     command: publish
     publishWebProjects: false
     projects: 'src/SFA.DAS.Forecasting.Triggers/SFA.DAS.Forecasting.Triggers.csproj'
-    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory) --no-restore --no-build'
 
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
   inputs:
-    Contents: 'azure\**'
+    Contents: 'azure/**'
     TargetFolder: '$(build.artifactstagingdirectory)'
     OverWrite: true
 
