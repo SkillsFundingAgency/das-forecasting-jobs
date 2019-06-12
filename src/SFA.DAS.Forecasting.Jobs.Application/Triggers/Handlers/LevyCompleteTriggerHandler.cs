@@ -28,28 +28,28 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
             _httpClient.XFunctionsKey = _configuration.Value.LevyDeclarationPreLoadHttpFunctionXFunctionKey;
         }
 
-        public async Task Handle(RefreshEmployerLevyDataCompletedEvent accountLegalEntityAddedEvent)
+        public async Task Handle(RefreshEmployerLevyDataCompletedEvent refreshEmployerLevyDataCompletedEvent)
         {
             try
             {
                 var triggerMessage = new AccountLevyCompleteTrigger
                 {
-                    EmployerAccountIds = new List<string> { accountLegalEntityAddedEvent.AccountId.ToString() },
-                    PeriodYear = accountLegalEntityAddedEvent.PeriodYear,
-                    PeriodMonth = accountLegalEntityAddedEvent.PeriodMonth
+                    EmployerAccountIds = new List<string> { refreshEmployerLevyDataCompletedEvent.AccountId.ToString() },
+                    PeriodYear = refreshEmployerLevyDataCompletedEvent.PeriodYear,
+                    PeriodMonth = refreshEmployerLevyDataCompletedEvent.PeriodMonth
                 };
 
                 var response = await _httpClient.PostAsync(_configuration.Value.LevyDeclarationPreLoadHttpFunctionBaseUrl, triggerMessage);
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogError($"Failed to trigger Levy PreLoad HttpTriggerFunction for AccountId: { accountLegalEntityAddedEvent.AccountId}, PeriodMonth: { accountLegalEntityAddedEvent.PeriodMonth}, PeriodYear: { accountLegalEntityAddedEvent.PeriodYear}. Status Code: {response.StatusCode}");
+                    _logger.LogError($"Failed to trigger Levy PreLoad HttpTriggerFunction for AccountId: { refreshEmployerLevyDataCompletedEvent.AccountId}, PeriodMonth: { refreshEmployerLevyDataCompletedEvent.PeriodMonth}, PeriodYear: { refreshEmployerLevyDataCompletedEvent.PeriodYear}. Status Code: {response.StatusCode}");
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to trigger Levy PreLoad HttpTriggerFunction for AccountId: {accountLegalEntityAddedEvent.AccountId}, PeriodMonth: {accountLegalEntityAddedEvent.PeriodMonth}, PeriodYear: {accountLegalEntityAddedEvent.PeriodYear}");
-                throw ex;
+                _logger.LogError(ex, $"Failed to trigger Levy PreLoad HttpTriggerFunction for AccountId: {refreshEmployerLevyDataCompletedEvent.AccountId}, PeriodMonth: {refreshEmployerLevyDataCompletedEvent.PeriodMonth}, PeriodYear: {refreshEmployerLevyDataCompletedEvent.PeriodYear}");
+                throw;
             }
         }
     }
