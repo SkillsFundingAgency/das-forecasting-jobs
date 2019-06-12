@@ -1,0 +1,163 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "resourceEnvironmentName": {
+            "type": "string",
+            "metadata": {
+                "description": "Short name of the environment. Used for the name of resources created"
+            }
+        },
+        "serviceName": {
+            "type": "string"
+        },
+        "NServiceBusConnectionString": {
+            "type": "securestring"
+        },
+        "NServiceBusLicense": {
+            "type": "securestring"
+        },
+        "appServicePlanSize": {
+            "type": "string",
+            "allowedValues": [
+                "1",
+                "2",
+                "3"
+            ],
+            "defaultValue": "1"
+        },
+        "appServicePlanInstances": {
+            "type": "int",
+            "defaultValue": 2
+        }
+    },
+    "variables": {
+        "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
+        "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
+        "appServicePlanName": "[concat(variables('resourceNamePrefix'),'wkr-asp')]",
+        "functionAppName": "[concat(variables('resourceNamePrefix'),'wkr-fa')]",
+        "storageAccountName": "[concat('das',toLower(parameters('resourceEnvironmentName')),toLower(parameters('serviceName')),'wkrstr')]"
+    },
+    "resources": [
+        {
+            "apiVersion": "2017-05-10",
+            "name": "WorkerAppServicePlan",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-plan.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appServicePlanName": {
+                        "value": "[variables('appServicePlanName')]"
+                    },
+                    "aspSize": {
+                        "value": "[parameters('appServicePlanSize')]"
+                    },
+                    "aspInstances": {
+                        "value": "[parameters('appServicePlanInstances')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "FunctionAppInsights",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appInsightsName": {
+                        "value": "[variables('functionAppName')]"
+                    },
+                    "attachedService": {
+                        "value": "[variables('functionAppName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "Storage",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'storage-account-arm.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "storageAccountName": {
+                        "value": "[variables('storageAccountName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "FunctionApp",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'function-app.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "functionAppName": {
+                        "value": "[variables('functionAppName')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[variables('appServicePlanName')]"
+                    },
+                    "appServicePlanResourceGroup": {
+                        "value": "[resourceGroup().name]"
+                    },
+                    "functionAppAppSettings": {
+                        "value": [
+                            {
+                                "name": "AzureWebJobsStorage",
+                                "value": "[reference('Storage').outputs.storageConnectionString.value]"
+                            },
+                            {
+                                "name": "AzureWebJobsDashboard",
+                                "value": "[reference('Storage').outputs.storageConnectionString.value]"
+                            },
+                            {
+                                "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                "value": "[reference('FunctionAppInsights').outputs.InstrumentationKey.value]"
+                            },
+                            {
+                                "name": "FUNCTIONS_EXTENSION_VERSION",
+                                "value": "~2"
+                            },                            
+                            {
+                                "name": "NServiceBusConnectionString",
+                                "value": "[parameters('NServiceBusConnectionString')]"
+                            },
+                            {
+                                "name": "NServiceBusLicense",
+                                "value": "[parameters('NServiceBusLicense')]"
+                            }
+                        ]
+                    }
+                }
+            },
+            "dependsOn": [
+                "WorkerAppServicePlan"
+            ]
+        }
+    ],
+    "outputs": {
+        "functionAppName": {
+            "type": "string",
+            "value": "[variables('functionAppName')]"
+        }
+    }
+}
