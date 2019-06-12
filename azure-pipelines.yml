@@ -16,7 +16,7 @@ variables:
   Build.MinorNumber: '0'
 
 pool:
-  name: 'Continuous Integration 02 - SSD - 160ACU'
+  name: 'Hosted VS2017'
 
 steps:
 - task: DotNetCoreCLI@2
