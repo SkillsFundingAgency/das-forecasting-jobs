@@ -9,7 +9,7 @@ using SFA.DAS.Forecasting.Triggers;
 namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests
 {
     [TestFixture]
-    public class WhenRefreshEmployerLevyDataCompletedTriggered
+    public class WhenAccountFundsExpiredTriggered
     {
 
         [Test]
@@ -17,14 +17,14 @@ namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests
         public async Task Then_Message_Will_Be_Handled()
         {
             //Arrange
-            var handler = new Mock<ILevyCompleteTriggerHandler>();
-            var message = new RefreshEmployerLevyDataCompletedEvent { AccountId = 123 };
+            var handler = new Mock<IAccountFundsExpiredTriggerHandler>();
+            var message = new AccountFundsExpiredEvent { AccountId = 123 };
 
             //Act
-            await HandleRefreshEmployerLevyDataCompleted.Run(message, handler.Object, Mock.Of<ILogger>());
+            await HandleAccountFundsExpiredEvent.Run(message, handler.Object, Mock.Of<ILogger>());
 
             //Assert
-            handler.Verify(s => s.Handle(It.Is<RefreshEmployerLevyDataCompletedEvent>(c => c.AccountId.Equals(message.AccountId))), Times.Once);
+            handler.Verify(s => s.Handle(It.Is<AccountFundsExpiredEvent>(c => c.AccountId.Equals(message.AccountId))), Times.Once);
         }
     }
 }

@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Forecasting.Jobs.In
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Forecasting.Domain", "SFA.DAS.Forecasting.Domain\SFA.DAS.Forecasting.Domain.csproj", "{4E97C817-FE1C-4962-99E3-C6EC00564A64}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SFA.DAS.Forecasting.Functions.Triggers.UnitTests", "SFA.DAS.Forecasting.Functions.Triggers.UnitTests\SFA.DAS.Forecasting.Functions.Triggers.UnitTests.csproj", "{18DB7254-3D22-483E-A500-CF6480D7E08D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SFA.DAS.Forecasting.Functions.Triggers.UnitTests", "SFA.DAS.Forecasting.Functions.Triggers.UnitTests\SFA.DAS.Forecasting.Functions.Triggers.UnitTests.csproj", "{18DB7254-3D22-483E-A500-CF6480D7E08D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

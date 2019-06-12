@@ -9,15 +9,15 @@ using SFA.DAS.Forecasting.Jobs.Infrastructure.NServicebus;
 
 namespace SFA.DAS.Forecasting.Triggers
 {
-    public static class HandleRefreshEmployerLevyDataCompleted
+    public static class HandleRefreshPaymentDataCompletedEvent
     {
-        [FunctionName("HandleRefreshEmployerLevyDataCompleted")]
+        [FunctionName("HandleRefreshPaymentDataCompletedEvent")]
         public static async Task Run(
-            [NServiceBusTrigger(EndPoint = "SFA.DAS.Forecasting.Jobs.TestEvent")]RefreshEmployerLevyDataCompletedEvent message,
-            [Inject] ILevyCompleteTriggerHandler handler,
+            [NServiceBusTrigger(EndPoint = "SFA.DAS.Forecasting.Jobs.RefreshPaymentDataCompletedEvent")]RefreshPaymentDataCompletedEvent message, 
+            [Inject] IRefreshPaymentDataCompletedTriggerHandler handler,
             ILogger log)
         {
-            log.LogInformation($"NServiceBus {nameof(RefreshEmployerLevyDataCompletedEvent)} trigger function executed at: {DateTime.Now}");
+            log.LogInformation($"NServiceBus {nameof(RefreshPaymentDataCompletedEvent)} trigger function executed at: {DateTime.Now}");
             await handler.Handle(message);
         }
     }

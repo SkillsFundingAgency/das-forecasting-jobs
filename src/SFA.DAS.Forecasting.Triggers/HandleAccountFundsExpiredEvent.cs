@@ -9,15 +9,15 @@ using SFA.DAS.Forecasting.Jobs.Infrastructure.NServicebus;
 
 namespace SFA.DAS.Forecasting.Triggers
 {
-    public static class HandleRefreshEmployerLevyDataCompleted
+    public static class HandleAccountFundsExpiredEvent
     {
-        [FunctionName("HandleRefreshEmployerLevyDataCompleted")]
+        [FunctionName("HandleAccountFundsExpiredEvent")]
         public static async Task Run(
-            [NServiceBusTrigger(EndPoint = "SFA.DAS.Forecasting.Jobs.TestEvent")]RefreshEmployerLevyDataCompletedEvent message,
-            [Inject] ILevyCompleteTriggerHandler handler,
+            [NServiceBusTrigger(EndPoint = "SFA.DAS.Forecasting.Jobs.AccountFundsExpiredEvent")]AccountFundsExpiredEvent message, 
+            [Inject] IAccountFundsExpiredTriggerHandler handler,
             ILogger log)
         {
-            log.LogInformation($"NServiceBus {nameof(RefreshEmployerLevyDataCompletedEvent)} trigger function executed at: {DateTime.Now}");
+            log.LogInformation($"NServiceBus {nameof(AccountFundsExpiredEvent)} trigger function executed at: {DateTime.Now}");
             await handler.Handle(message);
         }
     }
