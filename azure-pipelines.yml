@@ -50,7 +50,7 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
   inputs:
-    Contents: 'azure\**'
+    Contents: 'azure/**'
     TargetFolder: '$(build.artifactstagingdirectory)'
     OverWrite: true
 
