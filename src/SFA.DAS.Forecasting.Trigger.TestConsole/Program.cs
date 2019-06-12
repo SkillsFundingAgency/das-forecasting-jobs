@@ -35,7 +35,7 @@ namespace SFA.DAS.Forecasting.Trigger.TestConsole
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    services.Configure<ForecastingJobsConfiguration>(hostContext.Configuration.GetSection("ForecastingJobs"));
+                    services.Configure<ForecastingJobsConfiguration>(hostContext.Configuration.GetSection("ForecastingJobsConfiguration"));
                     services.AddSingleton(cfg => cfg.GetService<IOptions<ForecastingJobsConfiguration>>().Value);
                     services.AddTransient<NServiceBusConsole>();
                     services.AddHostedService<LifetimeEventsHostedService>();
