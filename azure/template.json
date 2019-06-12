@@ -10,14 +10,6 @@
         },
         "serviceName": {
             "type": "string"
-        },        
-        "aseResourceGroup": {
-            "type": "string",
-            "defaultValue": ""
-        },
-        "aseHostingEnvironmentName": {
-            "type": "string",
-            "defaultValue": ""
         },
         "NServiceBusConnectionString": {
             "type": "securestring"
@@ -60,12 +52,6 @@
                 "parameters": {
                     "appServicePlanName": {
                         "value": "[variables('appServicePlanName')]"
-                    },
-                    "aseHostingEnvironmentName": {
-                        "value": "[parameters('aseHostingEnvironmentName')]"
-                    },
-                    "aseResourceGroup": {
-                        "value": "[parameters('aseResourceGroup')]"
                     },
                     "aspSize": {
                         "value": "[parameters('appServicePlanSize')]"
