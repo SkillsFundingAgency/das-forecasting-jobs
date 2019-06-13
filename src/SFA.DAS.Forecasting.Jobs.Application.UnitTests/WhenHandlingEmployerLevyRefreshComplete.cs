@@ -26,7 +26,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-            _config = new ForecastingJobsConfiguration { LevyDeclarationPreLoadHttpFunctionBaseUrl = "FunctionBaseUrl" }
+            _config = new ForecastingJobsConfiguration { LevyDeclarationPreLoadHttpFunctionBaseUrl = "FunctionBaseUrl" };
             _event = new RefreshEmployerLevyDataCompletedEvent();
         }
 
