@@ -9,16 +9,16 @@
             }
         },
         "serviceName": {
-            "type": "string"
-        },
-        "NServiceBusConnectionString": {
-            "type": "securestring"
-        },
-        "NServiceBusLicense": {
-            "type": "securestring"
+            "type": "string",
+            "metadata": {
+                "description": "Short name of the service. Used for the name of resources created"
+            }
         },
         "appServicePlanSize": {
             "type": "string",
+            "metadata": {
+                "description": "Size of the app service plan"
+            },
             "allowedValues": [
                 "1",
                 "2",
@@ -28,6 +28,9 @@
         },
         "appServicePlanInstances": {
             "type": "int",
+            "metadata": {
+                "description": "Number of service plan instances to create"
+            },
             "defaultValue": 2
         }
     },
@@ -41,7 +44,7 @@
     "resources": [
         {
             "apiVersion": "2017-05-10",
-            "name": "WorkerAppServicePlan",
+            "name": "worker-app-service-plan",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -64,7 +67,7 @@
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "FunctionAppInsights",
+            "name": "function-app-insights",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -84,7 +87,7 @@
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "Storage",
+            "name": "storage-account",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -101,7 +104,7 @@
         },
         {
             "apiVersion": "2017-05-10",
-            "name": "FunctionApp",
+            "name": "function-app",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -123,39 +126,31 @@
                         "value": [
                             {
                                 "name": "AzureWebJobsStorage",
-                                "value": "[reference('Storage').outputs.storageConnectionString.value]"
+                                "value": "[reference('storage-account').outputs.storageConnectionString.value]"
                             },
                             {
                                 "name": "AzureWebJobsDashboard",
-                                "value": "[reference('Storage').outputs.storageConnectionString.value]"
+                                "value": "[reference('storage-account').outputs.storageConnectionString.value]"
                             },
                             {
                                 "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                "value": "[reference('FunctionAppInsights').outputs.InstrumentationKey.value]"
+                                "value": "[reference('function-app-insights').outputs.InstrumentationKey.value]"
                             },
                             {
                                 "name": "FUNCTIONS_EXTENSION_VERSION",
                                 "value": "~2"
-                            },                            
-                            {
-                                "name": "NServiceBusConnectionString",
-                                "value": "[parameters('NServiceBusConnectionString')]"
-                            },
-                            {
-                                "name": "NServiceBusLicense",
-                                "value": "[parameters('NServiceBusLicense')]"
                             }
                         ]
                     }
                 }
             },
             "dependsOn": [
-                "WorkerAppServicePlan"
+                "worker-app-service-plan"
             ]
         }
     ],
     "outputs": {
-        "functionAppName": {
+        "FunctionAppName": {
             "type": "string",
             "value": "[variables('functionAppName')]"
         }
