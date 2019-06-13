@@ -44,9 +44,9 @@
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
-        "appServicePlanName": "[concat(variables('resourceNamePrefix'),'wkr-asp')]",
-        "functionAppName": "[concat(variables('resourceNamePrefix'),'wkr-fa')]",
-        "storageAccountName": "[concat('das',toLower(parameters('resourceEnvironmentName')),toLower(parameters('serviceName')),'wkrstr')]"
+        "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
+        "functionAppName": "[concat(variables('resourceNamePrefix'),'-fa')]",
+        "storageAccountName": "[concat('das',toLower(parameters('resourceEnvironmentName')),toLower(parameters('serviceName')),'str')]"
     },
     "resources": [
         {
