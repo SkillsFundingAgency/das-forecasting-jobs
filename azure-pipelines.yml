@@ -11,7 +11,6 @@ workspace:
 
 variables:
   buildConfiguration: 'release'
-  buildPlatform: 'anycpu'
 
 pool:
   name: 'Continuous Integration 02 - SSD - 160ACU'

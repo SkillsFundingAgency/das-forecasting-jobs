@@ -32,6 +32,13 @@
                 "description": "Number of service plan instances to create"
             },
             "defaultValue": 2
+        },
+        "ipSecurityRestrictions": {
+            "type": "array",
+            "metadata": {
+                "description": "Allowed IP's"
+            },
+            "defaultValue": []
         }
     },
     "variables": {
@@ -121,6 +128,9 @@
                     },
                     "appServicePlanResourceGroup": {
                         "value": "[resourceGroup().name]"
+                    },
+                    "ipSecurityRestrictions": {
+                        "value": "[parameters('ipSecurityRestrictions')]"
                     },
                     "functionAppAppSettings": {
                         "value": [
