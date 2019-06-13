@@ -155,7 +155,9 @@
                 }
             },
             "dependsOn": [
-                "worker-app-service-plan"
+                "worker-app-service-plan",
+                "function-app-insights",
+                "storage-account"
             ]
         }
     ],
