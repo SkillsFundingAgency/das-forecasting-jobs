@@ -1,4 +1,3 @@
-name: das-forecasting-jobs
 trigger:
   batch: true
   branches:
@@ -11,14 +10,21 @@ workspace:
     clean: all
 
 variables:
-  BuildConfiguration: 'Release'
-  Build.MajorNumber: '1'
-  Build.MinorNumber: '0'
+  buildConfiguration: 'release'
+  buildPlatform: 'anycpu'
 
 pool:
   name: 'Hosted VS2017'
+  demands: 
+  - msbuild
+  - visualstudio  
 
 steps:
+- task: gittools.gitversion.gitversion-task.GitVersion@4
+  displayName: GitVersion
+  inputs:
+    updateAssemblyInfo: true
+
 - task: DotNetCoreCLI@2
   displayName: 'dotnet restore'
   inputs:
@@ -29,7 +35,7 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: 'Build'
   inputs:
-    projects: 'src/**/*.sln'
+    projects: 'src/**/*.csproj'
     arguments: '/p:Configuration=$(BuildConfiguration) --no-restore'
 
 - task: DotNetCoreCLI@2
