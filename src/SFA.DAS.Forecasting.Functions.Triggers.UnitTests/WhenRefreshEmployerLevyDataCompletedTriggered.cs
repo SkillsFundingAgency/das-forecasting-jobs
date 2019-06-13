@@ -6,7 +6,7 @@ using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Triggers;
 using SFA.DAS.Forecasting.Triggers;
 
-namespace Tests
+namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests
 {
     [TestFixture]
     public class WhenRefreshEmployerLevyDataCompletedTriggered
