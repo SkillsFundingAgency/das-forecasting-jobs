@@ -52,6 +52,20 @@ namespace SFA.DAS.Forecasting.Trigger.TestConsole
                         PeriodYear = "19/20"
                     });
 
+                    await endpointInstance.Publish(new RefreshPaymentDataCompletedEvent
+                    {
+                        AccountId = 1,
+                        Created = DateTime.Now,
+                        PaymentsProcessed = true,
+                        PeriodEnd = "1920-R08"
+                    });
+
+                    await endpointInstance.Publish(new AccountFundsExpiredEvent
+                    {
+                        AccountId = 1,
+                        Created = DateTime.Now
+                    });
+
 
                     Console.WriteLine("Message sent...");
                 }

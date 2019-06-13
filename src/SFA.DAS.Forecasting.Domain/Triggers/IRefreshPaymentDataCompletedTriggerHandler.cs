@@ -8,6 +8,6 @@ namespace SFA.DAS.Forecasting.Domain.Triggers
 {
     public interface IRefreshPaymentDataCompletedTriggerHandler
     {
-        Task Handle(RefreshPaymentDataCompletedEvent accountFundsExpiredEvent);
+        Task Handle(RefreshPaymentDataCompletedEvent refreshPaymentDataCompletedEvent);
     }
 }

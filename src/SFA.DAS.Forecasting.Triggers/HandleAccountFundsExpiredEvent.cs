@@ -14,11 +14,23 @@ namespace SFA.DAS.Forecasting.Triggers
         [FunctionName("HandleAccountFundsExpiredEvent")]
         public static async Task Run(
             [NServiceBusTrigger(EndPoint = "SFA.DAS.Forecasting.Jobs.AccountFundsExpiredEvent")]AccountFundsExpiredEvent message, 
-            [Inject] IAccountFundsExpiredTriggerHandler handler,
+            [Inject] ILevyCompleteTriggerHandler handler,
             ILogger log)
         {
             log.LogInformation($"NServiceBus {nameof(AccountFundsExpiredEvent)} trigger function executed at: {DateTime.Now}");
-            await handler.Handle(message);
+            var convertedMessage = new RefreshEmployerLevyDataCompletedEvent
+            {
+                AccountId = message.AccountId,
+                PeriodYear = ConvertDateToPeriodYear(DateTime.Today),
+                PeriodMonth = (short)DateTime.Today.Month
+            };
+            await handler.Handle(convertedMessage);
+        }
+
+        public static string ConvertDateToPeriodYear(DateTime date)
+        {
+            return date.Year.ToString().Substring(2, 2) + "/" +
+                   (date.Year + 1).ToString().Substring(2, 2);
         }
     }
 }

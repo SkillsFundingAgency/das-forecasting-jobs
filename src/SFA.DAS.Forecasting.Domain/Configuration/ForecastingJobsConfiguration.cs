@@ -5,5 +5,7 @@
         public string NServiceBusConnectionString { get; set; }
         public string LevyDeclarationPreLoadHttpFunctionBaseUrl { get; set; }
         public string LevyDeclarationPreLoadHttpFunctionXFunctionKey { get; set; }
+        public string PaymentPreLoadHttpFunctionBaseUrl { get; set; }
+        public string PaymentPreLoadHttpFunctionXFunctionKey { get; set; }
     }
 }
