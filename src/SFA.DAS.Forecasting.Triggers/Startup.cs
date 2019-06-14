@@ -57,6 +57,8 @@ namespace SFA.DAS.Forecasting.Triggers
                 _loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
 
             services.AddSingleton<ILevyCompleteTriggerHandler, LevyCompleteTriggerHandler>();
+            services
+                .AddSingleton<IRefreshPaymentDataCompletedTriggerHandler, IRefreshPaymentDataCompletedTriggerHandler>();
             services.AddSingleton(typeof(IHttpFunctionClient<>), typeof(HttpFunctionClient<>));
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
