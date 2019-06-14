@@ -25,7 +25,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
             _configuration = configuration;
             _httpClient = httpClient;
             _logger = logger;
-            _httpClient.XFunctionsKey = _configuration.Value.LevyDeclarationPreLoadHttpFunctionXFunctionKey;
+            _httpClient.XFunctionsKey = _configuration.Value.PaymentPreLoadHttpFunctionXFunctionKey;
         }
 
         public async Task Handle(RefreshPaymentDataCompletedEvent refreshPaymentDataCompletedEvent)
