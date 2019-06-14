@@ -6,6 +6,7 @@ using Microsoft.Azure.WebJobs.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Domain.Triggers;
@@ -40,6 +41,11 @@ namespace SFA.DAS.Forecasting.Triggers
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("local.settings.json", true)
                 .AddEnvironmentVariables()
+                .AddAzureTableStorage(o =>
+                {
+                    o.EnvironmentNameEnvironmentVariableName = configuration["EnvironmentName"];
+                    o.ConfigurationKeys = configuration["ConfigNames"].Split(',');
+                })
                 .Build();
 
             Configuration = config;
