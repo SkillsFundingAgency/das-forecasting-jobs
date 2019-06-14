@@ -21,15 +21,15 @@ namespace SFA.DAS.Forecasting.Triggers
             var convertedMessage = new RefreshEmployerLevyDataCompletedEvent
             {
                 AccountId = message.AccountId,
-                PeriodYear = ConvertDateToPeriodYear(DateTime.Today),
-                PeriodMonth = (short)DateTime.Today.Month
+                PeriodYear = ConvertDateToPeriodYear(message.Created),
+                PeriodMonth = (short)message.Created.Month
             };
             await handler.Handle(convertedMessage);
         }
 
-        public static string ConvertDateToPeriodYear(DateTime date)
+        private static string ConvertDateToPeriodYear(DateTime date)
         {
-            return date.Year.ToString().Substring(2, 2) + "/" +
+            return date.Year.ToString().Substring(2, 2) + "-" +
                    (date.Year + 1).ToString().Substring(2, 2);
         }
     }
