@@ -45,7 +45,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogError($"Failed to trigger Payment PreLoad HttpTriggerFunction for AccountId: { refreshPaymentDataCompletedEvent.AccountId}, PeriodMonth: { periodDate.PeriodMonth}, PeriodYear: { periodDate.PeriodYear}. Status Code: {response.StatusCode}");
+                    _logger.LogError($"Failed to trigger Payment PreLoad HttpTriggerFunction for AccountId: { refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: { refreshPaymentDataCompletedEvent.PeriodEnd}. Status Code: {response.StatusCode}");
                 }
             }
             catch (Exception ex)
@@ -55,19 +55,13 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
             }
         }
 
-        public static PeriodDate GetPeriodDateFromPeriodId(string periodId)
+        private static (int PeriodMonth, int PeriodYear) GetPeriodDateFromPeriodId(string periodId)
         {
             var periodYear = int.Parse("20"+periodId.Substring(0, 2));
             var periodIdMonthAsInt = int.Parse(periodId.Substring(6, 2));
             var periodMonth = periodIdMonthAsInt > 5 ? periodIdMonthAsInt - 5 : periodIdMonthAsInt + 7;
 
-            return new PeriodDate {PeriodMonth = periodMonth,PeriodYear = periodYear};
-        }
-
-        public class PeriodDate
-        {
-            public int PeriodMonth { get; set; }
-            public int PeriodYear { get; set; }
+            return (periodMonth, periodYear);
         }
     }
 }

@@ -100,10 +100,20 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         [TestCase("1718-R12",2017,7)]
         [TestCase("9899-R05",2098,12)]
         [TestCase("0001-R06",2000,1)]
-        public void ShouldTranslatePeriodEndCorrectly(string periodEnd,int expectedYear,int expectedMonth)
+        public async Task ShouldTranslatePeriodEndCorrectly(string periodEnd,int expectedYear,int expectedMonth)
         {
+            // Arrange 
+            _event.PeriodEnd = periodEnd;
+            PaymentDataCompleteTrigger res = new PaymentDataCompleteTrigger();
+            _httpClientMock.Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<PaymentDataCompleteTrigger>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK})
+                .Callback((string url, PaymentDataCompleteTrigger trigger) =>
+                {
+                    res = trigger;
+                });
+
             //Act
-            var res = PaymentCompleteTriggerHandler.GetPeriodDateFromPeriodId(periodEnd);
+            await _sut.Handle(_event);
 
             //Assert
             res.PeriodMonth.Should().Be(expectedMonth);
