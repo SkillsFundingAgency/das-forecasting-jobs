@@ -2,6 +2,12 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "environmentName": {
+            "type": "string",
+            "metadata": {
+                "description": "Short name of the environment. Used for the reference of the environment in table storage"
+            }
+        },
         "resourceEnvironmentName": {
             "type": "string",
             "metadata": {
@@ -149,6 +155,10 @@
                             {
                                 "name": "FUNCTIONS_EXTENSION_VERSION",
                                 "value": "~2"
+                            },
+                            {
+                                "name": "EnvironmentName",
+                                "value": "[toUpper(parameters('environmentName'))]"
                             }
                         ]
                     }
