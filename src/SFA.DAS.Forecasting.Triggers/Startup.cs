@@ -6,6 +6,7 @@ using Microsoft.Azure.WebJobs.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
@@ -41,6 +42,13 @@ namespace SFA.DAS.Forecasting.Triggers
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("local.settings.json", true)
                 .AddEnvironmentVariables()
+                .AddAzureTableStorage(o =>
+                {
+                    o.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
+                    o.EnvironmentName = configuration["EnvironmentName"];
+                    o.ConfigurationKeys = configuration["ConfigNames"].Split(',');
+                    o.PreFixConfigurationKeys = false;
+                })
                 .Build();
 
             Configuration = config;
@@ -50,9 +58,7 @@ namespace SFA.DAS.Forecasting.Triggers
         {
             var services = new ServiceCollection();
 
-            services.Configure<ForecastingJobsConfiguration>(Configuration.GetSection("Values"));
-
-            var serviceProvider = services.BuildServiceProvider();
+            services.Configure<ForecastingJobsConfiguration>(Configuration.GetSection("forecastingJobsConfiguration"));
 
             services.AddSingleton(_ =>
                 _loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
