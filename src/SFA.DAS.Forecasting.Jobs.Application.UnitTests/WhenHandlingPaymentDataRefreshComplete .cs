@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerFinance.Messages.Events;
+using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Domain.Triggers;
@@ -24,6 +25,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         private PaymentCompleteTriggerHandler _sut;
         private RefreshPaymentDataCompletedEvent _event;
         private Mock<ILogger> _loggerMock;
+        private Mock<IEncodingService> _encodingServiceMock;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
@@ -41,7 +43,8 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         {
             _loggerMock = new Mock<ILogger>();
             _httpClientMock = new Mock<IHttpFunctionClient<PaymentDataCompleteTrigger>>();
-            _sut = new PaymentCompleteTriggerHandler(Options.Create(_config), _httpClientMock.Object, _loggerMock.Object);
+            _encodingServiceMock = new Mock<IEncodingService>();
+            _sut = new PaymentCompleteTriggerHandler(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _loggerMock.Object);
         }
 
         [Test]

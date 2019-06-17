@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SFA.DAS.EmployerFinance.Messages.Events;
+using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Domain.Triggers;
@@ -16,15 +17,18 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
         private readonly IOptions<ForecastingJobsConfiguration> _configuration;
         private readonly IHttpFunctionClient<PaymentDataCompleteTrigger> _httpClient;
         private readonly ILogger _logger;
+        private readonly IEncodingService _encodingService;
 
         public PaymentCompleteTriggerHandler(
             IOptions<ForecastingJobsConfiguration> configuration,
             IHttpFunctionClient<PaymentDataCompleteTrigger> httpClient,
+            IEncodingService encodingService,
             ILogger logger)
         {
             _configuration = configuration;
             _httpClient = httpClient;
             _logger = logger;
+            _encodingService = encodingService;
             _httpClient.XFunctionsKey = _configuration.Value.PaymentPreLoadHttpFunctionXFunctionKey;
         }
 
@@ -35,7 +39,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
                 var periodDate = GetPeriodDateFromPeriodId(refreshPaymentDataCompletedEvent.PeriodEnd);
                 var triggerMessage = new PaymentDataCompleteTrigger
                 {
-                    EmployerAccountIds = new List<string> { refreshPaymentDataCompletedEvent.AccountId.ToString() },
+                    EmployerAccountIds = new List<string> { _encodingService.Encode(refreshPaymentDataCompletedEvent.AccountId, EncodingType.PublicAccountId) },
                     PeriodYear = periodDate.PeriodYear,
                     PeriodMonth = periodDate.PeriodMonth,
                     PeriodId = refreshPaymentDataCompletedEvent.PeriodEnd

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerFinance.Messages.Events;
+using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
@@ -22,6 +23,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         private LevyCompleteTriggerHandler _sut;
         private RefreshEmployerLevyDataCompletedEvent _event;
         private Mock<ILogger> _loggerMock;
+        private Mock<IEncodingService> _encodingServiceMock;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
@@ -35,7 +37,8 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         {
             _loggerMock = new Mock<ILogger>();
             _httpClientMock = new Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>>();
-            _sut = new LevyCompleteTriggerHandler(Options.Create(_config), _httpClientMock.Object, _loggerMock.Object);
+            _encodingServiceMock = new Mock<IEncodingService>();
+            _sut = new LevyCompleteTriggerHandler(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _loggerMock.Object);
         }
 
         [Test]
