@@ -43,7 +43,8 @@ namespace SFA.DAS.Forecasting.Triggers
                 .AddEnvironmentVariables()
                 .AddAzureTableStorage(o =>
                 {
-                    o.EnvironmentNameEnvironmentVariableName = configuration["EnvironmentName"];
+                    o.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
+                    o.EnvironmentName = configuration["EnvironmentName"];
                     o.ConfigurationKeys = configuration["ConfigNames"].Split(',');
                 })
                 .Build();
@@ -55,9 +56,7 @@ namespace SFA.DAS.Forecasting.Triggers
         {
             var services = new ServiceCollection();
 
-            services.Configure<ForecastingJobsConfiguration>(Configuration.GetSection("Values"));
-
-            var serviceProvider = services.BuildServiceProvider();
+            services.Configure<ForecastingJobsConfiguration>(Configuration.GetSection("forecastingJobsConfiguration"));
 
             services.AddSingleton(_ =>
                 _loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
