@@ -46,6 +46,7 @@ namespace SFA.DAS.Forecasting.Triggers
                     o.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
                     o.EnvironmentName = configuration["EnvironmentName"];
                     o.ConfigurationKeys = configuration["ConfigNames"].Split(',');
+                    o.PreFixConfigurationKeys = false;
                 })
                 .Build();
 
