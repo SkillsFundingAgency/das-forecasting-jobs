@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.Configuration.AzureTableStorage;
+using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Domain.Triggers;
@@ -62,7 +63,11 @@ namespace SFA.DAS.Forecasting.Triggers
             services.AddSingleton(_ =>
                 _loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
 
+            services.AddSingleton<IEncodingService,EncodingService>();
+
             services.AddSingleton<ILevyCompleteTriggerHandler, LevyCompleteTriggerHandler>();
+            services
+                .AddSingleton<IRefreshPaymentDataCompletedTriggerHandler, PaymentCompleteTriggerHandler>();
             services.AddSingleton(typeof(IHttpFunctionClient<>), typeof(HttpFunctionClient<>));
             services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
