@@ -21,7 +21,7 @@ namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests
             var message = new RefreshPaymentDataCompletedEvent { AccountId = 123 };
 
             //Act
-            await HandleRefreshPaymentDataCompletedEvent.Run(message, handler.Object, Mock.Of<ILogger>());
+            await HandleRefreshPaymentDataCompletedEvent.Run(message, handler.Object, Mock.Of<ILogger<RefreshPaymentDataCompletedEvent>>());
 
             //Assert
             handler.Verify(s => s.Handle(It.Is<RefreshPaymentDataCompletedEvent>(c => c.AccountId.Equals(message.AccountId))), Times.Once);

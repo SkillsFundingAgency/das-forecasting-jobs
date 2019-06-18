@@ -13,9 +13,9 @@ namespace SFA.DAS.Forecasting.Triggers
     {
         [FunctionName("HandleAccountFundsExpiredEvent")]
         public static async Task Run(
-            [NServiceBusTrigger(EndPoint = "SFA.DAS.Forecasting.Jobs.AccountFundsExpiredEvent")]AccountFundsExpiredEvent message, 
+            [NServiceBusTrigger(EndPoint = "SFA.DAS.Fcast.Jobs.FundsExpired")]AccountFundsExpiredEvent message, 
             [Inject] ILevyCompleteTriggerHandler handler,
-            ILogger log)
+            [Inject]ILogger<AccountFundsExpiredEvent> log)
         {
             log.LogInformation($"NServiceBus {nameof(AccountFundsExpiredEvent)} trigger function executed at: {DateTime.Now}");
             var convertedMessage = new RefreshEmployerLevyDataCompletedEvent

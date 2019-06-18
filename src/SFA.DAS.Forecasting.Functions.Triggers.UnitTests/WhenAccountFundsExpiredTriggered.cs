@@ -23,7 +23,7 @@ namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests
             var message = new AccountFundsExpiredEvent {AccountId = 123,Created = DateTime.Now};
 
             //Act
-            await HandleAccountFundsExpiredEvent.Run(message, handler.Object, Mock.Of<ILogger>());
+            await HandleAccountFundsExpiredEvent.Run(message, handler.Object, Mock.Of<ILogger<AccountFundsExpiredEvent>>());
 
             //Assert
             handler.Verify(
@@ -50,7 +50,7 @@ namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests
             });
 
             //Act
-            await HandleAccountFundsExpiredEvent.Run(message, handler.Object, Mock.Of<ILogger>());
+            await HandleAccountFundsExpiredEvent.Run(message, handler.Object, Mock.Of<ILogger<AccountFundsExpiredEvent>>());
 
             //Assert
             res.Should().Be(expectedPeriodYear);

@@ -22,7 +22,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         private Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>> _httpClientMock;
         private LevyCompleteTriggerHandler _sut;
         private RefreshEmployerLevyDataCompletedEvent _event;
-        private Mock<ILogger> _loggerMock;
+        private Mock<ILogger<LevyCompleteTriggerHandler>> _loggerMock;
         private Mock<IEncodingService> _encodingServiceMock;
 
         [OneTimeSetUp]
@@ -35,7 +35,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         [SetUp]
         public void SetUp()
         {
-            _loggerMock = new Mock<ILogger>();
+            _loggerMock = new Mock<ILogger<LevyCompleteTriggerHandler>>();
             _httpClientMock = new Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>>();
             _encodingServiceMock = new Mock<IEncodingService>();
             _sut = new LevyCompleteTriggerHandler(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _loggerMock.Object);

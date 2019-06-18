@@ -24,7 +24,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         private Mock<IHttpFunctionClient<PaymentDataCompleteTrigger>> _httpClientMock;
         private PaymentCompleteTriggerHandler _sut;
         private RefreshPaymentDataCompletedEvent _event;
-        private Mock<ILogger> _loggerMock;
+        private Mock<ILogger<PaymentCompleteTriggerHandler>> _loggerMock;
         private Mock<IEncodingService> _encodingServiceMock;
 
         [OneTimeSetUp]
@@ -41,7 +41,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         [SetUp]
         public void SetUp()
         {
-            _loggerMock = new Mock<ILogger>();
+            _loggerMock = new Mock<ILogger<PaymentCompleteTriggerHandler>>();
             _httpClientMock = new Mock<IHttpFunctionClient<PaymentDataCompleteTrigger>>();
             _encodingServiceMock = new Mock<IEncodingService>();
             _sut = new PaymentCompleteTriggerHandler(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _loggerMock.Object);

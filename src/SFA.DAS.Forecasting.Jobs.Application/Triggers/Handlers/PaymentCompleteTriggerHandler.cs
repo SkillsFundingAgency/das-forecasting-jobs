@@ -16,14 +16,14 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
     {
         private readonly IOptions<ForecastingJobsConfiguration> _configuration;
         private readonly IHttpFunctionClient<PaymentDataCompleteTrigger> _httpClient;
-        private readonly ILogger _logger;
+        private readonly ILogger<PaymentCompleteTriggerHandler> _logger;
         private readonly IEncodingService _encodingService;
 
         public PaymentCompleteTriggerHandler(
             IOptions<ForecastingJobsConfiguration> configuration,
             IHttpFunctionClient<PaymentDataCompleteTrigger> httpClient,
             IEncodingService encodingService,
-            ILogger logger)
+            ILogger<PaymentCompleteTriggerHandler> logger)
         {
             _configuration = configuration;
             _httpClient = httpClient;
