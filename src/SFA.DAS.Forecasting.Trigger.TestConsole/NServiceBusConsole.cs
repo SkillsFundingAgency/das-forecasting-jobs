@@ -20,7 +20,7 @@ namespace SFA.DAS.Forecasting.Trigger.TestConsole
         public async Task Run()
         {
             var endpointConfiguration = new EndpointConfiguration("SFA.DAS.Forecasting.Triggers.TestConsole")
-                .UseAzureServiceBusTransport(_configuration.NServiceBusConnectionString, r =>
+                .UseAzureServiceBusTransport(_configuration.ServiceBusConnectionString, r =>
                 {
                     // for testing messages rather than event 
                     // r.RouteToEndpoint(typeof(TestEvent), "TestQueue");

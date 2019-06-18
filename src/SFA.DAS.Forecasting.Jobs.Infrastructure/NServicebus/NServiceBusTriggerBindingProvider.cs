@@ -22,7 +22,7 @@ namespace SFA.DAS.Forecasting.Jobs.Infrastructure.NServicebus
 
             if (string.IsNullOrEmpty(attribute.Connection))
             {
-                attribute.Connection = EnvironmentVariables.NServiceBusConnectionString;
+                attribute.Connection = EnvironmentVariables.ServiceBusConnectionString;
             }
 
             return Task.FromResult<ITriggerBinding>(new NServiceBusTriggerBinding(parameter, attribute));
