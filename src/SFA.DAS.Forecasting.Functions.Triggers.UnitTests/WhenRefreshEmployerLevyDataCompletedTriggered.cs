@@ -21,7 +21,7 @@ namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests
             var message = new RefreshEmployerLevyDataCompletedEvent { AccountId = 123 };
 
             //Act
-            await HandleRefreshEmployerLevyDataCompleted.Run(message, handler.Object, Mock.Of<ILogger>());
+            await HandleRefreshEmployerLevyDataCompleted.Run(message, handler.Object, Mock.Of<ILogger<RefreshEmployerLevyDataCompletedEvent>>());
 
             //Assert
             handler.Verify(s => s.Handle(It.Is<RefreshEmployerLevyDataCompletedEvent>(c => c.AccountId.Equals(message.AccountId))), Times.Once);
