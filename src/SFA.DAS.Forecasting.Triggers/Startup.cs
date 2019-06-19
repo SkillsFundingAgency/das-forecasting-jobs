@@ -7,7 +7,6 @@ using Microsoft.Azure.WebJobs.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using NLog.Extensions.Logging;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.Encoding;
@@ -48,9 +47,14 @@ namespace SFA.DAS.Forecasting.Triggers
                 .AddEnvironmentVariables()
                 .AddAzureTableStorage(o =>
                 {
+                    var configKeys = configuration["ConfigNames"]
+                    .Split(',')
+                    .Select(s => s.Trim())
+                    .ToArray();
+
                     o.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
                     o.EnvironmentName = configuration["EnvironmentName"];
-                    o.ConfigurationKeys = configuration["ConfigNames"].Split(',');
+                    o.ConfigurationKeys = configKeys;
                     o.PreFixConfigurationKeys = false;
                 })
                 .Build();
