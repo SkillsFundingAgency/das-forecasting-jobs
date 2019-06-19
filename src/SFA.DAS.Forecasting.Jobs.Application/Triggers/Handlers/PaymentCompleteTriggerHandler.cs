@@ -51,6 +51,8 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
                 {
                     _logger.LogError($"Failed to trigger Payment PreLoad HttpTriggerFunction for AccountId: { refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: { refreshPaymentDataCompletedEvent.PeriodEnd}. Status Code: {response.StatusCode}");
                 }
+
+                _logger.LogInformation($"Successfully triggered Payment PreLoad HttpTriggerFunction for AccountId: { refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: { refreshPaymentDataCompletedEvent.PeriodEnd}, Status Code: {response.StatusCode}");
             }
             catch (Exception ex)
             {

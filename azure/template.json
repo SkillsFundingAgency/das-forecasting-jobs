@@ -45,6 +45,21 @@
                 "description": "Allowed IP's"
             },
             "defaultValue": []
+        },
+        "serviceBusConnectionString": {
+            "type": "string"
+        },
+        "nServiceBusLicense": {
+            "type": "string"
+        },
+        "loggingRedisConnectionString": {
+            "type": "securestring"
+        },
+        "configurationStorageConnectionString": {
+            "type": "string"
+        },
+        "configNames": {
+            "type": "string"
         }
     },
     "variables": {
@@ -159,6 +174,26 @@
                             {
                                 "name": "EnvironmentName",
                                 "value": "[toUpper(parameters('environmentName'))]"
+                            },
+                            {
+                                "name": "ServiceBusConnectionString",
+                                "value": "[parameters('serviceBusConnectionString')]"
+                            },
+                            {
+                                "name": "NServiceBusLicense",
+                                "value": "[parameters('nServiceBusLicense')]"
+                            },
+                            {
+                                "name": "LoggingRedisConnectionString",
+                                "value": "[parameters('loggingRedisConnectionString')]"
+                            },
+                            {
+                                "name": "ConfigurationStorageConnectionString",
+                                "value": "[parameters('configurationStorageConnectionString')]"
+                            },
+                            {
+                                "name": "ConfigNames",
+                                "value": "[parameters('configNames')]"
                             }
                         ]
                     }
