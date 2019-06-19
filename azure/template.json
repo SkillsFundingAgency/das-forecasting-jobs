@@ -51,6 +51,9 @@
         },
         "nServiceBusLicense": {
             "type": "string"
+        },
+        "loggingRedisConnectionString": {
+            "type": "securestring"
         }
     },
     "variables": {
@@ -173,6 +176,10 @@
                             {
                                 "name": "NServiceBusLicense",
                                 "value": "[parameters('nServiceBusLicense')]"
+                            },
+                            {
+                                "name": "LoggingRedisConnectionString",
+                                "value": "[parameters('loggingRedisConnectionString')]"
                             }
                         ]
                     }
