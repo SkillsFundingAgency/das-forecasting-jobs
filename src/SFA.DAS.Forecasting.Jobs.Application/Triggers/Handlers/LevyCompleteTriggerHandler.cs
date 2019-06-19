@@ -38,7 +38,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
             {
                 var triggerMessage = new AccountLevyCompleteTrigger
                 {
-                    EmployerAccountIds = new List<string> { _encodingService.Encode(refreshEmployerLevyDataCompletedEvent.AccountId,EncodingType.PublicAccountId) },
+                    EmployerAccountIds = new List<string> { _encodingService.Encode(refreshEmployerLevyDataCompletedEvent.AccountId, EncodingType.AccountId) },
                     PeriodYear = refreshEmployerLevyDataCompletedEvent.PeriodYear,
                     PeriodMonth = refreshEmployerLevyDataCompletedEvent.PeriodMonth
                 };
