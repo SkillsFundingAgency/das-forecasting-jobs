@@ -54,6 +54,12 @@
         },
         "loggingRedisConnectionString": {
             "type": "securestring"
+        },
+        "configurationStorageConnectionString": {
+            "type": "string"
+        },
+        "configNames": {
+            "type": "string"
         }
     },
     "variables": {
@@ -180,6 +186,14 @@
                             {
                                 "name": "LoggingRedisConnectionString",
                                 "value": "[parameters('loggingRedisConnectionString')]"
+                            },
+                            {
+                                "name": "ConfigurationStorageConnectionString",
+                                "value": "[parameters('configurationStorageConnectionString')]"
+                            },
+                            {
+                                "name": "ConfigNames",
+                                "value": "[parameters('configNames')]"
                             }
                         ]
                     }
