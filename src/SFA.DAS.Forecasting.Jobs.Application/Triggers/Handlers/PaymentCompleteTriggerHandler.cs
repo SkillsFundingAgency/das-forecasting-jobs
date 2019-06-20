@@ -39,7 +39,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
                 var periodDate = GetPeriodDateFromPeriodId(refreshPaymentDataCompletedEvent.PeriodEnd);
                 var triggerMessage = new PaymentDataCompleteTrigger
                 {
-                    EmployerAccountIds = new List<string> { _encodingService.Encode(refreshPaymentDataCompletedEvent.AccountId, EncodingType.PublicAccountId) },
+                    EmployerAccountIds = new List<string> { _encodingService.Encode(refreshPaymentDataCompletedEvent.AccountId, EncodingType.AccountId) },
                     PeriodYear = periodDate.PeriodYear,
                     PeriodMonth = periodDate.PeriodMonth,
                     PeriodId = refreshPaymentDataCompletedEvent.PeriodEnd
