@@ -20,24 +20,17 @@
                 "description": "Short name of the service. Used for the name of resources created"
             }
         },
-        "appServicePlanSize": {
+        "appServicePlanResourceGroup": {
             "type": "string",
             "metadata": {
-                "description": "Size of the app service plan"
-            },
-            "allowedValues": [
-                "1",
-                "2",
-                "3"
-            ],
-            "defaultValue": "1"
+                "description": "Resource group of the app service plan"
+            }
         },
-        "appServicePlanInstances": {
-            "type": "int",
+        "appServicePlanName": {
+            "type": "string",
             "metadata": {
-                "description": "Number of service plan instances to create"
-            },
-            "defaultValue": 2
+                "description": "Name of the app service plan"
+            }
         },
         "ipSecurityRestrictions": {
             "type": "array",
@@ -64,35 +57,11 @@
     },
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
-        "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
-        "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
+        "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",        
         "functionAppName": "[concat(variables('resourceNamePrefix'),'-fa')]",
         "storageAccountName": "[concat('das',toLower(parameters('resourceEnvironmentName')),toLower(parameters('serviceName')),'str')]"
     },
     "resources": [
-        {
-            "apiVersion": "2017-05-10",
-            "name": "worker-app-service-plan",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-plan.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "appServicePlanName": {
-                        "value": "[variables('appServicePlanName')]"
-                    },
-                    "aspSize": {
-                        "value": "[parameters('appServicePlanSize')]"
-                    },
-                    "aspInstances": {
-                        "value": "[parameters('appServicePlanInstances')]"
-                    }
-                }
-            }
-        },
         {
             "apiVersion": "2017-05-10",
             "name": "function-app-insights",
@@ -145,10 +114,10 @@
                         "value": "[variables('functionAppName')]"
                     },
                     "appServicePlanName": {
-                        "value": "[variables('appServicePlanName')]"
+                        "value": "[parameters('appServicePlanName')]"
                     },
                     "appServicePlanResourceGroup": {
-                        "value": "[resourceGroup().name]"
+                        "value": "[parameters('appServicePlanResourceGroup')]"
                     },
                     "ipSecurityRestrictions": {
                         "value": "[parameters('ipSecurityRestrictions')]"
@@ -200,7 +169,6 @@
                 }
             },
             "dependsOn": [
-                "worker-app-service-plan",
                 "function-app-insights",
                 "storage-account"
             ]
