@@ -21,16 +21,9 @@ namespace SFA.DAS.Forecasting.Triggers
             var convertedMessage = new RefreshEmployerLevyDataCompletedEvent
             {
                 AccountId = message.AccountId,
-                PeriodYear = ConvertDateToPeriodYear(message.Created),
-                PeriodMonth = (short)message.Created.Month
+                Created = message.Created
             };
             await handler.Handle(convertedMessage);
-        }
-
-        private static string ConvertDateToPeriodYear(DateTime date)
-        {
-            return date.Year.ToString().Substring(2, 2) + "-" +
-                   (date.Year + 1).ToString().Substring(2, 2);
         }
     }
 }

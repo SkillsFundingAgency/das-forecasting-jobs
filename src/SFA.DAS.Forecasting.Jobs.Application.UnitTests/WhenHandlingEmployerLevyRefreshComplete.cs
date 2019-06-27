@@ -18,6 +18,7 @@ using SFA.DAS.Forecasting.Jobs.Application.Triggers.Models;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
 {
+    [TestFixture, Parallelizable]
     public class WhenHandlingEmployerLevyRefreshComplete
     {
         private IFixture Fixture => new Fixture();
