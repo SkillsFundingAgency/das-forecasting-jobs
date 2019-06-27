@@ -63,7 +63,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
 
         private string GetTodayPeriodYear(DateTime eventCreatedDate)
         {
-            var twoDigitYear = int.Parse(eventCreatedDate.Year.ToString().Substring(2, 2));
+            var twoDigitYear = int.Parse(eventCreatedDate.ToString("yy"));
             return eventCreatedDate.Month < 4 ? $"{twoDigitYear - 1}-{twoDigitYear}" : $"{twoDigitYear}-{twoDigitYear + 1}";
         }
 
