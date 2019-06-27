@@ -9,7 +9,6 @@ using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Domain.Triggers;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Models;
-using SFA.DAS.Forecasting.Jobs.Infrastructure.Wrappers;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
 {
@@ -19,20 +18,17 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
         private readonly IHttpFunctionClient<AccountLevyCompleteTrigger> _httpClient;
         private readonly ILogger<LevyCompleteTriggerHandler> _logger;
         private readonly IEncodingService _encodingService;
-        private readonly IDateTimeService _dateTimeService;
 
         public LevyCompleteTriggerHandler(
             IOptions<ForecastingJobsConfiguration> configuration,
             IHttpFunctionClient<AccountLevyCompleteTrigger> httpClient,
             IEncodingService encodingService,
-            IDateTimeService dateTimeService,
             ILogger<LevyCompleteTriggerHandler> logger)
         {
             _configuration = configuration;
             _httpClient = httpClient;
             _logger = logger;
             _encodingService = encodingService;
-            _dateTimeService = dateTimeService;
             _httpClient.XFunctionsKey = _configuration.Value.LevyDeclarationPreLoadHttpFunctionXFunctionKey;
         }
 
@@ -40,8 +36,8 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
         {
             try
             {
-                var periodMonth = refreshEmployerLevyDataCompletedEvent.PeriodMonth != 0 ? refreshEmployerLevyDataCompletedEvent.PeriodMonth : GetTodayPeriodMonth();
-                var periodYear = !string.IsNullOrEmpty(refreshEmployerLevyDataCompletedEvent.PeriodYear) ? refreshEmployerLevyDataCompletedEvent.PeriodYear : GetTodayPeriodYear();  
+                var periodMonth = refreshEmployerLevyDataCompletedEvent.PeriodMonth != 0 ? refreshEmployerLevyDataCompletedEvent.PeriodMonth : GetTodayPeriodMonth(refreshEmployerLevyDataCompletedEvent.Created);
+                var periodYear = !string.IsNullOrEmpty(refreshEmployerLevyDataCompletedEvent.PeriodYear) ? refreshEmployerLevyDataCompletedEvent.PeriodYear : GetTodayPeriodYear(refreshEmployerLevyDataCompletedEvent.Created);  
                 var triggerMessage = new AccountLevyCompleteTrigger
                 {
                     EmployerAccountIds = new List<string> { _encodingService.Encode(refreshEmployerLevyDataCompletedEvent.AccountId, EncodingType.AccountId) },
@@ -65,15 +61,15 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
             }
         }
 
-        private string GetTodayPeriodYear()
+        private string GetTodayPeriodYear(DateTime eventCreatedDate)
         {
-            var twoDigitYear = int.Parse(_dateTimeService.UtcNow.Year.ToString().Substring(2, 2));
-            return _dateTimeService.UtcNow.Month < 4 ? $"{twoDigitYear - 1}-{twoDigitYear}" : $"{twoDigitYear}-{twoDigitYear + 1}";
+            var twoDigitYear = int.Parse(eventCreatedDate.Year.ToString().Substring(2, 2));
+            return eventCreatedDate.Month < 4 ? $"{twoDigitYear - 1}-{twoDigitYear}" : $"{twoDigitYear}-{twoDigitYear + 1}";
         }
 
-        private short GetTodayPeriodMonth()
+        private short GetTodayPeriodMonth(DateTime eventCreatedDate)
         {
-            var month = _dateTimeService.UtcNow.Month;
+            var month = eventCreatedDate.Month;
             return (short) (month >= 4 ? month - 3 : month + 9);
         }
     }

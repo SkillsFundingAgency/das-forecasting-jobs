@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoFixture;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
@@ -14,27 +15,25 @@ using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Models;
-using SFA.DAS.Forecasting.Jobs.Infrastructure.Wrappers;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
 {
     public class WhenHandlingEmployerLevyRefreshComplete
     {
+        private IFixture Fixture => new Fixture();
         private ForecastingJobsConfiguration _config;
         private Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>> _httpClientMock;
         private LevyCompleteTriggerHandler _sut;
         private RefreshEmployerLevyDataCompletedEvent _event;
         private Mock<ILogger<LevyCompleteTriggerHandler>> _loggerMock;
         private Mock<IEncodingService> _encodingServiceMock;
-        private Mock<IDateTimeService> _dateTimeServiceMock;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
+             
             _config = new ForecastingJobsConfiguration {LevyDeclarationPreLoadHttpFunctionBaseUrl = "FunctionBaseUrl"};
-            _event = new RefreshEmployerLevyDataCompletedEvent();
-            _dateTimeServiceMock = new Mock<IDateTimeService>();
-            _dateTimeServiceMock.SetupGet(mock => mock.UtcNow).Returns(new DateTime(2019, 1, 1));
+            _event = Fixture.Create<RefreshEmployerLevyDataCompletedEvent>();
         }
 
         [SetUp]
@@ -43,7 +42,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             _loggerMock = new Mock<ILogger<LevyCompleteTriggerHandler>>();
             _httpClientMock = new Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>>();
             _encodingServiceMock = new Mock<IEncodingService>();
-            _sut = new LevyCompleteTriggerHandler(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _dateTimeServiceMock.Object, _loggerMock.Object);
+            _sut = new LevyCompleteTriggerHandler(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _loggerMock.Object);
         }
 
         [Test]
@@ -87,8 +86,8 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         {
             // Arrange
             _event.PeriodMonth = 0;
-            _event.PeriodMonth = 0;
-            _dateTimeServiceMock.SetupGet(mock => mock.UtcNow).Returns(new DateTime(currentYear, currentMonth, 6));
+            _event.PeriodYear = string.Empty;
+            _event.Created = new DateTime(currentYear, currentMonth, 6);
             var actualTrigger = new AccountLevyCompleteTrigger();
 
             _httpClientMock
@@ -117,8 +116,8 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         {
             // Arrange
             _event.PeriodMonth = 0;
-            _event.PeriodMonth = 0;
-            _dateTimeServiceMock.SetupGet(mock => mock.UtcNow).Returns(new DateTime(currentYear, currentMonth, 6));
+            _event.PeriodYear = string.Empty;
+            _event.Created = new DateTime(currentYear, currentMonth, 6);
             var actualTrigger = new AccountLevyCompleteTrigger();
 
             _httpClientMock
