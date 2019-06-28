@@ -34,30 +34,33 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
 
         public async Task Handle(RefreshPaymentDataCompletedEvent refreshPaymentDataCompletedEvent)
         {
-            try
+            if (refreshPaymentDataCompletedEvent.PaymentsProcessed)
             {
-                var periodDate = GetPeriodDateFromPeriodId(refreshPaymentDataCompletedEvent.PeriodEnd);
-                var triggerMessage = new PaymentDataCompleteTrigger
+                try
                 {
-                    EmployerAccountIds = new List<string> { _encodingService.Encode(refreshPaymentDataCompletedEvent.AccountId, EncodingType.AccountId) },
-                    PeriodYear = periodDate.PeriodYear,
-                    PeriodMonth = periodDate.PeriodMonth,
-                    PeriodId = refreshPaymentDataCompletedEvent.PeriodEnd
-                };
+                    var periodDate = GetPeriodDateFromPeriodId(refreshPaymentDataCompletedEvent.PeriodEnd);
+                    var triggerMessage = new PaymentDataCompleteTrigger
+                    {
+                        EmployerAccountIds = new List<string> { _encodingService.Encode(refreshPaymentDataCompletedEvent.AccountId, EncodingType.AccountId) },
+                        PeriodYear = periodDate.PeriodYear,
+                        PeriodMonth = periodDate.PeriodMonth,
+                        PeriodId = refreshPaymentDataCompletedEvent.PeriodEnd
+                    };
 
-                var response = await _httpClient.PostAsync(_configuration.Value.PaymentPreLoadHttpFunctionBaseUrl, triggerMessage);
+                    var response = await _httpClient.PostAsync(_configuration.Value.PaymentPreLoadHttpFunctionBaseUrl, triggerMessage);
 
-                if (!response.IsSuccessStatusCode)
-                {
-                    _logger.LogError($"Failed to trigger Payment PreLoad HttpTriggerFunction for AccountId: { refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: { refreshPaymentDataCompletedEvent.PeriodEnd}. Status Code: {response.StatusCode}");
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        _logger.LogError($"Failed to trigger Payment PreLoad HttpTriggerFunction for AccountId: { refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: { refreshPaymentDataCompletedEvent.PeriodEnd}. Status Code: {response.StatusCode}");
+                    }
+
+                    _logger.LogInformation($"Successfully triggered Payment PreLoad HttpTriggerFunction for AccountId: { refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: { refreshPaymentDataCompletedEvent.PeriodEnd}, Status Code: {response.StatusCode}");
                 }
-
-                _logger.LogInformation($"Successfully triggered Payment PreLoad HttpTriggerFunction for AccountId: { refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: { refreshPaymentDataCompletedEvent.PeriodEnd}, Status Code: {response.StatusCode}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Failed to trigger Payment PreLoad HttpTriggerFunction for AccountId: {refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: {refreshPaymentDataCompletedEvent.PeriodEnd}");
-                throw;
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Failed to trigger Payment PreLoad HttpTriggerFunction for AccountId: {refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: {refreshPaymentDataCompletedEvent.PeriodEnd}");
+                    throw;
+                }
             }
         }
 

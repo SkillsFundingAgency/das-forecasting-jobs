@@ -32,9 +32,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         [OneTimeSetUp]
         public void OneTimeSetup()
         {
-             
             _config = new ForecastingJobsConfiguration {LevyDeclarationPreLoadHttpFunctionBaseUrl = "FunctionBaseUrl"};
-            _event = Fixture.Create<RefreshEmployerLevyDataCompletedEvent>();
         }
 
         [SetUp]
@@ -44,6 +42,26 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             _httpClientMock = new Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>>();
             _encodingServiceMock = new Mock<IEncodingService>();
             _sut = new LevyCompleteTriggerHandler(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _loggerMock.Object);
+
+            _event = Fixture
+                .Build<RefreshEmployerLevyDataCompletedEvent>()
+                .With(e => e.LevyImported, true)
+                .Create();
+        }
+
+        [Test]
+        [Category("UnitTest")]
+        public async Task If_No_Levy_Calculated_Should_Not_Trigger_Forecast()
+        {
+            // Arrange
+            _event.LevyImported = false;
+            _httpClientMock.Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<AccountLevyCompleteTrigger>())).ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+
+            // Act
+            await _sut.Handle(_event);
+
+            // Assert
+            _httpClientMock.Verify(mock => mock.PostAsync(It.Is<string>(x => x == _config.LevyDeclarationPreLoadHttpFunctionBaseUrl), It.IsAny<AccountLevyCompleteTrigger>()), Times.Never);
         }
 
         [Test]
