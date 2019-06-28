@@ -2,6 +2,8 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoFixture;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
 using Microsoft.Extensions.Options;
@@ -16,8 +18,10 @@ using SFA.DAS.Forecasting.Jobs.Application.Triggers.Models;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
 {
+    [TestFixture, Parallelizable]
     public class WhenHandlingEmployerLevyRefreshComplete
     {
+        private IFixture Fixture => new Fixture();
         private ForecastingJobsConfiguration _config;
         private Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>> _httpClientMock;
         private LevyCompleteTriggerHandler _sut;
@@ -29,7 +33,6 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         public void OneTimeSetup()
         {
             _config = new ForecastingJobsConfiguration {LevyDeclarationPreLoadHttpFunctionBaseUrl = "FunctionBaseUrl"};
-            _event = new RefreshEmployerLevyDataCompletedEvent();
         }
 
         [SetUp]
@@ -39,6 +42,26 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             _httpClientMock = new Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>>();
             _encodingServiceMock = new Mock<IEncodingService>();
             _sut = new LevyCompleteTriggerHandler(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _loggerMock.Object);
+
+            _event = Fixture
+                .Build<RefreshEmployerLevyDataCompletedEvent>()
+                .With(e => e.LevyImported, true)
+                .Create();
+        }
+
+        [Test]
+        [Category("UnitTest")]
+        public async Task If_No_Levy_Calculated_Should_Not_Trigger_Forecast()
+        {
+            // Arrange
+            _event.LevyImported = false;
+            _httpClientMock.Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<AccountLevyCompleteTrigger>())).ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+
+            // Act
+            await _sut.Handle(_event);
+
+            // Assert
+            _httpClientMock.Verify(mock => mock.PostAsync(It.Is<string>(x => x == _config.LevyDeclarationPreLoadHttpFunctionBaseUrl), It.IsAny<AccountLevyCompleteTrigger>()), Times.Never);
         }
 
         [Test]
@@ -57,7 +80,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
 
         [Test]
         [Category("UnitTest")]
-        public async Task If_Trigger_Errors_Should_Log_Error()
+        public void If_Trigger_Errors_Should_Log_Error()
         {
             // Arrange
             _httpClientMock.Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<AccountLevyCompleteTrigger>())).ThrowsAsync(new Exception("Its Broken"));
@@ -69,6 +92,66 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             _loggerMock.Verify(
                 x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(), It.Is<Exception>(e => e.Message == "Its Broken"),
                     It.IsAny<Func<object, Exception, string>>()), Times.Once);
+        }
+
+        [Test]
+        [Category("UnitTest")]
+        [TestCase(4, 2019, 1)]
+        [TestCase(5, 2019, 2)]
+        [TestCase(1, 2020, 10)]
+        [TestCase(4, 2020, 1)]
+
+        public async Task If_No_PeriodMonth_Should_Calculate_Today_Month(int currentMonth, int currentYear, short expectedPeriodMonth)
+        {
+            // Arrange
+            _event.PeriodMonth = 0;
+            _event.PeriodYear = string.Empty;
+            _event.Created = new DateTime(currentYear, currentMonth, 6);
+            var actualTrigger = new AccountLevyCompleteTrigger();
+
+            _httpClientMock
+                .Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<AccountLevyCompleteTrigger>()))
+                .Callback((string url, AccountLevyCompleteTrigger trigger) => 
+                {
+                    actualTrigger = trigger;
+                })
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+
+            // Act
+            await _sut.Handle(_event);
+
+            // Assert
+            actualTrigger.PeriodMonth.Should().Be(expectedPeriodMonth);
+        }
+
+        [Test]
+        [Category("UnitTest")]
+        [TestCase(4, 2019, "19-20")]
+        [TestCase(5, 2019, "19-20")]
+        [TestCase(1, 2020, "19-20")]
+        [TestCase(4, 2020, "20-21")]
+
+        public async Task If_No_PeriodYear_Should_Calculate_Today_Year(int currentMonth, int currentYear, string expectedPeriodYear)
+        {
+            // Arrange
+            _event.PeriodMonth = 0;
+            _event.PeriodYear = string.Empty;
+            _event.Created = new DateTime(currentYear, currentMonth, 6);
+            var actualTrigger = new AccountLevyCompleteTrigger();
+
+            _httpClientMock
+                .Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<AccountLevyCompleteTrigger>()))
+                .Callback((string url, AccountLevyCompleteTrigger trigger) =>
+                {
+                    actualTrigger = trigger;
+                })
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+
+            // Act
+            await _sut.Handle(_event);
+
+            // Assert
+            actualTrigger.PeriodYear.Should().Be(expectedPeriodYear);
         }
 
         [Test]

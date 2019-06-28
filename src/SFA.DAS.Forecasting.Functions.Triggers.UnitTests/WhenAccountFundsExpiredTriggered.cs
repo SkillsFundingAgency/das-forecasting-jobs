@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
@@ -10,7 +9,7 @@ using SFA.DAS.Forecasting.Triggers;
 
 namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests
 {
-    [TestFixture]
+    [TestFixture, Parallelizable]
     public class WhenAccountFundsExpiredTriggered
     {
 
@@ -19,41 +18,17 @@ namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests
         public async Task Then_Message_Will_Be_Handled()
         {
             //Arrange
+            var createdDate = DateTime.Now;
             var handler = new Mock<ILevyCompleteTriggerHandler>();
-            var message = new AccountFundsExpiredEvent {AccountId = 123,Created = DateTime.Now};
+            var message = new AccountFundsExpiredEvent {AccountId = 123,Created = createdDate};
 
             //Act
             await HandleAccountFundsExpiredEvent.Run(message, handler.Object, Mock.Of<ILogger<AccountFundsExpiredEvent>>());
 
             //Assert
             handler.Verify(
-                s => s.Handle(It.Is<RefreshEmployerLevyDataCompletedEvent>(c => c.AccountId.Equals(message.AccountId))),
+                s => s.Handle(It.Is<RefreshEmployerLevyDataCompletedEvent>(c => c.AccountId.Equals(message.AccountId) && c.Created == message.Created)),
                 Times.Once);
-        }
-
-        [Test]
-        [Category("UnitTest")]
-        [TestCase("01/01/2019", "19-20")]
-        [TestCase("01/01/2000", "00-01")]
-        [TestCase("01/01/2099", "99-00")]
-        public async Task Then_Period_Year_Is_Properly_Created(DateTime date, string expectedPeriodYear)
-        {
-            //Arrange
-            var message = new AccountFundsExpiredEvent {AccountId = 123, Created = date};
-            var handler = new Mock<ILevyCompleteTriggerHandler>();
-            string res = "";
-            handler.Setup(mock => mock.Handle(It.IsAny<RefreshEmployerLevyDataCompletedEvent>()))
-                .Returns(Task.CompletedTask)
-                .Callback((RefreshEmployerLevyDataCompletedEvent @event) =>
-            {
-                res =  @event.PeriodYear;
-            });
-
-            //Act
-            await HandleAccountFundsExpiredEvent.Run(message, handler.Object, Mock.Of<ILogger<AccountFundsExpiredEvent>>());
-
-            //Assert
-            res.Should().Be(expectedPeriodYear);
         }
     }
 }

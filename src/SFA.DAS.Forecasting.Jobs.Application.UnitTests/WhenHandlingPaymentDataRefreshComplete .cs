@@ -2,6 +2,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using AutoFixture;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Internal;
@@ -12,7 +13,6 @@ using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
-using SFA.DAS.Forecasting.Domain.Triggers;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Models;
 
@@ -20,6 +20,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
 {
     public class WhenHandlingPaymentDataRefreshComplete
     {
+        private IFixture Fixture => new Fixture();
         private ForecastingJobsConfiguration _config;
         private Mock<IHttpFunctionClient<PaymentDataCompleteTrigger>> _httpClientMock;
         private PaymentCompleteTriggerHandler _sut;
@@ -31,11 +32,6 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         public void OneTimeSetup()
         {
             _config = new ForecastingJobsConfiguration {PaymentPreLoadHttpFunctionBaseUrl = "FunctionBaseUrl"};
-            _event = new RefreshPaymentDataCompletedEvent
-            {
-                AccountId = 1,
-                PeriodEnd = "1920-R01"
-            };
         }
 
         [SetUp]
@@ -45,14 +41,38 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             _httpClientMock = new Mock<IHttpFunctionClient<PaymentDataCompleteTrigger>>();
             _encodingServiceMock = new Mock<IEncodingService>();
             _sut = new PaymentCompleteTriggerHandler(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _loggerMock.Object);
+            _event = Fixture
+                .Build<RefreshPaymentDataCompletedEvent>()
+                .With(e => e.PaymentsProcessed, true)
+                .With(e => e.PeriodEnd, "1819-R10")
+                .Create();
         }
 
         [Test]
         [Category("UnitTest")]
-        public async Task Should_Trigger_Levy_Forecast()
+        public async Task If_No_Payments_Processed_Should_Not_Trigger_Forecast()
         {
             // Arrange
-            _httpClientMock.Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<PaymentDataCompleteTrigger>())).ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+            _event.PaymentsProcessed = false;
+            _httpClientMock
+                .Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<PaymentDataCompleteTrigger>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
+
+            // Act
+            await _sut.Handle(_event);
+
+            // Assert
+            _httpClientMock.Verify(mock => mock.PostAsync(It.Is<string>(x => x == _config.LevyDeclarationPreLoadHttpFunctionBaseUrl), It.IsAny<PaymentDataCompleteTrigger>()), Times.Never);
+        }
+
+        [Test]
+        [Category("UnitTest")]
+        public async Task Should_Trigger_Payment_Forecast()
+        {
+            // Arrange
+            _httpClientMock
+                .Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<PaymentDataCompleteTrigger>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
 
             // Act
             await _sut.Handle(_event);
@@ -63,10 +83,12 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
 
         [Test]
         [Category("UnitTest")]
-        public async Task If_Trigger_Errors_Should_Log_Error()
+        public void If_Trigger_Errors_Should_Log_Error()
         {
             // Arrange
-            _httpClientMock.Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<PaymentDataCompleteTrigger>())).ThrowsAsync(new Exception("Its Broken"));
+            _httpClientMock
+                .Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<PaymentDataCompleteTrigger>()))
+                .ThrowsAsync(new Exception("Its Broken"));
 
             // Act
 
@@ -86,7 +108,9 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         public async Task If_Http_Call_Unsuccesful_Should_Log_Error(HttpStatusCode statusCode)
         {
             // Arrange
-            _httpClientMock.Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<PaymentDataCompleteTrigger>())).ReturnsAsync(new HttpResponseMessage { StatusCode = statusCode });
+            _httpClientMock
+                .Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<PaymentDataCompleteTrigger>()))
+                .ReturnsAsync(new HttpResponseMessage { StatusCode = statusCode });
 
             // Act
             await _sut.Handle(_event);

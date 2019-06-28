@@ -34,13 +34,20 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
 
         public async Task Handle(RefreshEmployerLevyDataCompletedEvent refreshEmployerLevyDataCompletedEvent)
         {
+            if (!refreshEmployerLevyDataCompletedEvent.LevyImported)
+            {
+                return;
+            }
+
             try
             {
+                var periodMonth = refreshEmployerLevyDataCompletedEvent.PeriodMonth != 0 ? refreshEmployerLevyDataCompletedEvent.PeriodMonth : GetTodayPeriodMonth(refreshEmployerLevyDataCompletedEvent.Created);
+                var periodYear = !string.IsNullOrEmpty(refreshEmployerLevyDataCompletedEvent.PeriodYear) ? refreshEmployerLevyDataCompletedEvent.PeriodYear : GetTodayPeriodYear(refreshEmployerLevyDataCompletedEvent.Created);
                 var triggerMessage = new AccountLevyCompleteTrigger
                 {
                     EmployerAccountIds = new List<string> { _encodingService.Encode(refreshEmployerLevyDataCompletedEvent.AccountId, EncodingType.AccountId) },
-                    PeriodYear = refreshEmployerLevyDataCompletedEvent.PeriodYear,
-                    PeriodMonth = refreshEmployerLevyDataCompletedEvent.PeriodMonth
+                    PeriodYear = periodYear,
+                    PeriodMonth = periodMonth
                 };
 
                 var response = await _httpClient.PostAsync(_configuration.Value.LevyDeclarationPreLoadHttpFunctionBaseUrl, triggerMessage);
@@ -57,6 +64,18 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
                 _logger.LogError(ex, $"Failed to trigger Levy PreLoad HttpTriggerFunction for AccountId: {refreshEmployerLevyDataCompletedEvent.AccountId}, PeriodMonth: {refreshEmployerLevyDataCompletedEvent.PeriodMonth}, PeriodYear: {refreshEmployerLevyDataCompletedEvent.PeriodYear}");
                 throw;
             }
+        }
+
+        private string GetTodayPeriodYear(DateTime eventCreatedDate)
+        {
+            var twoDigitYear = int.Parse(eventCreatedDate.ToString("yy"));
+            return eventCreatedDate.Month < 4 ? $"{twoDigitYear - 1}-{twoDigitYear}" : $"{twoDigitYear}-{twoDigitYear + 1}";
+        }
+
+        private short GetTodayPeriodMonth(DateTime eventCreatedDate)
+        {
+            var month = eventCreatedDate.Month;
+            return (short)(month >= 4 ? month - 3 : month + 9);
         }
     }
 }

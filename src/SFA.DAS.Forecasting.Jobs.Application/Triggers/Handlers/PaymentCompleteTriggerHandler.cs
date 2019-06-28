@@ -34,6 +34,11 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
 
         public async Task Handle(RefreshPaymentDataCompletedEvent refreshPaymentDataCompletedEvent)
         {
+            if (!refreshPaymentDataCompletedEvent.PaymentsProcessed)
+            {
+                return;
+            }
+
             try
             {
                 var periodDate = GetPeriodDateFromPeriodId(refreshPaymentDataCompletedEvent.PeriodEnd);
@@ -63,7 +68,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
 
         private static (int PeriodMonth, int PeriodYear) GetPeriodDateFromPeriodId(string periodId)
         {
-            var periodYear = int.Parse("20"+periodId.Substring(0, 2));
+            var periodYear = int.Parse("20" + periodId.Substring(0, 2));
             var periodIdMonthAsInt = int.Parse(periodId.Substring(6, 2));
             var periodMonth = periodIdMonthAsInt > 5 ? periodIdMonthAsInt - 5 : periodIdMonthAsInt + 7;
 
