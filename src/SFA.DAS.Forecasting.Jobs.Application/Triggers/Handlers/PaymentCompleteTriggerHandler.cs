@@ -34,39 +34,41 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
 
         public async Task Handle(RefreshPaymentDataCompletedEvent refreshPaymentDataCompletedEvent)
         {
-            if (refreshPaymentDataCompletedEvent.PaymentsProcessed)
+            if (!refreshPaymentDataCompletedEvent.PaymentsProcessed)
             {
-                try
+                return;
+            }
+
+            try
+            {
+                var periodDate = GetPeriodDateFromPeriodId(refreshPaymentDataCompletedEvent.PeriodEnd);
+                var triggerMessage = new PaymentDataCompleteTrigger
                 {
-                    var periodDate = GetPeriodDateFromPeriodId(refreshPaymentDataCompletedEvent.PeriodEnd);
-                    var triggerMessage = new PaymentDataCompleteTrigger
-                    {
-                        EmployerAccountIds = new List<string> { _encodingService.Encode(refreshPaymentDataCompletedEvent.AccountId, EncodingType.AccountId) },
-                        PeriodYear = periodDate.PeriodYear,
-                        PeriodMonth = periodDate.PeriodMonth,
-                        PeriodId = refreshPaymentDataCompletedEvent.PeriodEnd
-                    };
+                    EmployerAccountIds = new List<string> { _encodingService.Encode(refreshPaymentDataCompletedEvent.AccountId, EncodingType.AccountId) },
+                    PeriodYear = periodDate.PeriodYear,
+                    PeriodMonth = periodDate.PeriodMonth,
+                    PeriodId = refreshPaymentDataCompletedEvent.PeriodEnd
+                };
 
-                    var response = await _httpClient.PostAsync(_configuration.Value.PaymentPreLoadHttpFunctionBaseUrl, triggerMessage);
+                var response = await _httpClient.PostAsync(_configuration.Value.PaymentPreLoadHttpFunctionBaseUrl, triggerMessage);
 
-                    if (!response.IsSuccessStatusCode)
-                    {
-                        _logger.LogError($"Failed to trigger Payment PreLoad HttpTriggerFunction for AccountId: { refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: { refreshPaymentDataCompletedEvent.PeriodEnd}. Status Code: {response.StatusCode}");
-                    }
-
-                    _logger.LogInformation($"Successfully triggered Payment PreLoad HttpTriggerFunction for AccountId: { refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: { refreshPaymentDataCompletedEvent.PeriodEnd}, Status Code: {response.StatusCode}");
-                }
-                catch (Exception ex)
+                if (!response.IsSuccessStatusCode)
                 {
-                    _logger.LogError(ex, $"Failed to trigger Payment PreLoad HttpTriggerFunction for AccountId: {refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: {refreshPaymentDataCompletedEvent.PeriodEnd}");
-                    throw;
+                    _logger.LogError($"Failed to trigger Payment PreLoad HttpTriggerFunction for AccountId: { refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: { refreshPaymentDataCompletedEvent.PeriodEnd}. Status Code: {response.StatusCode}");
                 }
+
+                _logger.LogInformation($"Successfully triggered Payment PreLoad HttpTriggerFunction for AccountId: { refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: { refreshPaymentDataCompletedEvent.PeriodEnd}, Status Code: {response.StatusCode}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Failed to trigger Payment PreLoad HttpTriggerFunction for AccountId: {refreshPaymentDataCompletedEvent.AccountId}, PeriodEnd: {refreshPaymentDataCompletedEvent.PeriodEnd}");
+                throw;
             }
         }
 
         private static (int PeriodMonth, int PeriodYear) GetPeriodDateFromPeriodId(string periodId)
         {
-            var periodYear = int.Parse("20"+periodId.Substring(0, 2));
+            var periodYear = int.Parse("20" + periodId.Substring(0, 2));
             var periodIdMonthAsInt = int.Parse(periodId.Substring(6, 2));
             var periodMonth = periodIdMonthAsInt > 5 ? periodIdMonthAsInt - 5 : periodIdMonthAsInt + 7;
 
