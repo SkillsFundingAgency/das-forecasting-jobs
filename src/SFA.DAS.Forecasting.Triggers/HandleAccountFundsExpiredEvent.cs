@@ -21,7 +21,9 @@ namespace SFA.DAS.Forecasting.Triggers
             var convertedMessage = new RefreshEmployerLevyDataCompletedEvent
             {
                 AccountId = message.AccountId,
-                Created = message.Created
+                Created = message.Created,
+                // Allow forecasting to be triggered for Expiry event
+                LevyImported = true
             };
             await handler.Handle(convertedMessage);
         }
