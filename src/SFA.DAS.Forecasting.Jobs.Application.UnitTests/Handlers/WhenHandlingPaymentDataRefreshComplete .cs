@@ -1,11 +1,6 @@
-using System;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Internal;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerFinance.Messages.Events;
