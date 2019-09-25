@@ -15,17 +15,18 @@ using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Models;
+using SFA.DAS.Forecasting.Jobs.Application.Triggers.Services;
 
-namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
+namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
 {
-    public class WhenHandlingPaymentDataRefreshComplete
+    public class WhenTiggeringPaymentForecast
     {
         private IFixture Fixture => new Fixture();
         private ForecastingJobsConfiguration _config;
         private Mock<IHttpFunctionClient<PaymentDataCompleteTrigger>> _httpClientMock;
-        private PaymentCompleteTriggerHandler _sut;
+        private PaymentForecastService _sut;
         private RefreshPaymentDataCompletedEvent _event;
-        private Mock<ILogger<PaymentCompleteTriggerHandler>> _loggerMock;
+        private Mock<ILogger<PaymentForecastService>> _loggerMock;
         private Mock<IEncodingService> _encodingServiceMock;
 
         [OneTimeSetUp]
@@ -37,32 +38,10 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         [SetUp]
         public void SetUp()
         {
-            _loggerMock = new Mock<ILogger<PaymentCompleteTriggerHandler>>();
+            _loggerMock = new Mock<ILogger<PaymentForecastService>>();
             _httpClientMock = new Mock<IHttpFunctionClient<PaymentDataCompleteTrigger>>();
             _encodingServiceMock = new Mock<IEncodingService>();
-            _sut = new PaymentCompleteTriggerHandler(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _loggerMock.Object);
-            _event = Fixture
-                .Build<RefreshPaymentDataCompletedEvent>()
-                .With(e => e.PaymentsProcessed, true)
-                .With(e => e.PeriodEnd, "1819-R10")
-                .Create();
-        }
-
-        [Test]
-        [Category("UnitTest")]
-        public async Task If_No_Payments_Processed_Should_Not_Trigger_Forecast()
-        {
-            // Arrange
-            _event.PaymentsProcessed = false;
-            _httpClientMock
-                .Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<PaymentDataCompleteTrigger>()))
-                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
-
-            // Act
-            await _sut.Handle(_event);
-
-            // Assert
-            _httpClientMock.Verify(mock => mock.PostAsync(It.Is<string>(x => x == _config.LevyDeclarationPreLoadHttpFunctionBaseUrl), It.IsAny<PaymentDataCompleteTrigger>()), Times.Never);
+            _sut = new PaymentForecastService(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _loggerMock.Object);
         }
 
         [Test]
@@ -75,7 +54,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
                 .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
 
             // Act
-            await _sut.Handle(_event);
+            await _sut.TriggerPaymentForecast(1, 19, "18-19R10", 1);
 
             // Assert
             _httpClientMock.Verify(mock => mock.PostAsync(It.Is<string>(x => x == _config.PaymentPreLoadHttpFunctionBaseUrl), It.IsAny<PaymentDataCompleteTrigger>()), Times.Once);
@@ -93,7 +72,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             // Act
 
             // Assert
-            Assert.ThrowsAsync<Exception>(() => _sut.Handle(_event));
+            Assert.ThrowsAsync<Exception>(() => _sut.TriggerPaymentForecast(1, 19, "18-19R10", 1));
             _loggerMock.Verify(
                 x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(), It.Is<Exception>(e => e.Message == "Its Broken"),
                     It.IsAny<Func<object, Exception, string>>()), Times.Once);
@@ -113,38 +92,12 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
                 .ReturnsAsync(new HttpResponseMessage { StatusCode = statusCode });
 
             // Act
-            await _sut.Handle(_event);
+            await _sut.TriggerPaymentForecast(1, 19, "18-19R10", 1);
 
             // Assert
             _loggerMock.Verify(
                x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(), It.IsAny<Exception>(),
                    It.IsAny<Func<object, Exception, string>>()), Times.Once);
-        }
-
-        [Test]
-        [Category("UnitTest")]
-        [TestCase("1920-R01",2019,8)]
-        [TestCase("1718-R12",2017,7)]
-        [TestCase("9899-R05",2098,12)]
-        [TestCase("0001-R06",2000,1)]
-        public async Task ShouldTranslatePeriodEndCorrectly(string periodEnd,int expectedYear,int expectedMonth)
-        {
-            // Arrange 
-            _event.PeriodEnd = periodEnd;
-            PaymentDataCompleteTrigger res = new PaymentDataCompleteTrigger();
-            _httpClientMock.Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<PaymentDataCompleteTrigger>()))
-                .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK})
-                .Callback((string url, PaymentDataCompleteTrigger trigger) =>
-                {
-                    res = trigger;
-                });
-
-            //Act
-            await _sut.Handle(_event);
-
-            //Assert
-            res.PeriodMonth.Should().Be(expectedMonth);
-            res.PeriodYear.Should().Be(expectedYear);
         }
     }
 }
