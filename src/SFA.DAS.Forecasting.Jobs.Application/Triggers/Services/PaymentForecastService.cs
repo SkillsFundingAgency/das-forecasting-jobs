@@ -6,11 +6,12 @@ using Microsoft.Extensions.Options;
 using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
+using SFA.DAS.Forecasting.Domain.Services;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Models;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Services
 {
-    public class PaymentForecastService
+    public class PaymentForecastService : IPaymentForecastService
     {
         private ForecastingJobsConfiguration _configuration;
         private IHttpFunctionClient<PaymentDataCompleteTrigger> _httpFunctionClient;
