@@ -47,6 +47,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Services
                 if (!response.IsSuccessStatusCode)
                 {
                     _logger.LogError($"Failed to trigger Levy PreLoad HttpTriggerFunction for AccountId: { accountId }, PeriodMonth: { periodMonth }, PeriodYear: { periodYear }. Status Code: {response.StatusCode}");
+                    throw new Exception($"Status Code: {response.StatusCode}, reason: {response.ReasonPhrase}");
                 }
 
                 _logger.LogInformation($"Successfully triggered Levy HttpTriggerFunction for AccountId: { accountId }, PeriodMonth: { periodMonth }, PeriodYear: { periodYear }. Status Code: {response.StatusCode}");
