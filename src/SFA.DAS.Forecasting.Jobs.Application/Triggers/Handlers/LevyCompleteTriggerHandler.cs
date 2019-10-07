@@ -30,7 +30,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
                 ? refreshEmployerLevyDataCompletedEvent.PeriodYear 
                 : GetTodayPeriodYear(refreshEmployerLevyDataCompletedEvent.Created);
 
-            await _triggerLevyForecastService.TriggerLevyForecast(periodMonth, periodYear, refreshEmployerLevyDataCompletedEvent.AccountId);
+            await _triggerLevyForecastService.Trigger(periodMonth, periodYear, refreshEmployerLevyDataCompletedEvent.AccountId);
         }
 
         private string GetTodayPeriodYear(DateTime eventCreatedDate)

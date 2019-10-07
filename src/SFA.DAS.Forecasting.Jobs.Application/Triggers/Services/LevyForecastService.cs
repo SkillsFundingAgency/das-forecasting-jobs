@@ -31,7 +31,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Services
             _httpClient.XFunctionsKey = _configuration.Value.LevyDeclarationPreLoadHttpFunctionXFunctionKey;
         }
 
-        public async Task TriggerLevyForecast(short periodMonth, string periodYear, long accountId)
+        public async Task Trigger(short periodMonth, string periodYear, long accountId)
         {
             try
             {

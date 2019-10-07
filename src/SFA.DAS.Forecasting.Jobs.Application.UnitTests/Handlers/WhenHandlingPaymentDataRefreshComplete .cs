@@ -40,7 +40,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             await _sut.Handle(_event);
 
             // Assert
-            _paymentForecastServiceMock.Verify(mock => mock.TriggerPaymentForecast(It.IsAny<short>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<long>()), Times.Never);
+            _paymentForecastServiceMock.Verify(mock => mock.Trigger(It.IsAny<short>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<long>()), Times.Never);
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             await _sut.Handle(_event);
 
             // Assert
-            _paymentForecastServiceMock.Verify(mock => mock.TriggerPaymentForecast(It.IsAny<short>(), It.IsAny<int>(),  It.IsAny<string>(), It.IsAny<long>()), Times.Once);
+            _paymentForecastServiceMock.Verify(mock => mock.Trigger(It.IsAny<short>(), It.IsAny<int>(),  It.IsAny<string>(), It.IsAny<long>()), Times.Once);
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             PaymentDataCompleteTrigger res = new PaymentDataCompleteTrigger();
 
             _paymentForecastServiceMock
-                .Setup(mock => mock.TriggerPaymentForecast(It.IsAny<short>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<long>()))
+                .Setup(mock => mock.Trigger(It.IsAny<short>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<long>()))
                 .Callback((short periodMonth, int periodYear, string callbackPeriodEnd, long accountId) =>
                 {
                     actualPeriodMonth = periodMonth;
@@ -100,7 +100,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             PaymentDataCompleteTrigger res = new PaymentDataCompleteTrigger();
 
             _paymentForecastServiceMock
-                .Setup(mock => mock.TriggerPaymentForecast(It.IsAny<short>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<long>()))
+                .Setup(mock => mock.Trigger(It.IsAny<short>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<long>()))
                 .Callback((short periodMonth, int periodYear, string callbackPeriodEnd, long accountId) =>
                 {
                     actualPeriodYear = periodYear;

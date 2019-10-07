@@ -30,7 +30,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Services
             _logger = logger;
         }
 
-        public async Task TriggerPaymentForecast(short periodMonth, int periodYear, string periodEnd, long accountId)
+        public async Task Trigger(short periodMonth, int periodYear, string periodEnd, long accountId)
         {
             try
             {

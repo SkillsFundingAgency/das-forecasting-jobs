@@ -23,7 +23,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
 
             var periodEndDates = GetPeriodDateFromPeriodId(refreshPaymentDataCompletedEvent.PeriodEnd);
 
-            await _paymentForecastService.TriggerPaymentForecast(
+            await _paymentForecastService.Trigger(
                 periodEndDates.PeriodMonth, 
                 periodEndDates.PeriodYear,
                 refreshPaymentDataCompletedEvent.PeriodEnd,

@@ -54,7 +54,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
                 .ReturnsAsync(new HttpResponseMessage { StatusCode = HttpStatusCode.OK });
 
             // Act
-            await _sut.TriggerPaymentForecast(1, 19, "18-19R10", 1);
+            await _sut.Trigger(1, 19, "18-19R10", 1);
 
             // Assert
             _httpClientMock.Verify(mock => mock.PostAsync(It.Is<string>(x => x == _config.PaymentPreLoadHttpFunctionBaseUrl), It.IsAny<PaymentDataCompleteTrigger>()), Times.Once);
@@ -72,7 +72,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
             // Act
 
             // Assert
-            Assert.ThrowsAsync<Exception>(() => _sut.TriggerPaymentForecast(1, 19, "18-19R10", 1));
+            Assert.ThrowsAsync<Exception>(() => _sut.Trigger(1, 19, "18-19R10", 1));
             _loggerMock.Verify(
                 x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(), It.Is<Exception>(e => e.Message == "Its Broken"),
                     It.IsAny<Func<object, Exception, string>>()), Times.Once);
@@ -92,7 +92,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
                 .ReturnsAsync(new HttpResponseMessage { StatusCode = statusCode });
 
             // Act
-            await _sut.TriggerPaymentForecast(1, 19, "18-19R10", 1);
+            await _sut.Trigger(1, 19, "18-19R10", 1);
 
             // Assert
             _loggerMock.Verify(

@@ -42,7 +42,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             await _sut.Handle(_event);
 
             // Assert
-            _levyForecastServiceMock.Verify(mock => mock.TriggerLevyForecast(It.IsAny<short>(), It.IsAny<string>(), It.IsAny<long>()), Times.Never);
+            _levyForecastServiceMock.Verify(mock => mock.Trigger(It.IsAny<short>(), It.IsAny<string>(), It.IsAny<long>()), Times.Never);
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             await _sut.Handle(_event);
 
             // Assert
-            _levyForecastServiceMock.Verify(mock => mock.TriggerLevyForecast(_event.PeriodMonth, _event.PeriodYear, _event.AccountId), Times.Once);
+            _levyForecastServiceMock.Verify(mock => mock.Trigger(_event.PeriodMonth, _event.PeriodYear, _event.AccountId), Times.Once);
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             short actualPeriodMonth = 0;
 
             _levyForecastServiceMock
-                .Setup(mock => mock.TriggerLevyForecast(It.IsAny<short>(), It.IsAny<string>(), It.IsAny<long>()))
+                .Setup(mock => mock.Trigger(It.IsAny<short>(), It.IsAny<string>(), It.IsAny<long>()))
                 .Callback((short periodMonth, string periodYear, long accountId) =>
                 {
                     actualPeriodMonth = periodMonth;
@@ -104,7 +104,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             string actualPeriodYear = string.Empty;
 
             _levyForecastServiceMock
-                .Setup(mock => mock.TriggerLevyForecast(It.IsAny<short>(), It.IsAny<string>(), It.IsAny<long>()))
+                .Setup(mock => mock.Trigger(It.IsAny<short>(), It.IsAny<string>(), It.IsAny<long>()))
                 .Callback((short periodMonth, string periodYear, long accountId) =>
                 {
                     actualPeriodYear = periodYear;
