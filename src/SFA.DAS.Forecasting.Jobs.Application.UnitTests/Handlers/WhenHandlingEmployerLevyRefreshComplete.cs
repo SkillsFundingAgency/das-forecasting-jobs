@@ -42,7 +42,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             await _sut.Handle(_event);
 
             // Assert
-            _levyForecastServiceMock.Verify(mock => mock.TriggerLevyForecast(_event.PeriodMonth, _event.PeriodYear, _event.AccountId), Times.Never);
+            _levyForecastServiceMock.Verify(mock => mock.TriggerLevyForecast(It.IsAny<short>(), It.IsAny<string>(), It.IsAny<long>()), Times.Never);
         }
 
         [Test]
