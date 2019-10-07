@@ -12,9 +12,11 @@ using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
+using SFA.DAS.Forecasting.Domain.Services;
 using SFA.DAS.Forecasting.Domain.Triggers;
 using SFA.DAS.Forecasting.Jobs.Application.Services;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
+using SFA.DAS.Forecasting.Jobs.Application.Triggers.Services;
 using SFA.DAS.Forecasting.Jobs.Infrastructure.DependencyInjection;
 using SFA.DAS.Forecasting.Jobs.Infrastructure.Logging;
 using SFA.DAS.Forecasting.Jobs.Infrastructure.NServicebus;
@@ -96,6 +98,8 @@ namespace SFA.DAS.Forecasting.Triggers
 
             services.AddSingleton<ILevyCompleteTriggerHandler, LevyCompleteTriggerHandler>();
             services.AddSingleton<IRefreshPaymentDataCompletedTriggerHandler, PaymentCompleteTriggerHandler>();
+            services.AddSingleton<ILevyForecastService, LevyForecastService>();
+            services.AddSingleton<IPaymentForecastService, PaymentForecastService>();
             services.AddSingleton(typeof(IHttpFunctionClient<>), typeof(HttpFunctionClient<>));
             //services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
