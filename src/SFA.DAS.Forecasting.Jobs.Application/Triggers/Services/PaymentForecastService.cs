@@ -47,7 +47,6 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Services
                 if (!response.IsSuccessStatusCode)
                 {
                     _logger.LogError($"Failed to trigger Payment PreLoad HttpTriggerFunction for AccountId: { accountId}, PeriodEnd: { periodEnd}. Status Code: {response.StatusCode}");
-                    throw new Exception($"Status Code: {response.StatusCode}, reason: {response.ReasonPhrase}");
                 }
 
                 _logger.LogInformation($"Successfully triggered Payment PreLoad HttpTriggerFunction for AccountId: { accountId}, PeriodEnd: { periodEnd}, Status Code: {response.StatusCode}");
