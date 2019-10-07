@@ -84,7 +84,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
         [TestCase(HttpStatusCode.Unauthorized)]
         [TestCase(HttpStatusCode.NotFound)]
         [TestCase(HttpStatusCode.ServiceUnavailable)]
-        public async Task If_Http_Call_Unsuccesful_Should_Log_Error(HttpStatusCode statusCode)
+        public void If_Http_Call_Unsuccesful_Should_Log_Error(HttpStatusCode statusCode)
         {
             // Arrange
             _httpClientMock
@@ -92,12 +92,12 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
                 .ReturnsAsync(new HttpResponseMessage { StatusCode = statusCode });
 
             // Act
-            await _sut.Trigger(1, 19, "18-19R10", 1);
+            Assert.ThrowsAsync<Exception>(() => _sut.Trigger(1, 19, "18-19R10", 1));
 
             // Assert
             _loggerMock.Verify(
                x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(), It.IsAny<Exception>(),
-                   It.IsAny<Func<object, Exception, string>>()), Times.Once);
+                   It.IsAny<Func<object, Exception, string>>()), Times.AtLeastOnce());
         }
     }
 }
