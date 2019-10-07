@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using AutoFixture;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
@@ -13,7 +12,6 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
     [TestFixture, Parallelizable]
     public class WhenHandlingEmployerLevyRefreshComplete
     {
-        private IFixture Fixture => new Fixture();
         private Mock<ILevyForecastService> _levyForecastServiceMock;
         private LevyCompleteTriggerHandler _sut;
         private RefreshEmployerLevyDataCompletedEvent _event;
@@ -21,13 +19,16 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         [SetUp]
         public void SetUp()
         {
+            _event = new RefreshEmployerLevyDataCompletedEvent
+            {
+                AccountId = 777,
+                PeriodMonth = 9,
+                PeriodYear = "18-19",
+                LevyImported = true
+            };
+
             _levyForecastServiceMock = new Mock<ILevyForecastService>();
             _sut = new LevyCompleteTriggerHandler(_levyForecastServiceMock.Object);
-
-            _event = Fixture
-                .Build<RefreshEmployerLevyDataCompletedEvent>()
-                .With(e => e.LevyImported, true)
-                .Create();
         }
 
         [Test]
@@ -41,7 +42,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             await _sut.Handle(_event);
 
             // Assert
-            _levyForecastServiceMock.Verify(mock => mock.TriggerLevyForecast(It.IsAny<short>(), It.IsAny<string>(), It.IsAny<long>()), Times.Never);
+            _levyForecastServiceMock.Verify(mock => mock.TriggerLevyForecast(_event.PeriodMonth, _event.PeriodYear, _event.AccountId), Times.Never);
         }
 
         [Test]
@@ -54,7 +55,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
             await _sut.Handle(_event);
 
             // Assert
-            _levyForecastServiceMock.Verify(mock => mock.TriggerLevyForecast(It.IsAny<short>(), It.IsAny<string>(), It.IsAny<long>()), Times.Once);
+            _levyForecastServiceMock.Verify(mock => mock.TriggerLevyForecast(_event.PeriodMonth, _event.PeriodYear, _event.AccountId), Times.Once);
         }
 
         [Test]
