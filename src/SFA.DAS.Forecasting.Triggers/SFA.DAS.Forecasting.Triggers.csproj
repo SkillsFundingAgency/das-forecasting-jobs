@@ -21,12 +21,26 @@
     <ProjectReference Include="..\SFA.DAS.Forecasting.Jobs.Infrastructure\SFA.DAS.Forecasting.Jobs.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="Directory.Build.Targets">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="host.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="local.settings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="HandleAccountFundsExpiredEvent/function.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="HandleRefreshEmployerLevyDataCompleted/function.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="HandleRefreshPaymentDataCompletedEvent/function.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 </Project>
