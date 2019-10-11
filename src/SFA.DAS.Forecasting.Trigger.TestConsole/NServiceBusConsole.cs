@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using NServiceBus;
 using SFA.DAS.EmployerFinance.Messages.Events;
-using SFA.DAS.NServiceBus;
-using SFA.DAS.NServiceBus.AzureServiceBus;
-using SFA.DAS.NServiceBus.NewtonsoftJsonSerializer;
+using SFA.DAS.NServiceBus.Configuration;
+using SFA.DAS.NServiceBus.Configuration.AzureServiceBus;
+using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
 
 namespace SFA.DAS.Forecasting.Trigger.TestConsole
 {
@@ -21,11 +21,11 @@ namespace SFA.DAS.Forecasting.Trigger.TestConsole
         public async Task Run()
         {
             var endpointConfiguration = new EndpointConfiguration("SFA.DAS.Forecasting.Triggers.TestConsole")
-                .UseAzureServiceBusTransport(_configuration["ServiceBusConnectionString"], r =>
-                {
-                    // for testing messages rather than event 
-                    // r.RouteToEndpoint(typeof(TestEvent), "TestQueue");
-                })
+            .UseAzureServiceBusTransport(_configuration["ServiceBusConnectionString"], r =>
+            {
+                // for testing messages rather than event 
+                // r.RouteToEndpoint(typeof(TestEvent), "TestQueue");
+            })
                 .UseErrorQueue()
                 .UseInstallers()
                 .UseMessageConventions()
@@ -55,10 +55,10 @@ namespace SFA.DAS.Forecasting.Trigger.TestConsole
 
                     await endpointInstance.Publish(new RefreshPaymentDataCompletedEvent
                     {
-                        AccountId = 1,
+                        AccountId = 5151,
                         Created = DateTime.Now,
                         PaymentsProcessed = true,
-                        PeriodEnd = "1920-R08"
+                        PeriodEnd = "1819-R07"
                     });
 
                     await endpointInstance.Publish(new AccountFundsExpiredEvent
