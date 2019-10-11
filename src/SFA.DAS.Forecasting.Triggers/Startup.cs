@@ -37,93 +37,74 @@ namespace SFA.DAS.Forecasting.Triggers
 
     internal class ServiceProviderBuilder : IServiceProviderBuilder
     {
-        private readonly ILogger _logger;
         private readonly ILoggerFactory _loggerFactory;
         public IConfiguration Configuration { get; }
         public ServiceProviderBuilder(ILoggerFactory loggerFactory, IConfiguration configuration)
         {
             _loggerFactory = loggerFactory;
 
-            _logger = _loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common"));
+            var config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("local.settings.json", true)
+                .AddEnvironmentVariables()
+                .AddAzureTableStorage(o =>
+                {
+                    var configKeys = configuration["ConfigNames"]
+                    .Split(',')
+                    .Select(s => s.Trim())
+                    .ToArray();
 
-            try
-            {
-                var config = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("local.settings.json", true)
-                    .AddEnvironmentVariables()
-                    .AddAzureTableStorage(o =>
-                    {
-                        var configKeys = configuration["ConfigNames"]
-                        .Split(',')
-                        .Select(s => s.Trim())
-                        .ToArray();
+                    o.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
+                    o.EnvironmentName = configuration["EnvironmentName"];
+                    o.ConfigurationKeys = configKeys;
+                    o.PreFixConfigurationKeys = false;
+                })
+                .Build();
 
-                        o.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
-                        o.EnvironmentName = configuration["EnvironmentName"];
-                        o.ConfigurationKeys = configKeys;
-                        o.PreFixConfigurationKeys = false;
-                    })
-                    .Build();
-
-                Configuration = config;
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex, "Error in startup");
-                throw;
-            }
+            Configuration = config;
         }
 
         public IServiceProvider Build()
         {
-            try
+
+            var services = new ServiceCollection();
+
+            services.Configure<ForecastingJobsConfiguration>(Configuration.GetSection("ForecastingJobs"));
+
+            var nLogConfiguration = new NLogConfiguration();
+
+            services.AddLogging((options) =>
             {
-                _logger.LogInformation("Building Service provider");
-                var services = new ServiceCollection();
-
-                services.Configure<ForecastingJobsConfiguration>(Configuration.GetSection("ForecastingJobs"));
-
-                var nLogConfiguration = new NLogConfiguration();
-
-                services.AddLogging((options) =>
+                options.AddConfiguration(Configuration.GetSection("Logging"));
+                options.SetMinimumLevel(LogLevel.Trace);
+                options.AddNLog(new NLogProviderOptions
                 {
-                    options.AddConfiguration(Configuration.GetSection("Logging"));
-                    options.SetMinimumLevel(LogLevel.Trace);
-                    options.AddNLog(new NLogProviderOptions
-                    {
-                        CaptureMessageTemplates = true,
-                        CaptureMessageProperties = true
-                    });
-
-                    options.AddConsole();
-                    options.AddDebug();
-
-                    nLogConfiguration.ConfigureNLog(Configuration);
+                    CaptureMessageTemplates = true,
+                    CaptureMessageProperties = true
                 });
 
-                services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+                options.AddConsole();
+                options.AddDebug();
 
-                services.AddSingleton(_ => _loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
-                EncodingConfig encodingConfig = GetEncodingConfig();
+                nLogConfiguration.ConfigureNLog(Configuration);
+            });
 
-                services.AddSingleton(encodingConfig);
-                services.AddSingleton<IEncodingService, EncodingService>();
+            services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
-                services.AddSingleton<ILevyCompleteTriggerHandler, LevyCompleteTriggerHandler>();
-                services.AddSingleton<IRefreshPaymentDataCompletedTriggerHandler, PaymentCompleteTriggerHandler>();
-                services.AddSingleton<ILevyForecastService, LevyForecastService>();
-                services.AddSingleton<IPaymentForecastService, PaymentForecastService>();
-                services.AddSingleton(typeof(IHttpFunctionClient<>), typeof(HttpFunctionClient<>));
-                services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+            services.AddSingleton(_ => _loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
+            EncodingConfig encodingConfig = GetEncodingConfig();
 
-                return services.BuildServiceProvider();
-            }
-            catch(Exception ex)
-            {
-                _logger.LogError(ex, "Error in startup");
-                throw;
-            }
+            services.AddSingleton(encodingConfig);
+            services.AddSingleton<IEncodingService, EncodingService>();
+
+            services.AddSingleton<ILevyCompleteTriggerHandler, LevyCompleteTriggerHandler>();
+            services.AddSingleton<IRefreshPaymentDataCompletedTriggerHandler, PaymentCompleteTriggerHandler>();
+            services.AddSingleton<ILevyForecastService, LevyForecastService>();
+            services.AddSingleton<IPaymentForecastService, PaymentForecastService>();
+            services.AddSingleton(typeof(IHttpFunctionClient<>), typeof(HttpFunctionClient<>));
+            // services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
+
+            return services.BuildServiceProvider();
         }
 
         private EncodingConfig GetEncodingConfig()
