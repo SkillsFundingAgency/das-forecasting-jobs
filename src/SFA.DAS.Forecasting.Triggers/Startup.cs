@@ -66,6 +66,7 @@ namespace SFA.DAS.Forecasting.Triggers
 
         public IServiceProvider Build()
         {
+
             var services = new ServiceCollection();
 
             services.Configure<ForecastingJobsConfiguration>(Configuration.GetSection("ForecastingJobs"));
@@ -101,7 +102,6 @@ namespace SFA.DAS.Forecasting.Triggers
             services.AddSingleton<ILevyForecastService, LevyForecastService>();
             services.AddSingleton<IPaymentForecastService, PaymentForecastService>();
             services.AddSingleton(typeof(IHttpFunctionClient<>), typeof(HttpFunctionClient<>));
-            //services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_INSTRUMENTATIONKEY"]);
 
             return services.BuildServiceProvider();
         }

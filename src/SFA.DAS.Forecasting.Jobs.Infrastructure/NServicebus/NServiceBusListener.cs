@@ -8,7 +8,7 @@ using NServiceBus.Extensibility;
 using NServiceBus.Raw;
 using NServiceBus.Transport;
 using SFA.DAS.Forecasting.Jobs.Infrastructure.Configuration;
-using SFA.DAS.NServiceBus.AzureServiceBus;
+using SFA.DAS.NServiceBus.Configuration.AzureServiceBus;
 
 namespace SFA.DAS.Forecasting.Jobs.Infrastructure.NServicebus
 {
