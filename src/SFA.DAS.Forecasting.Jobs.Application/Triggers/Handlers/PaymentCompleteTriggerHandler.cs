@@ -16,11 +16,6 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
 
         public async Task Handle(RefreshPaymentDataCompletedEvent refreshPaymentDataCompletedEvent)
         {
-            if (!refreshPaymentDataCompletedEvent.PaymentsProcessed)
-            {
-                return;
-            }
-
             var periodEndDates = GetPeriodDateFromPeriodId(refreshPaymentDataCompletedEvent.PeriodEnd);
 
             await _paymentForecastService.Trigger(
