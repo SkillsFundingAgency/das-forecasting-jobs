@@ -31,20 +31,6 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
 
         [Test]
         [Category("UnitTest")]
-        public async Task If_No_Payments_Processed_Should_Not_Trigger_Forecast()
-        {
-            // Arrange
-            _event.PaymentsProcessed = false;
-
-            // Act
-            await _sut.Handle(_event);
-
-            // Assert
-            _paymentForecastServiceMock.Verify(mock => mock.Trigger(It.IsAny<short>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<long>()), Times.Never);
-        }
-
-        [Test]
-        [Category("UnitTest")]
         public async Task Should_Trigger_Payment_Forecast()
         {
             // Arrange
