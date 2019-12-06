@@ -28,6 +28,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Services
             _httpFunctionClient = httpFunctionClient;
             _encodingService = encodingService;
             _logger = logger;
+            _httpFunctionClient.XFunctionsKey = _configuration.PaymentPreLoadHttpFunctionXFunctionKey;
         }
 
         public async Task Trigger(short periodMonth, int periodYear, string periodEnd, long accountId)
