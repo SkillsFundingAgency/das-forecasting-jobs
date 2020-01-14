@@ -192,7 +192,8 @@
             },
             "dependsOn": [
                 "function-app-insights",
-                "storage-account"
+                "storage-account",
+                "app-service-plan"
             ]
         }
     ],
