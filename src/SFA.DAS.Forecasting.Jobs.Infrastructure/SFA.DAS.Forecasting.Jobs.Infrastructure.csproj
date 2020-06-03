@@ -10,7 +10,7 @@
     <PackageReference Include="NServiceBus.Raw" Version="3.0.1" />
     <PackageReference Include="NServiceBus.Transport.AzureServiceBus" Version="1.2.1" />
     <PackageReference Include="SFA.DAS.NLog.Targets.Redis" Version="1.2.1" />
-    <PackageReference Include="SFA.DAS.NServiceBus" Version="15.0.8" />
+    <PackageReference Include="SFA.DAS.NServiceBus" Version="11.0.2" />
   </ItemGroup>
 
   <ItemGroup>
