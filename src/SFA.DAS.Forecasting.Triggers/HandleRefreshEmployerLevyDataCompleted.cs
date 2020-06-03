@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Triggers;
 using SFA.DAS.Forecasting.Jobs.Infrastructure.Attributes;
-using SFA.DAS.Forecasting.Jobs.Infrastructure.NServicebus;
+using SFA.DAS.NServiceBus.AzureFunction.Infrastructure;
 
 namespace SFA.DAS.Forecasting.Triggers
 {

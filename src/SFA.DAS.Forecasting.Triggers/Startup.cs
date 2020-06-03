@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NLog.Extensions.Logging;
+using SFA.DAS.NServiceBus.AzureFunction.Infrastructure;
 using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
@@ -19,7 +20,6 @@ using SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Services;
 using SFA.DAS.Forecasting.Jobs.Infrastructure.DependencyInjection;
 using SFA.DAS.Forecasting.Jobs.Infrastructure.Logging;
-using SFA.DAS.Forecasting.Jobs.Infrastructure.NServicebus;
 using SFA.DAS.Forecasting.Triggers;
 
 [assembly: WebJobsStartup(typeof(Startup))]
