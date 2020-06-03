@@ -37,7 +37,7 @@
             "type": "string",
             "defaultValue": "Basic"
         },
-        "serviceBusConnectionString": {
+        "nServiceBusConnectionString": {
             "type": "string"
         },
         "nServiceBusLicense": {
@@ -167,8 +167,8 @@
                                 "value": "[toUpper(parameters('environmentName'))]"
                             },
                             {
-                                "name": "ServiceBusConnectionString",
-                                "value": "[parameters('serviceBusConnectionString')]"
+                                "name": "NServiceBusConnectionString",
+                                "value": "[parameters('nServiceBusConnectionString')]"
                             },
                             {
                                 "name": "NServiceBusLicense",
