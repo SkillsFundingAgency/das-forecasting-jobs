@@ -112,16 +112,12 @@ namespace SFA.DAS.Forecasting.Triggers
             encodingConfig.Encodings = Configuration
                 .GetSection("Encodings")
                 .GetChildren()
-                .Select(encConfig =>
+                .Select(encConfig => new Encoding.Encoding
                 {
-                    var a = Enum.Parse(typeof(EncodingType), encConfig["EncodingType"]);
-                    return new Encoding.Encoding
-                    {
-                        EncodingType = (EncodingType)Enum.Parse(typeof(EncodingType), encConfig["EncodingType"]),
-                        Alphabet = encConfig["Alphabet"],
-                        MinHashLength = int.Parse(encConfig["MinHashLength"]),
-                        Salt = encConfig["Salt"],
-                    };
+                    EncodingType = encConfig["EncodingType"],
+                    Alphabet = encConfig["Alphabet"],
+                    MinHashLength = int.Parse(encConfig["MinHashLength"]),
+                    Salt = encConfig["Salt"],
                 }).ToList();
             return encodingConfig;
         }
