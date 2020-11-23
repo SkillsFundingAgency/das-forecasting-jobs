@@ -4,27 +4,25 @@ using SFA.DAS.NServiceBus.AzureFunction.Attributes;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusFunctions
+namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions
 {
-    public class ApprenticeshipCompletionDateUpdated
+    public class ApprenticeshipCompletedFunction
     {
         private readonly IForecastingDbContext _forecastingDbContext;
 
-        public ApprenticeshipCompletionDateUpdated(IForecastingDbContext forecastingDbContext)
+        public ApprenticeshipCompletedFunction(IForecastingDbContext forecastingDbContext)
         {
             _forecastingDbContext = forecastingDbContext;
         }
 
-        [FunctionName("ApprenticeshipCompletionDateUpdated")]
+        [FunctionName("ApprenticeshipCompleted")]
         public async Task Run(
-            [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.CompletionDateUpdated")] ApprenticeshipCompletionDateUpdatedEvent message)
+            [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.ApprenticeshipCompletedEvent")] ApprenticeshipCompletedEvent message)
         {
-            message.ApprenticeshipId = 2;
             var selectedApprenticeship = _forecastingDbContext.Commitment.Where(x => x.ApprenticeshipId == message.ApprenticeshipId).First();
             selectedApprenticeship.ActualEndDate = message.CompletionDate;
             selectedApprenticeship.Status = Status.Completed;
-            _forecastingDbContext.SaveChanges();
-            await Task.FromResult(0);
+            await _forecastingDbContext.SaveChangesAsync();
         }
     }
 }

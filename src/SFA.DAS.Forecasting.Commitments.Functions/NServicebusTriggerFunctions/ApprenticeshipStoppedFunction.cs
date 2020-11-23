@@ -7,13 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusFunctions
+namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions
 {
-    public class ApprenticeshipStopped
+    public class ApprenticeshipStoppedFunction
     {
         private readonly IForecastingDbContext _forecastingDbContext;
 
-        public ApprenticeshipStopped(IForecastingDbContext forecastingDbContext)
+        public ApprenticeshipStoppedFunction(IForecastingDbContext forecastingDbContext)
         {
             _forecastingDbContext = forecastingDbContext;
         }
@@ -22,12 +22,10 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusFunctions
         public async Task Run(
             [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.ApprenticeshipStopped")] ApprenticeshipStoppedEvent message)
         {
-           // message.ApprenticeshipId = 2;
             var selectedApprenticeship = _forecastingDbContext.Commitment.Where(x => x.ApprenticeshipId == message.ApprenticeshipId).First();
             selectedApprenticeship.ActualEndDate = message.StopDate;
             selectedApprenticeship.Status = Status.Stopped;
-            _forecastingDbContext.SaveChanges();
-            await Task.FromResult(0);
+            await _forecastingDbContext.SaveChangesAsync();
         }
     }
 }

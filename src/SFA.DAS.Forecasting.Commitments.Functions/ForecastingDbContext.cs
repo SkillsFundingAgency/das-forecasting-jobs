@@ -2,14 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Commitments.Functions
 {
     public interface IForecastingDbContext
     {
         DbSet<Commitments> Commitment { get; set; }
-        int SaveChanges();
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
+
     public class ForecastingDbContext : DbContext, IForecastingDbContext
     {
         public ForecastingDbContext(DbContextOptions options) : base(options)

@@ -7,10 +7,8 @@ using NLog.Extensions.Logging;
 using NServiceBus;
 using SFA.DAS.Configuration.AzureTableStorage;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text;
 
 [assembly: FunctionsStartup(typeof(SFA.DAS.Forecasting.Commitments.Functions.Startup))]
 namespace SFA.DAS.Forecasting.Commitments.Functions
@@ -46,12 +44,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             }
 
             var config = configBuilder.Build();
-
             builder.Services.AddOptions();
-            //builder.Services.Configure<ApplicationSettings>(config.GetSection("ApplicationSettings"));
-
-            //builder.Services.AddCommandService();
-
             var logger = serviceProvider.GetService<ILoggerProvider>().CreateLogger(GetType().AssemblyQualifiedName);
 
             if (!ConfigurationIsLocalOrDev(config))
@@ -64,20 +57,20 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
                     logger,
                     (options) =>
                     {
-                       // if (config["ApplicationSettings:NServiceBusConnectionString"] == "UseLearningEndpoint=true")
-                        //{
-                        //    options.EndpointConfiguration = (endpoint) =>
-                        //    {
-                        //        endpoint.UseTransport<LearningTransport>()
-                        //        .StorageDirectory("D:\\EFSA\\das-commitments\\src\\.learningtransport");
-                        //        return endpoint;
-                        //    };
-                        //}
+                        if (config["NServiceBusConnectionString"] == "UseLearningEndpoint=true")
+                        {
+                            options.EndpointConfiguration = (endpoint) =>
+                            {
+                                endpoint.UseTransport<LearningTransport>()
+                                .StorageDirectory(config["NServiceBusStorageDirectory"]);
+                                return endpoint;
+                            };
+                        }
                     });
             }
 
             builder.Services.AddDbContext<ForecastingDbContext>(options =>
-            options.UseSqlServer("sqlServerConnectionString"));
+            options.UseSqlServer(config["DatabaseConnectionString"]));
 
             builder.Services.AddScoped<IForecastingDbContext, ForecastingDbContext>(provider => provider.GetService<ForecastingDbContext>());
         }

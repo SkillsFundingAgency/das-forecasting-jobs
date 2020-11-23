@@ -9,38 +9,6 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
 {
     public static class ServiceCollectionExtensions
     {
-        //// public static IServiceCollection AddCommandService(this IServiceCollection serviceCollection)
-        // {
-        //     serviceCollection.AddTransient<ICommandService>(s =>
-        //     {
-        //         var settings = s.GetService<IOptions<ApplicationSettings>>().Value;
-
-        //         var clientBuilder = new HttpClientBuilder()
-        //             .WithDefaultHeaders()
-        //             .WithLogging(s.GetService<ILoggerFactory>());
-
-        //         if (!string.IsNullOrEmpty(settings.Identifier))
-        //         {
-        //             clientBuilder.WithManagedIdentityAuthorisationHeader(new ManagedIdentityTokenGenerator(settings));
-        //         }
-
-        //         var httpClient = clientBuilder.Build();
-
-        //         if (!settings.ApiBaseUrl.EndsWith("/"))
-        //         {
-        //             settings.ApiBaseUrl += "/";
-        //         }
-
-        //         httpClient.BaseAddress = new Uri(settings.ApiBaseUrl);
-
-        //         return new CommandService(httpClient);
-        //     });
-
-        //     serviceCollection.Decorate<ICommandService, CommandServiceWithLogging>();
-
-        //     return serviceCollection;
-        // }
-
         public static IServiceCollection AddNServiceBus(
             this IServiceCollection serviceCollection,
             ILogger logger,
