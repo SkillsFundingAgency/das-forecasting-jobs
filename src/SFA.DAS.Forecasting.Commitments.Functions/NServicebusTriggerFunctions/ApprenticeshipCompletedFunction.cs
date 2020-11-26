@@ -19,10 +19,13 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions
         public async Task Run(
             [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.ApprenticeshipCompletedEvent")] ApprenticeshipCompletedEvent message)
         {
-            var selectedApprenticeship = _forecastingDbContext.Commitment.Where(x => x.ApprenticeshipId == message.ApprenticeshipId).First();
-            selectedApprenticeship.ActualEndDate = message.CompletionDate;
-            selectedApprenticeship.Status = Status.Completed;
-            await _forecastingDbContext.SaveChangesAsync();
+            var selectedApprenticeship = _forecastingDbContext.Commitment.FirstOrDefault(x => x.ApprenticeshipId == message.ApprenticeshipId);
+            if (selectedApprenticeship != null)
+            {
+                selectedApprenticeship.ActualEndDate = message.CompletionDate;
+                selectedApprenticeship.Status = Status.Completed;
+                await _forecastingDbContext.SaveChangesAsync();
+            }
         }
     }
 }
