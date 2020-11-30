@@ -36,13 +36,13 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
         private string GetTodayPeriodYear(DateTime eventCreatedDate)
         {
             var twoDigitYear = int.Parse(eventCreatedDate.ToString("yy"));
-            return eventCreatedDate.Month < 4 ? $"{twoDigitYear - 1}-{twoDigitYear}" : $"{twoDigitYear}-{twoDigitYear + 1}";
+            return eventCreatedDate.Month <= 4 ? $"{twoDigitYear - 1}-{twoDigitYear}" : $"{twoDigitYear}-{twoDigitYear + 1}";
         }
 
         private short GetTodayPeriodMonth(DateTime eventCreatedDate)
         {
             var month = eventCreatedDate.Month;
-            return (short)(month >= 4 ? month - 3 : month + 9);
+            return (short)(month >= 5 ? month - 4 : month + 8);
         }
     }
 }
