@@ -20,6 +20,18 @@
                 "description": "Short name of the service. Used for the name of resources created"
             }
         },
+        "sharedEnvResourceGroup": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the environment's shared resource group"
+            }
+        },
+        "sharedServiceBusName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the environment's shared service bus namespace"
+            }
+        },
         "appServicePlanSize": {
             "type": "string",
             "allowedValues": [
@@ -286,6 +298,34 @@
             "dependsOn": [
                 "app-service-plan"
             ]
+        },
+        {
+            "apiVersion": "2017-05-10",
+            "name": "[concat('role-assignments-', copyIndex())]",
+            "type": "Microsoft.Resources/deployments",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignment.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "principalId": {
+                        "value": "[createArray(reference('commitments-function-app').outputs.managedServiceIdentityId.value, reference('commitments-function-app').outputs.stagingManagedServiceIdentityId.value)[copyIndex()]]"
+                    },
+                    "assignmentType": {
+                        "value": "ServiceBusListener"
+                    },
+                    "resourceName": {
+                        "value": "[parameters('sharedServiceBusName')]"
+                    }
+                }
+            },
+            "copy": {
+                "name": "role-assignments",
+                "count": 2
+            }
         }
     ],
     "outputs": {
