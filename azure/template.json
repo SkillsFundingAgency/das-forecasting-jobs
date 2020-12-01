@@ -337,7 +337,7 @@
                         "value": "[createArray(reference('commitments-function-app').outputs.managedServiceIdentityId.value, reference('commitments-function-app').outputs.stagingManagedServiceIdentityId.value)[copyIndex()]]"
                     },
                     "assignmentType": {
-                        "value": "ServiceBusListener"
+                        "value": "ServiceBusReceiver"
                     },
                     "resourceName": {
                         "value": "[parameters('sharedServiceBusName')]"
