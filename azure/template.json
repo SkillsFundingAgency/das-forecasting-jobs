@@ -323,7 +323,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "[concat('role-assignments-', copyIndex())]",
+            "name": "[concat('role-assignment-commitments-function-app')]",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -334,7 +334,7 @@
                 },
                 "parameters": {
                     "principalId": {
-                        "value": "[createArray(reference('commitments-function-app').outputs.managedServiceIdentityId.value, reference('commitments-function-app').outputs.stagingManagedServiceIdentityId.value)[copyIndex()]]"
+                        "value": "[reference('commitments-function-app').outputs.managedServiceIdentityId.value]"
                     },
                     "assignmentType": {
                         "value": "ServiceBusReceiver"
@@ -343,10 +343,6 @@
                         "value": "[parameters('sharedServiceBusName')]"
                     }
                 }
-            },
-            "copy": {
-                "name": "role-assignments",
-                "count": 2
             }
         }
     ],
