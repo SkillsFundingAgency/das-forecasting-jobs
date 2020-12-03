@@ -70,6 +70,9 @@
         "configNames": {
             "type": "string"
         },
+        "commitmentsConfigNames": {
+            "type": "string"
+        },
         "functionsExtensionVersion": {
             "type": "string",
             "defaultValue": "~2.0"
@@ -310,7 +313,7 @@
                                 },
                                 {
                                     "name": "ConfigNames",
-                                    "value": "[parameters('configNames')]"
+                                    "value": "[parameters('commitmentsConfigNames')]"
                                 }
                             ]
                         }
