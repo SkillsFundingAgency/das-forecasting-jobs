@@ -22,13 +22,14 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions
         public async Task Run(
             [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.ApprenticeshipStopped")] ApprenticeshipStoppedEvent message)
         {
-            var selectedApprenticeship = _forecastingDbContext.Commitment.FirstOrDefault(x => x.ApprenticeshipId == message.ApprenticeshipId);
-            if (selectedApprenticeship != null)
-            {
-                selectedApprenticeship.ActualEndDate = message.StopDate;
-                selectedApprenticeship.Status = Status.Stopped;
-                await _forecastingDbContext.SaveChangesAsync();
-            }
+            await _forecastingDbContext.SaveChangesAsync(8128443, Status.Stopped, message.StopDate);
+            //var selectedApprenticeship = _forecastingDbContext.Commitment.FirstOrDefault(x => x.ApprenticeshipId == message.ApprenticeshipId);
+            //if (selectedApprenticeship != null)
+            //{
+            //    selectedApprenticeship.ActualEndDate = message.StopDate;
+            //    selectedApprenticeship.Status = Status.Stopped;
+            //    await _forecastingDbContext.SaveChangesAsync();
+            //}
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -71,10 +70,10 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
                     });
             }
 
-            builder.Services.AddDbContext<ForecastingDbContext>(options =>
-            options.UseSqlServer(config["DatabaseConnectionString"]));
+            //builder.Services.AddDbContext<ForecastingDbContext>(options =>
+            //options.UseSqlServer(config["DatabaseConnectionString"]));
 
-            builder.Services.AddScoped<IForecastingDbContext, ForecastingDbContext>(provider => provider.GetService<ForecastingDbContext>());
+            builder.Services.AddScoped<IForecastingDbContext>(s => new ForecastingDbContext(config["DatabaseConnectionString"]));
         }
 
         private bool ConfigurationIsLocalOrDev(IConfiguration configuration)

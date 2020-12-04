@@ -1,6 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Dapper;
 using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -9,17 +10,31 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
 {
     public interface IForecastingDbContext
     {
-        DbSet<Commitments> Commitment { get; set; }
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+      //  DbSet<Commitments> Commitment { get; set; }
+        Task<int> SaveChangesAsync(long apprenticeshipId, Status status, DateTime actualEndDate);
     }
 
-    public class ForecastingDbContext : DbContext, IForecastingDbContext
+    public class ForecastingDbContext : IForecastingDbContext
     {
-        public ForecastingDbContext(DbContextOptions options) : base(options)
+        private string _connectionString;
+
+        public ForecastingDbContext(string connectionString)
         {
+            _connectionString = connectionString;
         }
 
-        public DbSet<Commitments> Commitment { get; set; }
+        //public ForecastingDbContext(DbContextOptions options) : base(options)
+        //{
+        //}
+
+        // public DbSet<Commitments> Commitment { get; set; }
+        public async Task<int> SaveChangesAsync(long apprenticeshipId, Status status, DateTime actualEndDate)
+        {
+            using (SqlConnection connection = new SqlConnection(_connectionString))
+            {
+                return await connection.ExecuteAsync($"UPDATE Commitment SET Status = {status} ActualEndDate = {actualEndDate} WHERE ApprenticeshipId = {apprenticeshipId}");
+            }
+        }
     }
 
     public class Commitments
