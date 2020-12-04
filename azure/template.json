@@ -1,7 +1,13 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        "tags": {
+            "type": "object"
+        },
+        "resourceGroupLocation": {
+            "type": "string"
+        },
         "environmentName": {
             "type": "string",
             "metadata": {
@@ -18,6 +24,18 @@
             "type": "string",
             "metadata": {
                 "description": "Short name of the service. Used for the name of resources created"
+            }
+        },
+        "sharedEnvResourceGroup": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the environment's shared resource group"
+            }
+        },
+        "sharedServiceBusName": {
+            "type": "string",
+            "metadata": {
+                "description": "Name of the environment's shared service bus namespace"
             }
         },
         "appServicePlanSize": {
@@ -52,6 +70,9 @@
         "configNames": {
             "type": "string"
         },
+        "commitmentsConfigNames": {
+            "type": "string"
+        },
         "functionsExtensionVersion": {
             "type": "string",
             "defaultValue": "~2.0"
@@ -60,14 +81,26 @@
     "variables": {
         "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
         "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
+        "resourceGroupName": "[concat(variables('resourceNamePrefix'), '-rg')]",
         "functionAppName": "[concat(variables('resourceNamePrefix'),'-fa')]",
+        "commitmentsFunctionAppName": "[concat(variables('resourceNamePrefix'),'-comt-fa')]",
         "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
         "storageAccountName": "[concat('das',toLower(parameters('resourceEnvironmentName')),toLower(parameters('serviceName')),'str')]"
     },
     "resources": [
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2020-06-01",
+            "name": "[variables('resourceGroupName')]",
+            "type": "Microsoft.Resources/resourceGroups",
+            "location": "[parameters('resourceGroupLocation')]",
+            "tags": "[parameters('tags')]",
+            "properties": {
+            }
+        },
+        {
+            "apiVersion": "2020-06-01",
             "name": "function-app-insights",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -86,8 +119,30 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2020-06-01",
+            "name": "commitments-function-app-insights",
+            "resourceGroup": "[variables('resourceGroupName')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "appInsightsName": {
+                        "value": "[variables('commitmentsFunctionAppName')]"
+                    },
+                    "attachedService": {
+                        "value": "[variables('commitmentsFunctionAppName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2020-06-01",
             "name": "storage-account",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -103,8 +158,9 @@
             }
         },
         {
-            "apiVersion": "2019-05-01",
+            "apiVersion": "2020-06-01",
             "name": "app-service-plan",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -129,8 +185,9 @@
             }
         },
         {
-            "apiVersion": "2017-05-10",
+            "apiVersion": "2020-06-01",
             "name": "function-app",
+            "resourceGroup": "[variables('resourceGroupName')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
@@ -146,7 +203,7 @@
                         "value": "[variables('appServicePlanName')]"
                     },
                     "appServicePlanResourceGroup": {
-                        "value": "[resourceGroup().name]"
+                        "value": "[variables('resourceGroupName')]"
                     },
                     "functionAppAppSettings": {
                         "value": {
@@ -201,12 +258,109 @@
                 "storage-account",
                 "app-service-plan"
             ]
+        },
+        {
+            "apiVersion": "2020-06-01",
+            "name": "commitments-function-app",
+            "resourceGroup": "[variables('resourceGroupName')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'function-app-v2.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "functionAppName": {
+                        "value": "[variables('commitmentsFunctionAppName')]"
+                    },
+                    "appServicePlanName": {
+                        "value": "[variables('appServicePlanName')]"
+                    },
+                    "appServicePlanResourceGroup": {
+                        "value": "[variables('resourceGroupName')]"
+                    },
+                    "functionAppAppSettings": {
+                        "value": {
+                            "array": [
+                                {
+                                    "name": "AzureWebJobsStorage",
+                                    "value": "[reference('storage-account').outputs.storageConnectionString.value]"
+                                },
+                                {
+                                    "name": "AzureWebJobsDashboard",
+                                    "value": "[reference('storage-account').outputs.storageConnectionString.value]"
+                                },
+                                {
+                                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                                    "value": "[reference('commitments-function-app-insights').outputs.InstrumentationKey.value]"
+                                },
+                                {
+                                    "name": "FUNCTIONS_EXTENSION_VERSION",
+                                    "value": "[parameters('functionsExtensionVersion')]"
+                                },
+                                {
+                                    "name": "EnvironmentName",
+                                    "value": "[toUpper(parameters('environmentName'))]"
+                                },
+                                {
+                                    "name": "LoggingRedisConnectionString",
+                                    "value": "[parameters('loggingRedisConnectionString')]"
+                                },
+                                {
+                                    "name": "ConfigurationStorageConnectionString",
+                                    "value": "[parameters('configurationStorageConnectionString')]"
+                                },
+                                {
+                                    "name": "ConfigNames",
+                                    "value": "[parameters('commitmentsConfigNames')]"
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "dependsOn": [
+                "app-service-plan"
+            ]
+        },
+        {
+            "apiVersion": "2020-06-01",
+            "name": "[concat('role-assignment-commitments-function-app')]",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignment.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "principalId": {
+                        "value": "[reference('commitments-function-app').outputs.managedServiceIdentityId.value]"
+                    },
+                    "assignmentType": {
+                        "value": "ServiceBusReceiver"
+                    },
+                    "resourceName": {
+                        "value": "[parameters('sharedServiceBusName')]"
+                    }
+                }
+            }
         }
     ],
     "outputs": {
+        "ResourceGroupName": {
+            "type": "string",
+            "value": "[variables('resourceGroupName')]"
+        },
         "FunctionAppName": {
             "type": "string",
             "value": "[variables('functionAppName')]"
+        },
+        "CommitmentsFunctionAppName": {
+            "type": "string",
+            "value": "[variables('commitmentsFunctionAppName')]"
         }
     }
 }
