@@ -1,13 +1,19 @@
 using AutoFixture;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.Logging;
 using Moq;
 using NServiceBus;
 using NUnit.Framework;
+using SFA.DAS.CommitmentsV2.Api.Client;
+using SFA.DAS.CommitmentsV2.Api.Types.Responses;
+using SFA.DAS.CommitmentsV2.Api.Types.Validation;
 using SFA.DAS.CommitmentsV2.Messages.Events;
 using SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions;
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Commitments.Functions.UnitTests
@@ -18,7 +24,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.UnitTests
         [Test]
         public async Task ApprenticeshipComplatedEventUpdatesTheActualEndDate()
         {
-            var fixture = new ApprenticeshipCompletedEventTestsFixture();
+            var fixture = new ApprenticeshipCompletedEventTestsFixture(true);
             await fixture.Run();
 
             fixture.AssertActualEndDate();
@@ -27,28 +33,53 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.UnitTests
         [Test]
         public async Task ApprenticeshipComplatedEventUpdatesTheStatus()
         {
-            var fixture = new ApprenticeshipCompletedEventTestsFixture();
+            var fixture = new ApprenticeshipCompletedEventTestsFixture(true);
             await fixture.Run();
 
             fixture.AssertStatus();
         }
+
+        [Test]
+        public async Task ReceivedApprenticeshipCompletedEvent_IfApprenticeshipNotExists_ThenCreateRecord()
+        {
+            //Arrange
+            var fixture = new ApprenticeshipCompletedEventTestsFixture(false);            
+
+            //Act
+            await fixture.Run();
+
+            //Assert
+            fixture.AssertRecordCreated();         
+        }
+       
     }
 
     public class ApprenticeshipCompletedEventTestsFixture
     {
         public Mock<IMessageHandlerContext> MessageHandlerContext { get; set; }
+        public Mock<ICommitmentsApiClient> MockCommitmentsApiClient { get; set; }
+        public Mock<IMapper> MockMapper { get; set; }
+        public Mock<ILogger<ApprenticeshipCompletedFunction>> MockLogger { get; set; } 
         public ForecastingDbContext Db { get; set; }
         public Commitments Commitment { get; set; }
         public Fixture Fixture { get; set; }
         public long CommitmentId { get; set; }
         public ApprenticeshipCompletedFunction Sut { get; set; }
+        public GetApprenticeshipResponse ApprenticeshipResponse { get; set; }
 
         public ApprenticeshipCompletedEvent ApprenticeshipCompletedEvent { get; set; }
 
-        public ApprenticeshipCompletedEventTestsFixture()
+        public ApprenticeshipCompletedEventTestsFixture(bool setApprenticeshipId)
         {
             MessageHandlerContext = new Mock<IMessageHandlerContext>();
+            MockCommitmentsApiClient = new Mock<ICommitmentsApiClient>();
+            MockMapper = new Mock<IMapper>();
+            MockLogger = new Mock<ILogger<ApprenticeshipCompletedFunction>>();
             Fixture = new Fixture();
+
+            ApprenticeshipResponse = Fixture.Create<GetApprenticeshipResponse>();
+            ApprenticeshipResponse.Uln = "12345";
+            MockCommitmentsApiClient.Setup(x => x.GetApprenticeship(It.IsAny<long>(), It.IsAny<CancellationToken>())).ReturnsAsync(ApprenticeshipResponse);
 
             Db = new ForecastingDbContext(new DbContextOptionsBuilder<ForecastingDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -61,10 +92,13 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.UnitTests
             Commitment.Status = Status.LiveOrWaitingToStart;
             Db.Commitment.Add(Commitment);
 
-            ApprenticeshipCompletedEvent = Fixture.Create<ApprenticeshipCompletedEvent>();
-            ApprenticeshipCompletedEvent.ApprenticeshipId = Commitment.ApprenticeshipId;
+            ApprenticeshipCompletedEvent = Fixture.Create<ApprenticeshipCompletedEvent>();            
+            if (setApprenticeshipId) { ApprenticeshipCompletedEvent.ApprenticeshipId = Commitment.ApprenticeshipId; }
 
-            Sut = new ApprenticeshipCompletedFunction(Db);
+            var configuration = new MapperConfiguration(cfg => cfg.AddProfile<AutoMapperProfile>());
+            var mapper = new Mapper(configuration);
+
+            Sut = new ApprenticeshipCompletedFunction(Db, MockCommitmentsApiClient.Object, mapper, MockLogger.Object);
             Db.SaveChanges();
         }
 
@@ -82,5 +116,10 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.UnitTests
         {
             Assert.AreEqual(Status.Completed, Db.Commitment.Where(x => x.Id == CommitmentId).First().Status);
         }
-    }
+
+        internal void AssertRecordCreated()
+        {
+            Assert.AreEqual(1, Db.Commitment.Where(x => x.ApprenticeshipId == ApprenticeshipResponse.Id).Count());
+        }       
+    }   
 }

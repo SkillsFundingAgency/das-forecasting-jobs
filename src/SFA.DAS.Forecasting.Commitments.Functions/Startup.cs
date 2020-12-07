@@ -1,11 +1,16 @@
-﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+﻿using AutoMapper;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 using NServiceBus;
+using SFA.DAS.CommitmentsV2.Api.Client;
+using SFA.DAS.CommitmentsV2.Api.Client.Configuration;
 using SFA.DAS.Configuration.AzureTableStorage;
+using SFA.DAS.Http;
 using System;
 using System.IO;
 using System.Reflection;
@@ -15,6 +20,8 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
 {
     public class Startup : FunctionsStartup
     {
+        private  ILoggerFactory _loggerFactory;
+
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services.AddLogging(logBuilder =>
@@ -25,7 +32,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             });
 
             var serviceProvider = builder.Services.BuildServiceProvider();
-            var configuration = serviceProvider.GetService<IConfiguration>();
+            var configuration = serviceProvider.GetService<IConfiguration>(); // Local
 
             var configBuilder = new ConfigurationBuilder()
                 .AddConfiguration(configuration)
@@ -43,7 +50,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
                 });
             }
 
-            var config = configBuilder.Build();
+            var config = configBuilder.Build(); // azure storage explorer
             builder.Services.AddOptions();
             var logger = serviceProvider.GetService<ILoggerProvider>().CreateLogger(GetType().AssemblyQualifiedName);
 
@@ -73,6 +80,16 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             options.UseSqlServer(config["DatabaseConnectionString"]));
 
             builder.Services.AddScoped<IForecastingDbContext, ForecastingDbContext>(provider => provider.GetService<ForecastingDbContext>());
+
+            ConfigureLogFactoy();
+
+            CommitmentsClientApiConfiguration commitmentsClientApiConfig = GetCommitmentsClientApiConfiguration(builder, serviceProvider, config);
+            builder.Services.AddSingleton<ICommitmentsApiClientFactory>(x => new CommitmentsApiClientFactory(commitmentsClientApiConfig, _loggerFactory));
+            builder.Services.AddTransient<ICommitmentsApiClient>(provider => provider.GetRequiredService<ICommitmentsApiClientFactory>().CreateClient());
+                                  
+            var mapperConfig = new MapperConfiguration(config => { config.AddProfile<AutoMapperProfile>(); });
+            IMapper mapper = mapperConfig.CreateMapper();
+            builder.Services.AddSingleton(mapper);
         }
 
         private bool ConfigurationIsLocalOrDev(IConfiguration configuration)
@@ -80,5 +97,36 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             return configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
                    configuration["EnvironmentName"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
         }
-    }
+
+        private CommitmentsClientApiConfiguration GetCommitmentsClientApiConfiguration(IFunctionsHostBuilder builder, ServiceProvider serviceProvider, IConfigurationRoot config)
+        {
+            CommitmentsClientApiConfiguration commitmentsClientApiConfig;
+            if (ConfigurationIsLocalOrDev(config))
+            {
+                commitmentsClientApiConfig = new CommitmentsClientApiConfiguration
+                {
+                    ApiBaseUrl = config["CommitmentsV2ApiBaseUrl"],
+                    IdentifierUri = config["CommitmentsV2ApiIdentifierUri"],
+                    ClientId = config["CommitmentsV2ApiClientId"],
+                    ClientSecret = config["CommitmentsV2ApiClientSecret"],
+                    Tenant = config["CommitmentsV2ApiTenant"]
+                };
+            }
+            else
+            {
+                builder.Services.Configure<CommitmentsClientApiConfiguration>(config.GetSection("CommitmentsV2Api"));
+                builder.Services.AddSingleton(cfg => cfg.GetService<IOptions<CommitmentsClientApiConfiguration>>().Value);
+                commitmentsClientApiConfig = serviceProvider.GetService<CommitmentsClientApiConfiguration>();
+            }
+
+            return commitmentsClientApiConfig;
+        }
+
+        public void ConfigureLogFactoy()
+        {            
+            _loggerFactory = new LoggerFactory();
+            var logger = _loggerFactory.CreateLogger("Startup");            
+        }       
+
+    }   
 }

@@ -1,10 +1,9 @@
-﻿using Microsoft.Azure.WebJobs;
+﻿using AutoMapper;
+using Microsoft.Azure.WebJobs;
+using SFA.DAS.CommitmentsV2.Api.Client;
 using SFA.DAS.CommitmentsV2.Messages.Events;
 using SFA.DAS.NServiceBus.AzureFunction.Attributes;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions
@@ -12,10 +11,16 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions
     public class ApprenticeshipStoppedFunction
     {
         private readonly IForecastingDbContext _forecastingDbContext;
+        private readonly ICommitmentsApiClient _commitmentsApiClient;
+        private readonly IMapper _mapper;
 
-        public ApprenticeshipStoppedFunction(IForecastingDbContext forecastingDbContext)
+        public ApprenticeshipStoppedFunction(IForecastingDbContext forecastingDbContext, 
+            ICommitmentsApiClient commitmentsApiClient,
+            IMapper mapper)
         {
             _forecastingDbContext = forecastingDbContext;
+            _commitmentsApiClient = commitmentsApiClient;
+            _mapper = mapper;
         }
 
         [FunctionName("ApprenticeshipStopped")]
@@ -27,8 +32,17 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions
             {
                 selectedApprenticeship.ActualEndDate = message.StopDate;
                 selectedApprenticeship.Status = Status.Stopped;
-                await _forecastingDbContext.SaveChangesAsync();
             }
+            else
+            {
+                var apprenticeshipResponse = await _commitmentsApiClient.GetApprenticeship(message.ApprenticeshipId); //147108                    
+                var result = _mapper.Map<Commitments>(apprenticeshipResponse);
+                result.Status = Status.Stopped;
+                result.ActualEndDate = message.StopDate;
+                _forecastingDbContext.Commitment.Add(result);
+            }
+
+            await _forecastingDbContext.SaveChangesAsync();
         }
     }
 }
