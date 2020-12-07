@@ -13,8 +13,4 @@
     <PackageReference Include="SFA.DAS.NServiceBus" Version="11.0.2" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SFA.DAS.Forecasting.Domain\SFA.DAS.Forecasting.Domain.csproj" />
-  </ItemGroup>
-
 </Project>
