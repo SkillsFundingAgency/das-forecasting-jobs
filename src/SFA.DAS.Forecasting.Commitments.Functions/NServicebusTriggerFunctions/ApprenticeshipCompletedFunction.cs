@@ -45,7 +45,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions
                 }
                 else
                 {
-                    var apprenticeshipResponse = await _commitmentsApiClient.GetApprenticeship(message.ApprenticeshipId); //147108                    
+                    var apprenticeshipResponse = await _commitmentsApiClient.GetApprenticeship(message.ApprenticeshipId);              
                     var result = _mapper.Map<Commitments>(apprenticeshipResponse);
                     result.Status = Status.Completed;
                     result.ActualEndDate = message.CompletionDate;
@@ -56,7 +56,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions
             }
             catch(CommitmentsApiModelException commitmentException )
             {
-                _logger.LogError(commitmentException, $"Failure to retrieve  ApprenticeshipId: [{message.ApprenticeshipId}]");
+                _logger.LogError(commitmentException, $"Apprenticeship Completed function Failure to retrieve  ApprenticeshipId: [{message.ApprenticeshipId}]");
             }
             catch (Exception ex)
             {              
