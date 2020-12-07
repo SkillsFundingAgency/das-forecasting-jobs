@@ -54,6 +54,8 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             builder.Services.AddOptions();
             var logger = serviceProvider.GetService<ILoggerProvider>().CreateLogger(GetType().AssemblyQualifiedName);
 
+            //logger.LogDebug("Just before the Nservicebus :" + config["NServiceBusConnectionString"]);
+
             if (!ConfigurationIsLocalOrDev(config))
             {
                 builder.Services.AddNServiceBus(logger);
