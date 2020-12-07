@@ -55,7 +55,7 @@ steps:
     command: publish
     publishWebProjects: false
     projects: 'src/SFA.DAS.Forecasting.Commitments.Functions/SFA.DAS.Forecasting.Commitments.Functions.csproj'
-    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory) --no-restore --no-build'
+    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
 
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
