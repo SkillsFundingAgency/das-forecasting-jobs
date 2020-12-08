@@ -73,7 +73,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             //builder.Services.AddDbContext<ForecastingDbContext>(options =>
             //options.UseSqlServer(config["DatabaseConnectionString"]));
 
-            builder.Services.AddScoped<IForecastingDbContext>(s => new ForecastingDbContext(config["DatabaseConnectionString"]));
+           // builder.Services.AddScoped<IForecastingDbContext>(s => new ForecastingDbContext(config["DatabaseConnectionString"]));
         }
 
         private bool ConfigurationIsLocalOrDev(IConfiguration configuration)

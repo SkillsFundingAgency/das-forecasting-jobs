@@ -8,18 +8,19 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions
 {
     public class ApprenticeshipCompletedFunction
     {
-        private readonly IForecastingDbContext _forecastingDbContext;
+       // private readonly IForecastingDbContext _forecastingDbContext;
 
-        public ApprenticeshipCompletedFunction(IForecastingDbContext forecastingDbContext)
+        //public ApprenticeshipCompletedFunction(IForecastingDbContext forecastingDbContext)
+        public ApprenticeshipCompletedFunction()
         {
-            _forecastingDbContext = forecastingDbContext;
+            //_forecastingDbContext = forecastingDbContext;
         }
 
         [FunctionName("ApprenticeshipCompleted")]
         public async Task Run(
             [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.ApprenticeshipCompletedEvent")] ApprenticeshipCompletedEvent message)
         {
-            await _forecastingDbContext.SaveChangesAsync(6333998, Status.Completed, message.CompletionDate);
+          //  await _forecastingDbContext.SaveChangesAsync(6333998, Status.Completed, message.CompletionDate);
             //var selectedApprenticeship = _forecastingDbContext.Commitment.FirstOrDefault(x => x.ApprenticeshipId == message.ApprenticeshipId);
             //if (selectedApprenticeship != null)
             //{
