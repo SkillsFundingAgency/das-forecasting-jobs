@@ -297,7 +297,7 @@
                                 },
                                 {
                                     "name": "FUNCTIONS_EXTENSION_VERSION",
-                                    "value": "[parameters('functionsExtensionVersion')]"
+                                    "value": "~3"
                                 },
                                 {
                                     "name": "EnvironmentName",
