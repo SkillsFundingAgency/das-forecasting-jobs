@@ -314,6 +314,14 @@
                                 {
                                     "name": "ConfigNames",
                                     "value": "[parameters('commitmentsConfigNames')]"
+                                },
+                                {
+                                    "name": "NServiceBusConnectionString",
+                                    "value": "[parameters('nServiceBusConnectionString')]"
+                                },
+                                {
+                                    "name": "NServiceBusLicense",
+                                    "value": "[parameters('nServiceBusLicense')]"
                                 }
                             ]
                         }
