@@ -348,7 +348,7 @@
                         "value": "[reference('commitments-function-app').outputs.managedServiceIdentityId.value]"
                     },
                     "assignmentType": {
-                        "value": "ServiceBusSender"
+                        "value": "ServiceBusOwner"
                     },
                     "resourceName": {
                         "value": "[parameters('sharedServiceBusName')]"
