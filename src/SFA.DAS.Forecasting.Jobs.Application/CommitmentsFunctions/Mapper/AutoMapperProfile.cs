@@ -17,7 +17,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Mapper
              .ForMember(dest => dest.ApprenticeshipId, m => m.MapFrom(src => src.Id))
              .BeforeMap((s, dest) => dest.FundingSource = FundingSource.Levy)
              .BeforeMap((s, dest) => dest.UpdatedDateTime = DateTime.UtcNow)
-             .BeforeMap((s, dest) => dest.HasHadPayment = true)
+             .BeforeMap((s, dest) => dest.HasHadPayment = false)
              .BeforeMap((s, dest) => dest.MonthlyInstallment = 0)
              .BeforeMap((s, dest) => dest.NumberOfInstallments = 0)
              .BeforeMap((s, dest) => dest.CompletionAmount = 0);
