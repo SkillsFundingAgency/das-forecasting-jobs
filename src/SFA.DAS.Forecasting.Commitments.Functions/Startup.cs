@@ -46,7 +46,6 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             }
 
             var config = configBuilder.Build();
-            builder.Services.AddOptions();
             var logger = serviceProvider.GetService<ILoggerProvider>().CreateLogger(GetType().AssemblyQualifiedName);
 
             logger.LogDebug("Just before the Nservicebus :" + config["NServiceBusConnectionString"]);
@@ -73,6 +72,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
                     });
             }
 
+            builder.Services.AddSingleton<IConfiguration>(config);
             builder.Services.AddSingleton(new AzureServiceTokenProvider());
             builder.Services.AddDbContext<ForecastingDbContext>();
             builder.Services.AddScoped<IForecastingDbContext, ForecastingDbContext>(provider => provider.GetService<ForecastingDbContext>());
@@ -80,8 +80,8 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
 
         private bool ConfigurationIsLocalOrDev(IConfiguration configuration)
         {
-            return configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
-                   configuration["EnvironmentName"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
+            return configuration["EnvironmentName"].Equals("LOCAL1", StringComparison.CurrentCultureIgnoreCase) ||
+                   configuration["EnvironmentName"].Equals("DEV1", StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }
