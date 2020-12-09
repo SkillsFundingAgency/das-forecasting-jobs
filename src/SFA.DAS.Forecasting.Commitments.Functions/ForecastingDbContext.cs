@@ -23,21 +23,30 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
         private readonly IConfiguration _configuration;
         private readonly AzureServiceTokenProvider _azureServiceTokenProvider;
 
+        public ForecastingDbContext(DbContextOptions options) : base(options)
+        {
+        }
+
         public ForecastingDbContext (IConfiguration config, DbContextOptions options, AzureServiceTokenProvider azureServiceTokenProvider) : base(options)
         {
             _configuration = config;
             _azureServiceTokenProvider = azureServiceTokenProvider;
         }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        var connection = new SqlConnection
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            ConnectionString = _configuration["DatabaseConnectionString"],
-            AccessToken = _azureServiceTokenProvider.GetAccessTokenAsync(AzureResource).Result
-        };
-        optionsBuilder.UseSqlServer(connection);
-    }
+            if (_configuration == null || _azureServiceTokenProvider == null)
+            {
+                return;
+            }
+
+            var connection = new SqlConnection
+            {
+                ConnectionString = _configuration["DatabaseConnectionString"],
+                AccessToken = _azureServiceTokenProvider.GetAccessTokenAsync(AzureResource).Result
+            };
+            optionsBuilder.UseSqlServer(connection);
+        }
 
         public DbSet<Commitments> Commitment { get; set; }
     }

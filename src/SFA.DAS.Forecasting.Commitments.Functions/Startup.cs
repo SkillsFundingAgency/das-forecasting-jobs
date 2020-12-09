@@ -1,6 +1,4 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -8,9 +6,9 @@ using NLog.Extensions.Logging;
 using NServiceBus;
 using SFA.DAS.Configuration.AzureTableStorage;
 using System;
-using System.Data.SqlClient;
 using System.IO;
 using System.Reflection;
+using SFA.DAS.Forecasting.Commitments.Functions.AppStart;
 
 [assembly: FunctionsStartup(typeof(SFA.DAS.Forecasting.Commitments.Functions.Startup))]
 namespace SFA.DAS.Forecasting.Commitments.Functions
@@ -28,13 +26,14 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
 
             var serviceProvider = builder.Services.BuildServiceProvider();
             var configuration = serviceProvider.GetService<IConfiguration>();
+            var environment = configuration["EnvironmentName"];
 
             var configBuilder = new ConfigurationBuilder()
                 .AddConfiguration(configuration)
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddEnvironmentVariables();
 
-            if (!ConfigurationIsLocalOrDev(configuration))
+            if (!ConfigurationIsLocalOrDev(environment))
             {
                 configBuilder.AddAzureTableStorage(options =>
                 {
@@ -48,13 +47,11 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             var config = configBuilder.Build();
             var logger = serviceProvider.GetService<ILoggerProvider>().CreateLogger(GetType().AssemblyQualifiedName);
 
-            logger.LogDebug("Just before the Nservicebus :" + config["NServiceBusConnectionString"]);
-
-            if (!ConfigurationIsLocalOrDev(config))
+            if (!ConfigurationIsLocalOrDev(environment))
             {
                 builder.Services.AddNServiceBus(logger);
             }
-            else if (ConfigurationIsLocalOrDev(config))
+            else
             {
                 builder.Services.AddNServiceBus(
                     logger,
@@ -73,15 +70,13 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             }
 
             builder.Services.AddSingleton<IConfiguration>(config);
-            builder.Services.AddSingleton(new AzureServiceTokenProvider());
-            builder.Services.AddDbContext<ForecastingDbContext>();
-            builder.Services.AddScoped<IForecastingDbContext, ForecastingDbContext>(provider => provider.GetService<ForecastingDbContext>());
+            builder.Services.AddDatabaseRegistration(config, environment );
         }
 
-        private bool ConfigurationIsLocalOrDev(IConfiguration configuration)
+        private bool ConfigurationIsLocalOrDev(string environment)
         {
-            return configuration["EnvironmentName"].Equals("LOCAL1", StringComparison.CurrentCultureIgnoreCase) ||
-                   configuration["EnvironmentName"].Equals("DEV1", StringComparison.CurrentCultureIgnoreCase);
+            return environment.Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+                   environment.Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
         }
     }
 }

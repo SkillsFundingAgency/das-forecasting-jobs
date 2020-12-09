@@ -5,7 +5,7 @@ using SFA.DAS.NServiceBus.AzureFunction.Configuration;
 using SFA.DAS.NServiceBus.AzureFunction.Hosting;
 using System;
 
-namespace SFA.DAS.Forecasting.Commitments.Functions
+namespace SFA.DAS.Forecasting.Commitments.Functions.AppStart
 {
     public static class ServiceCollectionExtensions
     {
