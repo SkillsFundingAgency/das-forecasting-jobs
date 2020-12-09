@@ -36,7 +36,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             });
 
             var serviceProvider = builder.Services.BuildServiceProvider();
-            var configuration = serviceProvider.GetService<IConfiguration>(); // Local
+            var configuration = serviceProvider.GetService<IConfiguration>();
 
             var configBuilder = new ConfigurationBuilder()
                 .AddConfiguration(configuration)
@@ -54,7 +54,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
                 });
             }
 
-            var config = configBuilder.Build(); // azure storage explorer
+            var config = configBuilder.Build();
             builder.Services.AddOptions();
             var logger = serviceProvider.GetService<ILoggerProvider>().CreateLogger(GetType().AssemblyQualifiedName);
 
