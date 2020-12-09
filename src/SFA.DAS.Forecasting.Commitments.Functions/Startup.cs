@@ -10,6 +10,10 @@ using NServiceBus;
 using SFA.DAS.CommitmentsV2.Api.Client;
 using SFA.DAS.CommitmentsV2.Api.Client.Configuration;
 using SFA.DAS.Configuration.AzureTableStorage;
+using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
+using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers;
+using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Mapper;
+using SFA.DAS.Forecasting.Jobs.Infrastructure;
 using SFA.DAS.Http;
 using System;
 using System.IO;
@@ -92,6 +96,9 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             var mapperConfig = new MapperConfiguration(config => { config.AddProfile<AutoMapperProfile>(); });
             IMapper mapper = mapperConfig.CreateMapper();
             builder.Services.AddSingleton(mapper);
+
+            builder.Services.AddSingleton<IApprenticeshipCompletedEventHandler, ApprenticeshipCompletedEventHandler>();
+            builder.Services.AddSingleton<IApprenticeshipStoppedEventHandler, ApprenticeshipStoppedEventHandler>();
         }
 
         private bool ConfigurationIsLocalOrDev(IConfiguration configuration)

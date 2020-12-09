@@ -5,8 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="2.2.0" />
+    <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Client" Version="5.1.0" />
+    <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Types" Version="5.1.0" />
+    <PackageReference Include="SFA.DAS.CommitmentsV2.Messages" Version="5.1.0" />
+    <PackageReference Include="SFA.DAS.CommitmentsV2.Types" Version="5.1.0" />
     <PackageReference Include="SFA.DAS.Encoding" Version="1.1.61" />
   </ItemGroup>
 
