@@ -1,4 +1,5 @@
 ﻿using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +8,7 @@ using NLog.Extensions.Logging;
 using NServiceBus;
 using SFA.DAS.Configuration.AzureTableStorage;
 using System;
+using System.Data.SqlClient;
 using System.IO;
 using System.Reflection;
 
@@ -71,9 +73,8 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
                     });
             }
 
-            builder.Services.AddDbContext<ForecastingDbContext>(options =>
-            options.UseSqlServer(config["DatabaseConnectionString"]));
-
+            builder.Services.AddSingleton(new AzureServiceTokenProvider());
+            builder.Services.AddDbContext<ForecastingDbContext>();
             builder.Services.AddScoped<IForecastingDbContext, ForecastingDbContext>(provider => provider.GetService<ForecastingDbContext>());
         }
 
