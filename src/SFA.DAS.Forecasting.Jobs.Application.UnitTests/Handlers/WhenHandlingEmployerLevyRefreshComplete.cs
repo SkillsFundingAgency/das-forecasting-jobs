@@ -60,10 +60,10 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
 
         [Test]
         [Category("UnitTest")]
-        [TestCase(4, 2019, 1)]
-        [TestCase(5, 2019, 2)]
-        [TestCase(1, 2020, 10)]
-        [TestCase(4, 2020, 1)]
+        [TestCase(4, 2019, 12)]
+        [TestCase(5, 2019, 1)]
+        [TestCase(1, 2020, 9)]
+        [TestCase(4, 2020, 12)]
 
         public async Task If_No_PeriodMonth_Should_Calculate_Today_Month(int currentMonth, int currentYear, short expectedPeriodMonth)
         {
@@ -90,10 +90,10 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
 
         [Test]
         [Category("UnitTest")]
-        [TestCase(4, 2019, "19-20")]
+        [TestCase(4, 2019, "18-19")]
         [TestCase(5, 2019, "19-20")]
         [TestCase(1, 2020, "19-20")]
-        [TestCase(4, 2020, "20-21")]
+        [TestCase(4, 2020, "19-20")]
 
         public async Task If_No_PeriodYear_Should_Calculate_Today_Year(int currentMonth, int currentYear, string expectedPeriodYear)
         {
