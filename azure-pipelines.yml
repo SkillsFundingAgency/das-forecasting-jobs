@@ -49,6 +49,14 @@ steps:
     projects: 'src/SFA.DAS.Forecasting.Triggers/SFA.DAS.Forecasting.Triggers.csproj'
     arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory) --no-restore --no-build'
 
+- task: DotNetCoreCLI@2
+  displayName: 'Publish'
+  inputs:
+    command: publish
+    publishWebProjects: false
+    projects: 'src/SFA.DAS.Forecasting.Commitments.Functions/SFA.DAS.Forecasting.Commitments.Functions.csproj'
+    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory) --no-restore --no-build'
+
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
   inputs:
