@@ -18,6 +18,7 @@ using SFA.DAS.Http;
 using System;
 using System.IO;
 using System.Reflection;
+using SFA.DAS.Forecasting.Commitments.Functions.AppStart;
 
 [assembly: FunctionsStartup(typeof(SFA.DAS.Forecasting.Commitments.Functions.Startup))]
 namespace SFA.DAS.Forecasting.Commitments.Functions
@@ -37,13 +38,14 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
 
             var serviceProvider = builder.Services.BuildServiceProvider();
             var configuration = serviceProvider.GetService<IConfiguration>();
+            var environment = configuration["EnvironmentName"];
 
             var configBuilder = new ConfigurationBuilder()
                 .AddConfiguration(configuration)
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddEnvironmentVariables();
 
-            if (!ConfigurationIsLocalOrDev(configuration))
+            if (!ConfigurationIsLocalOrDev(environment))
             {
                 configBuilder.AddAzureTableStorage(options =>
                 {
@@ -55,16 +57,13 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             }
 
             var config = configBuilder.Build();
-            builder.Services.AddOptions();
             var logger = serviceProvider.GetService<ILoggerProvider>().CreateLogger(GetType().AssemblyQualifiedName);
 
-            logger.LogDebug("Just before the Nservicebus :" + config["NServiceBusConnectionString"]);
-
-            if (!ConfigurationIsLocalOrDev(config))
+            if (!ConfigurationIsLocalOrDev(environment))
             {
                 builder.Services.AddNServiceBus(logger);
             }
-            else if (ConfigurationIsLocalOrDev(config))
+            else
             {
                 builder.Services.AddNServiceBus(
                     logger,
@@ -89,7 +88,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
 
             ConfigureLogFactoy();
 
-            CommitmentsClientApiConfiguration commitmentsClientApiConfig = GetCommitmentsClientApiConfiguration(builder, serviceProvider, config);
+            CommitmentsClientApiConfiguration commitmentsClientApiConfig = GetCommitmentsClientApiConfiguration(builder, serviceProvider, config, environment);
             builder.Services.AddSingleton<ICommitmentsApiClientFactory>(x => new CommitmentsApiClientFactory(commitmentsClientApiConfig, _loggerFactory));
             builder.Services.AddTransient<ICommitmentsApiClient>(provider => provider.GetRequiredService<ICommitmentsApiClientFactory>().CreateClient());
                                   
@@ -99,18 +98,20 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
 
             builder.Services.AddSingleton<IApprenticeshipCompletedEventHandler, ApprenticeshipCompletedEventHandler>();
             builder.Services.AddSingleton<IApprenticeshipStoppedEventHandler, ApprenticeshipStoppedEventHandler>();
+            builder.Services.AddSingleton<IConfiguration>(config);
+            builder.Services.AddDatabaseRegistration(config, environment );
         }
 
-        private bool ConfigurationIsLocalOrDev(IConfiguration configuration)
+        private bool ConfigurationIsLocalOrDev(string environment)
         {
-            return configuration["EnvironmentName"].Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
-                   configuration["EnvironmentName"].Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
+            return environment.Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
+                   environment.Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
         }
 
-        private CommitmentsClientApiConfiguration GetCommitmentsClientApiConfiguration(IFunctionsHostBuilder builder, ServiceProvider serviceProvider, IConfigurationRoot config)
+        private CommitmentsClientApiConfiguration GetCommitmentsClientApiConfiguration(IFunctionsHostBuilder builder, ServiceProvider serviceProvider, IConfigurationRoot config, string environment)
         {
             CommitmentsClientApiConfiguration commitmentsClientApiConfig;
-            if (ConfigurationIsLocalOrDev(config))
+            if (ConfigurationIsLocalOrDev(environment))
             {
                 commitmentsClientApiConfig = new CommitmentsClientApiConfiguration
                 {

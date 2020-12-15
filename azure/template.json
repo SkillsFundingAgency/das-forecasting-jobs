@@ -314,6 +314,14 @@
                                 {
                                     "name": "ConfigNames",
                                     "value": "[parameters('commitmentsConfigNames')]"
+                                },
+                                {
+                                    "name": "NServiceBusConnectionString",
+                                    "value": "[parameters('nServiceBusConnectionString')]"
+                                },
+                                {
+                                    "name": "NServiceBusLicense",
+                                    "value": "[parameters('nServiceBusLicense')]"
                                 }
                             ]
                         }
@@ -332,7 +340,7 @@
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignment.json')]",
+                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignments/role-assignment-service-bus.json')]",
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
@@ -340,7 +348,7 @@
                         "value": "[reference('commitments-function-app').outputs.managedServiceIdentityId.value]"
                     },
                     "assignmentType": {
-                        "value": "ServiceBusReceiver"
+                        "value": "ServiceBusOwner"
                     },
                     "resourceName": {
                         "value": "[parameters('sharedServiceBusName')]"
