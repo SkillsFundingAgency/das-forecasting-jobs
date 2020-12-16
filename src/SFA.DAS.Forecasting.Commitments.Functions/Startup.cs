@@ -84,8 +84,8 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             ConfigureLogFactoy();
 
             CommitmentsClientApiConfiguration commitmentsClientApiConfig = GetCommitmentsClientApiConfiguration(builder, serviceProvider, config, environment);
-            builder.Services.AddScoped<ICommitmentsApiClientFactory>(x => new CommitmentsApiClientFactory(commitmentsClientApiConfig, _loggerFactory));
-            builder.Services.AddScoped<ICommitmentsApiClient>(provider => provider.GetRequiredService<ICommitmentsApiClientFactory>().CreateClient());
+            builder.Services.AddSingleton<ICommitmentsApiClientFactory>(x => new CommitmentsApiClientFactory(commitmentsClientApiConfig, _loggerFactory));
+            builder.Services.AddSingleton<ICommitmentsApiClient>(provider => provider.GetRequiredService<ICommitmentsApiClientFactory>().CreateClient());
                                   
             var mapperConfig = new MapperConfiguration(config => { config.AddProfile<AutoMapperProfile>(); });
             IMapper mapper = mapperConfig.CreateMapper();
