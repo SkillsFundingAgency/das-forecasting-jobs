@@ -19,7 +19,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.UnitTests
         public async Task Then_Message_Will_Be_Handled()
         {
             //Arrange
-            var fixture = new ApprenticeshipCompletedEventTestsFixture();
+            var fixture = new ApprenticeshipStoppedEventTestsFixture();
 
             //Act
             await fixture.Run();
@@ -32,21 +32,21 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.UnitTests
     public class ApprenticeshipStoppedEventTestsFixture
     {
         public Mock<IApprenticeshipStoppedEventHandler> MockpprenticeshipStoppedEventHandler { get; set; }
-        public Mock<ILogger<ApprenticeshipStoppedFunction>> MockLogger { get; set; }        
-        public Fixture Fixture { get; set; } 
+        public Mock<ILogger<ApprenticeshipStoppedFunction>> MockLogger { get; set; }
+        public Fixture Fixture { get; set; }
         public ApprenticeshipStoppedEvent ApprenticeshipStoppedEvent { get; set; }
         public ApprenticeshipStoppedFunction Sut { get; set; }
         public ApprenticeshipStoppedEventTestsFixture()
         {
             MockpprenticeshipStoppedEventHandler = new Mock<IApprenticeshipStoppedEventHandler>();
-            MockLogger = new Mock<ILogger<ApprenticeshipStoppedFunction>>();            
-            Fixture = new Fixture();          
+            MockLogger = new Mock<ILogger<ApprenticeshipStoppedFunction>>();
+            Fixture = new Fixture();
 
             ApprenticeshipStoppedEvent = Fixture.Create<ApprenticeshipStoppedEvent>();
 
             var configuration = new MapperConfiguration(cfg => cfg.AddProfile<AutoMapperProfile>());
             var mapper = new Mapper(configuration);
-            
+
             Sut = new ApprenticeshipStoppedFunction(MockpprenticeshipStoppedEventHandler.Object, MockLogger.Object);
         }
 
