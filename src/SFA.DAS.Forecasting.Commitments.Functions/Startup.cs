@@ -81,23 +81,18 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
                     });
             }
 
-            builder.Services.AddDbContext<ForecastingDbContext>(options =>
-            options.UseSqlServer(config["DatabaseConnectionString"]));
-
-            //builder.Services.AddSingleton<IForecastingDbContext, ForecastingDbContext>(provider => provider.GetService<ForecastingDbContext>());
-
             ConfigureLogFactoy();
 
             CommitmentsClientApiConfiguration commitmentsClientApiConfig = GetCommitmentsClientApiConfiguration(builder, serviceProvider, config, environment);
-            builder.Services.AddSingleton<ICommitmentsApiClientFactory>(x => new CommitmentsApiClientFactory(commitmentsClientApiConfig, _loggerFactory));
-            builder.Services.AddTransient<ICommitmentsApiClient>(provider => provider.GetRequiredService<ICommitmentsApiClientFactory>().CreateClient());
+            builder.Services.AddScoped<ICommitmentsApiClientFactory>(x => new CommitmentsApiClientFactory(commitmentsClientApiConfig, _loggerFactory));
+            builder.Services.AddScoped<ICommitmentsApiClient>(provider => provider.GetRequiredService<ICommitmentsApiClientFactory>().CreateClient());
                                   
             var mapperConfig = new MapperConfiguration(config => { config.AddProfile<AutoMapperProfile>(); });
             IMapper mapper = mapperConfig.CreateMapper();
             builder.Services.AddSingleton(mapper);
 
-            builder.Services.AddSingleton<IApprenticeshipCompletedEventHandler, ApprenticeshipCompletedEventHandler>();
-            builder.Services.AddSingleton<IApprenticeshipStoppedEventHandler, ApprenticeshipStoppedEventHandler>();
+            builder.Services.AddScoped<IApprenticeshipCompletedEventHandler, ApprenticeshipCompletedEventHandler>();
+            builder.Services.AddScoped<IApprenticeshipStoppedEventHandler, ApprenticeshipStoppedEventHandler>();
             builder.Services.AddSingleton<IConfiguration>(config);
             builder.Services.AddDatabaseRegistration(config, environment );
         }
