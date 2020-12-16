@@ -84,7 +84,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             builder.Services.AddDbContext<ForecastingDbContext>(options =>
             options.UseSqlServer(config["DatabaseConnectionString"]));
 
-            builder.Services.AddScoped<IForecastingDbContext, ForecastingDbContext>(provider => provider.GetService<ForecastingDbContext>());
+            builder.Services.AddSingleton<IForecastingDbContext, ForecastingDbContext>(provider => provider.GetService<ForecastingDbContext>());
 
             ConfigureLogFactoy();
 
