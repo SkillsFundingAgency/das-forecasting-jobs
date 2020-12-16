@@ -83,9 +83,9 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
 
             ConfigureLogFactoy();
 
-            CommitmentsClientApiConfiguration commitmentsClientApiConfig = GetCommitmentsClientApiConfiguration(builder, serviceProvider, config, environment);
+            CommitmentsClientApiConfiguration commitmentsClientApiConfig = GetCommitmentsClientApiConfiguration(builder, serviceProvider, config, environment);            
             builder.Services.AddSingleton<ICommitmentsApiClientFactory>(x => new CommitmentsApiClientFactory(commitmentsClientApiConfig, _loggerFactory));
-            builder.Services.AddSingleton<ICommitmentsApiClient>(provider => provider.GetRequiredService<ICommitmentsApiClientFactory>().CreateClient());
+            builder.Services.AddTransient<ICommitmentsApiClient>(provider => provider.GetRequiredService<ICommitmentsApiClientFactory>().CreateClient());
                                   
             var mapperConfig = new MapperConfiguration(config => { config.AddProfile<AutoMapperProfile>(); });
             IMapper mapper = mapperConfig.CreateMapper();
@@ -121,7 +121,8 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             {
                 builder.Services.Configure<CommitmentsClientApiConfiguration>(config.GetSection("CommitmentsV2Api"));
                 builder.Services.AddSingleton(cfg => cfg.GetService<IOptions<CommitmentsClientApiConfiguration>>().Value);
-                commitmentsClientApiConfig = serviceProvider.GetService<CommitmentsClientApiConfiguration>();
+                //commitmentsClientApiConfig = serviceProvider.GetService<CommitmentsClientApiConfiguration>();
+                commitmentsClientApiConfig = serviceProvider.GetService<IOptions<CommitmentsClientApiConfiguration>>().Value;                
             }
 
             return commitmentsClientApiConfig;
