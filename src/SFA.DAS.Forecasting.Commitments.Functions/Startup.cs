@@ -91,7 +91,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
 
             builder.Services.AddScoped<IApprenticeshipCompletedEventHandler, ApprenticeshipCompletedEventHandler>();
             builder.Services.AddScoped<IApprenticeshipStoppedEventHandler, ApprenticeshipStoppedEventHandler>();
-            builder.Services.AddScoped<IApprenticeshipUpdatedApprovedEventHandler, ApprenticeshipUpdatedApprovedEventHandler>();
+            builder.Services.AddScoped<IApprenticeshipStopDateChangedEventHandler, ApprenticeshipStopDateChangedEventHandler>();
             builder.Services.AddScoped<IApprenticeshipCompletionDateUpdatedEventHandler, ApprenticeshipCompletionDateUpdatedEventHandler>(); 
 
             builder.Services.AddSingleton<IConfiguration>(config);

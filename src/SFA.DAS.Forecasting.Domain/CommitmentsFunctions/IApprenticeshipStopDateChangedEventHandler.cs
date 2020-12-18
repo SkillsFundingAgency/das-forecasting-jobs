@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Domain.CommitmentsFunctions
 {
-    public interface IApprenticeshipUpdatedApprovedEventHandler
+    public interface IApprenticeshipStopDateChangedEventHandler
     {
-        Task Handle(ApprenticeshipUpdatedApprovedEvent apprenticeshipCompletedEvent);
+        Task Handle(ApprenticeshipStopDateChangedEvent apprenticeshipCompletedEvent);
     }
 }

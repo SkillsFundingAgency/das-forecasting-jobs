@@ -22,14 +22,14 @@ using System.Threading.Tasks;
 namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
 {
     [TestFixture]
-    public class WhenApprenticeshipUpdatedApprovedEvent
+    public class WhenApprenticeshipStopDateChangedEvent
     {
 
         [Test]
         public async Task Then_Update_ActualEndDate()
         {
             //Arrange
-            var fixture = new ApprenticeshipUpdatedApprovedEventFixture();
+            var fixture = new ApprenticeshipStopDateChangedEventFixture();
             
             //Act
             await fixture.Run();
@@ -42,7 +42,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
         public async Task Then_Update_Status()
         {
             //Arrange
-            var fixture = new ApprenticeshipUpdatedApprovedEventFixture();
+            var fixture = new ApprenticeshipStopDateChangedEventFixture();
             
             //Act
             await fixture.Run();
@@ -55,7 +55,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
         public async Task If_Apprenticeship_NotExists_Then_CreateRecord()
         {
             //Arrange
-            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture().SetApprenticeshipId();
+            var fixture = new ApprenticeshipStopDateChangedEventFixture().SetApprenticeshipId();
 
             //Act
             await fixture.Run();
@@ -69,7 +69,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
         public void If_Event_Errors_Should_Log_Error()
         {
             //Arrange            
-            var fixture = new ApprenticeshipUpdatedApprovedEventFixture().SetApprenticeshipId().SetException();
+            var fixture = new ApprenticeshipStopDateChangedEventFixture().SetApprenticeshipId().SetException();
 
             //Act
             fixture.RunEventWithException();
@@ -82,7 +82,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
         public void If_Api_Call_Unsuccesful_Should_Log_Error()
         {
             //Arrange            
-            var fixture = new ApprenticeshipUpdatedApprovedEventFixture().SetApprenticeshipId().SetCommitmentsApiModelException();
+            var fixture = new ApprenticeshipStopDateChangedEventFixture().SetApprenticeshipId().SetCommitmentsApiModelException();
 
             //Act
             fixture.RunEventWithCommitmentsApiModelException();
@@ -92,29 +92,29 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
         }
     }
 
-    public class ApprenticeshipUpdatedApprovedEventFixture
+    public class ApprenticeshipStopDateChangedEventFixture
     {
         public Mock<IMessageHandlerContext> MessageHandlerContext { get; set; }
         public Mock<ICommitmentsApiClient> MockCommitmentsApiClient { get; set; }
         public Mock<IMapper> MockMapper { get; set; }
-        public Mock<ILogger<ApprenticeshipUpdatedApprovedEventHandler>> MockLogger { get; set; }
-        public Mock<IApprenticeshipUpdatedApprovedEventHandler> MockApprenticeshipCompletionDateUpdatedEventHandler { get; set; }
+        public Mock<ILogger<ApprenticeshipStopDateChangedEventHandler>> MockLogger { get; set; }
+        public Mock<IApprenticeshipStopDateChangedEventHandler> MockApprenticeshipStopDateChangedEventHandler { get; set; }
         public ForecastingDbContext Db { get; set; }
         public Commitments Commitment { get; set; }
         public Fixture Fixture { get; set; }
         public long CommitmentId { get; set; }
-        public ApprenticeshipUpdatedApprovedEventHandler Sut { get; set; }
+        public ApprenticeshipStopDateChangedEventHandler Sut { get; set; }
         public GetApprenticeshipResponse ApprenticeshipResponse { get; set; }
 
-        public ApprenticeshipUpdatedApprovedEvent ApprenticeshipUpdatedApprovedEvent { get; set; }
+        public ApprenticeshipStopDateChangedEvent ApprenticeshipStopDateChangedEvent { get; set; }
 
-        public ApprenticeshipUpdatedApprovedEventFixture()
+        public ApprenticeshipStopDateChangedEventFixture()
         {
             MessageHandlerContext = new Mock<IMessageHandlerContext>();
             MockCommitmentsApiClient = new Mock<ICommitmentsApiClient>();
             MockMapper = new Mock<IMapper>();
-            MockLogger = new Mock<ILogger<ApprenticeshipUpdatedApprovedEventHandler>>();
-            MockApprenticeshipCompletionDateUpdatedEventHandler = new Mock<IApprenticeshipUpdatedApprovedEventHandler>();
+            MockLogger = new Mock<ILogger<ApprenticeshipStopDateChangedEventHandler>>();
+            MockApprenticeshipStopDateChangedEventHandler = new Mock<IApprenticeshipStopDateChangedEventHandler>();
             Fixture = new Fixture();
 
             ApprenticeshipResponse = Fixture.Create<GetApprenticeshipResponse>();
@@ -131,23 +131,23 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
             Commitment.Status = Status.LiveOrWaitingToStart;
             Db.Commitment.Add(Commitment);
 
-            ApprenticeshipUpdatedApprovedEvent = Fixture.Create<ApprenticeshipUpdatedApprovedEvent>();
-            ApprenticeshipUpdatedApprovedEvent.ApprenticeshipId = Commitment.ApprenticeshipId;
+            ApprenticeshipStopDateChangedEvent = Fixture.Create<ApprenticeshipStopDateChangedEvent>();
+            ApprenticeshipStopDateChangedEvent.ApprenticeshipId = Commitment.ApprenticeshipId;
 
             var configuration = new MapperConfiguration(cfg => cfg.AddProfile<AutoMapperProfile>());
             var mapper = new Mapper(configuration);
 
-            Sut = new ApprenticeshipUpdatedApprovedEventHandler(Db, MockCommitmentsApiClient.Object, mapper, MockLogger.Object);
+            Sut = new ApprenticeshipStopDateChangedEventHandler(Db, MockCommitmentsApiClient.Object, mapper, MockLogger.Object);
             Db.SaveChanges();
         }
 
-        public ApprenticeshipUpdatedApprovedEventFixture SetApprenticeshipId()
+        public ApprenticeshipStopDateChangedEventFixture SetApprenticeshipId()
         {
-            ApprenticeshipUpdatedApprovedEvent.ApprenticeshipId = 0;
+            ApprenticeshipStopDateChangedEvent.ApprenticeshipId = 0;
 
             return this;
         }
-        public ApprenticeshipUpdatedApprovedEventFixture SetCommitmentsApiModelException()
+        public ApprenticeshipStopDateChangedEventFixture SetCommitmentsApiModelException()
         {
             MockCommitmentsApiClient.Setup(s => s.GetApprenticeship(It.IsAny<long>(), It.IsAny<CancellationToken>()))
                     .Throws(new CommitmentsApiModelException(new List<ErrorDetail>()));
@@ -155,7 +155,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
             return this;
         }
 
-        public ApprenticeshipUpdatedApprovedEventFixture SetException()
+        public ApprenticeshipStopDateChangedEventFixture SetException()
         {
             MockCommitmentsApiClient.Setup(x => x.GetApprenticeship(It.IsAny<long>(), It.IsAny<CancellationToken>())).ThrowsAsync(new Exception());
 
@@ -164,22 +164,22 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
 
         public async Task Run()
         {
-            await Sut.Handle(ApprenticeshipUpdatedApprovedEvent);
+            await Sut.Handle(ApprenticeshipStopDateChangedEvent);
         }
 
         public void RunEventWithException()
         {
-           Assert.ThrowsAsync<Exception>(() => Sut.Handle(ApprenticeshipUpdatedApprovedEvent));
+           Assert.ThrowsAsync<Exception>(() => Sut.Handle(ApprenticeshipStopDateChangedEvent));
         }
 
         public void RunEventWithCommitmentsApiModelException()
         {
-            Assert.ThrowsAsync<CommitmentsApiModelException>(() => Sut.Handle(ApprenticeshipUpdatedApprovedEvent));
+            Assert.ThrowsAsync<CommitmentsApiModelException>(() => Sut.Handle(ApprenticeshipStopDateChangedEvent));
         }
 
         internal void AssertActualEndDate()
         {
-            Assert.AreEqual(ApprenticeshipUpdatedApprovedEvent.EndDate, Db.Commitment.Where(x => x.Id == CommitmentId).First().ActualEndDate);
+            Assert.AreEqual(ApprenticeshipStopDateChangedEvent.StopDate, Db.Commitment.Where(x => x.Id == CommitmentId).First().ActualEndDate);
         }
 
         internal void AssertStatus()
