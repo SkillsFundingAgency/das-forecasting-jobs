@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -13,7 +12,6 @@ using SFA.DAS.Configuration.AzureTableStorage;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
 using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers;
 using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Mapper;
-using SFA.DAS.Forecasting.Jobs.Infrastructure;
 using SFA.DAS.Http;
 using System;
 using System.IO;
@@ -93,6 +91,9 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
 
             builder.Services.AddScoped<IApprenticeshipCompletedEventHandler, ApprenticeshipCompletedEventHandler>();
             builder.Services.AddScoped<IApprenticeshipStoppedEventHandler, ApprenticeshipStoppedEventHandler>();
+            builder.Services.AddScoped<IApprenticeshipUpdatedApprovedEventHandler, ApprenticeshipUpdatedApprovedEventHandler>();
+            builder.Services.AddScoped<IApprenticeshipCompletionDateUpdatedEventHandler, ApprenticeshipCompletionDateUpdatedEventHandler>(); 
+
             builder.Services.AddSingleton<IConfiguration>(config);
             builder.Services.AddDatabaseRegistration(config, environment );
         }
@@ -119,7 +120,8 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             }
             else
             {
-                builder.Services.Configure<CommitmentsClientApiConfiguration>(config.GetSection("CommitmentsV2Api"));
+                var section = config.GetSection("CommitmentsV2Api");
+                builder.Services.Configure<CommitmentsClientApiConfiguration>(section);
                 builder.Services.AddSingleton(cfg => cfg.GetService<IOptions<CommitmentsClientApiConfiguration>>().Value);
                 commitmentsClientApiConfig = serviceProvider.GetService<CommitmentsClientApiConfiguration>();
             }

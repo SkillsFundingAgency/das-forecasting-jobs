@@ -5,7 +5,6 @@ using NUnit.Framework;
 using SFA.DAS.CommitmentsV2.Messages.Events;
 using SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
-using System;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Commitments.Functions.UnitTests
@@ -56,24 +55,6 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.UnitTests
         {
             MockLogger.VerifyLogging(LogLevel.Information);
             MockpprenticeshipCompletedEventHandler.Verify(s => s.Handle(It.Is<ApprenticeshipCompletedEvent>(c => c.ApprenticeshipId.Equals(ApprenticeshipCompletedEvent.ApprenticeshipId))), Times.Once);
-        }
-    }
-
-    public static class VerifyLog
-    {
-        public static Mock<ILogger<T>> VerifyLogging<T>(this Mock<ILogger<T>> logger, LogLevel level, Times? times = null)
-        {
-            times ??= Times.AtLeastOnce();
-
-            logger.Verify(
-                x => x.Log(
-                    It.Is<LogLevel>(l => l == level),
-                    It.IsAny<EventId>(),
-                    It.Is<It.IsAnyType>((v, t) => true),
-                    It.IsAny<Exception>(),
-                    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), (Times)times);
-
-            return logger;
         }
     }
 }
