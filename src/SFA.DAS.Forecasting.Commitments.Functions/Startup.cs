@@ -121,10 +121,9 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             else
             {
                 var section = config.GetSection("CommitmentsV2Api");
+                commitmentsClientApiConfig =  section.Get<CommitmentsClientApiConfiguration>();
                 builder.Services.Configure<CommitmentsClientApiConfiguration>(section);
-                builder.Services.AddSingleton(cfg => cfg.GetService<IOptions<CommitmentsClientApiConfiguration>>().Value);
-                //commitmentsClientApiConfig = serviceProvider.GetService<CommitmentsClientApiConfiguration>();
-                commitmentsClientApiConfig = serviceProvider.GetService<IOptions<CommitmentsClientApiConfiguration>>().Value;                
+                builder.Services.AddSingleton(cfg => commitmentsClientApiConfig);
             }
 
             return commitmentsClientApiConfig;
