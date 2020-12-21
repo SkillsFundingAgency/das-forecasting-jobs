@@ -51,18 +51,18 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
             fixture.AssertStatus();
         }
 
-        [Test]
-        public async Task If_Apprenticeship_NotExists_Then_CreateRecord()
-        {
-            //Arrange
-            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture().SetApprenticeshipId();
+        //[Test]
+        //public async Task If_Apprenticeship_NotExists_Then_CreateRecord()
+        //{
+        //    //Arrange
+        //    var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture().SetApprenticeshipId();
 
-            //Act
-            await fixture.Run();
+        //    //Act
+        //    await fixture.Run();
 
-            //Assert
-            fixture.AssertRecordCreated();
-        }       
+        //    //Assert
+        //    fixture.AssertRecordCreated();
+        //}       
 
 
         [Test]
