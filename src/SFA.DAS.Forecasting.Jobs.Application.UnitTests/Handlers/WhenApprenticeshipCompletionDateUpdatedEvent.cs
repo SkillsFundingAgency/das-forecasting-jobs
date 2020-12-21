@@ -29,7 +29,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
         public async Task Then_Update_ActualEndDate()
         {
             //Arrange
-            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture();
+            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false);
             
             //Act
             await fixture.Run();
@@ -42,7 +42,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
         public async Task Then_Update_Status()
         {
             //Arrange
-            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture();
+            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false);
             
             //Act
             await fixture.Run();
@@ -55,21 +55,21 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
         public async Task If_Apprenticeship_NotExists_Then_CreateRecord()
         {
             //Arrange
-            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture().SetApprenticeshipId();
+            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(true).SetApprenticeshipId();
 
             //Act
             await fixture.Run();
 
             //Assert
             fixture.AssertRecordCreated();
-        }       
+        }
 
 
         [Test]
         public void If_Event_Errors_Should_Log_Error()
         {
             //Arrange            
-            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture().SetApprenticeshipId().SetException();
+            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false).SetApprenticeshipId().SetException();
 
             //Act
             fixture.RunEventWithException();
@@ -82,7 +82,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
         public void If_Api_Call_Unsuccesful_Should_Log_Error()
         {
             //Arrange            
-            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture().SetApprenticeshipId().SetCommitmentsApiModelException();
+            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false).SetApprenticeshipId().SetCommitmentsApiModelException();
 
             //Act
             fixture.RunEventWithCommitmentsApiModelException();
@@ -108,7 +108,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
 
         public ApprenticeshipCompletionDateUpdatedEvent ApprenticeshipCompletionDateUpdatedEvent { get; set; }
 
-        public ApprenticeshipCompletionDateUpdatedEventFixture()
+        public ApprenticeshipCompletionDateUpdatedEventFixture(bool SetState)
         {
             MessageHandlerContext = new Mock<IMessageHandlerContext>();
             MockCommitmentsApiClient = new Mock<ICommitmentsApiClient>();
@@ -131,6 +131,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
             Commitment.ActualEndDate = null;
             Commitment.Status = Status.LiveOrWaitingToStart;
             Db.Commitment.Add(Commitment);
+            if (SetState) { Db.Entry(Commitment).State = EntityState.Detached; }
 
             ApprenticeshipCompletionDateUpdatedEvent = Fixture.Create<ApprenticeshipCompletionDateUpdatedEvent>();
             ApprenticeshipCompletionDateUpdatedEvent.ApprenticeshipId = Commitment.ApprenticeshipId;
