@@ -53,7 +53,7 @@
         },
         "appServicePlanTier": {
             "type": "string",
-            "defaultValue": "Basic"
+            "defaultValue": "Standard"
         },
         "nServiceBusConnectionString": {
             "type": "securestring"
@@ -76,6 +76,18 @@
         "functionsExtensionVersion": {
             "type": "string",
             "defaultValue": "~2.0"
+        },
+        "sharedEnvVirtualNetworkName": {
+            "type": "string"
+        },
+        "subnetObject": {
+            "type": "object"
+        },
+        "subnetServiceEndpointList": {
+            "type": "array"
+        },
+        "subnetDelegations": {
+            "type": "array"
         }
     },
     "variables": {
@@ -95,6 +107,36 @@
             "location": "[parameters('resourceGroupLocation')]",
             "tags": "[parameters('tags')]",
             "properties": {
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2020-06-01",
+            "name": "function-app-subnet",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'subnet.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "virtualNetworkName": {
+                        "value": "[parameters('sharedEnvVirtualNetworkName')]"
+                    },
+                    "subnetName": {
+                        "value": "[parameters('subnetObject').name]"
+                    },
+                    "subnetAddressPrefix": {
+                        "value": "[parameters('subnetObject').addressSpace]"
+                    },
+                    "serviceEndpointList": {
+                        "value": "[parameters('subnetServiceEndpointList')]"
+                    },
+                    "delegations": {
+                        "value": "[parameters('subnetDelegations')]"
+                    }
+                }
             }
         },
         {
@@ -205,6 +247,9 @@
                     "appServicePlanResourceGroup": {
                         "value": "[variables('resourceGroupName')]"
                     },
+                    "subnetResourceId": {
+                        "value": "[reference('function-app-subnet').outputs.subnetResourceId.value]"
+                    },
                     "functionAppAppSettings": {
                         "value": {
                             "array": [
@@ -256,7 +301,8 @@
             "dependsOn": [
                 "function-app-insights",
                 "storage-account",
-                "app-service-plan"
+                "app-service-plan",
+                "function-app-subnet"
             ]
         },
         {
@@ -279,6 +325,9 @@
                     },
                     "appServicePlanResourceGroup": {
                         "value": "[variables('resourceGroupName')]"
+                    },
+                    "subnetResourceId": {
+                        "value": "[reference('function-app-subnet').outputs.subnetResourceId.value]"
                     },
                     "functionAppAppSettings": {
                         "value": {
