@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.Forecasting.Commitments.Functions
+namespace SFA.DAS.Forecasting.Jobs.Infrastructure
 {
     public interface IForecastingDbContext
     {
