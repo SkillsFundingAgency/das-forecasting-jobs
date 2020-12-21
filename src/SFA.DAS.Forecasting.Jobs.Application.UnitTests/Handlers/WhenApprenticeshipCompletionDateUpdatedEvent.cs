@@ -123,10 +123,11 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
 
             Db = new ForecastingDbContext(new DbContextOptionsBuilder<ForecastingDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())          
+                .EnableSensitiveDataLogging()
                 .Options);
 
             Commitment = Fixture.Create<Commitments>();
-            Commitment.Id = CommitmentId = 1;
+            Commitment.Id = CommitmentId = 101;
             Commitment.ActualEndDate = null;
             Commitment.Status = Status.LiveOrWaitingToStart;
             Db.Commitment.Add(Commitment);
