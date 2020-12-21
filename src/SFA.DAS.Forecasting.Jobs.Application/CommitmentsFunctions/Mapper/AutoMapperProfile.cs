@@ -10,6 +10,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Mapper
         public AutoMapperProfile()
         {
             CreateMap<GetApprenticeshipResponse, Commitments>()
+             .ForMember(dest => dest.Id, opt => opt.Ignore())
              .ForMember(dest => dest.LearnerId, m => m.MapFrom(src => long.Parse(src.Uln)))
              .ForMember(dest => dest.SendingEmployerAccountId, m => m.MapFrom(src => src.EmployerAccountId))
              .ForMember(dest => dest.PlannedEndDate, m => m.MapFrom(src => src.EndDate))
