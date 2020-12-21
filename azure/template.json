@@ -326,6 +326,9 @@
                     "appServicePlanResourceGroup": {
                         "value": "[variables('resourceGroupName')]"
                     },
+                    "subnetResourceId": {
+                        "value": "[reference('function-app-subnet').outputs.subnetResourceId.value]"
+                    },
                     "functionAppAppSettings": {
                         "value": {
                             "array": [
