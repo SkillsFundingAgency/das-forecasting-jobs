@@ -3,13 +3,10 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoFixture;
-using FluentAssertions;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Internal;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
@@ -69,7 +66,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
             // Assert
             Assert.ThrowsAsync<Exception>(() => _sut.Trigger(1, "18-19", 1));
             _loggerMock.Verify(
-                x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(), It.Is<Exception>(e => e.Message == "Its Broken"),
+                x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.Is<Exception>(e => e.Message == "Its Broken"),
                     It.IsAny<Func<object, Exception, string>>()), Times.Once);
         }
 
@@ -89,7 +86,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
 
             // Assert
             _loggerMock.Verify(
-               x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<FormattedLogValues>(), It.IsAny<Exception>(),
+               x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(),
                    It.IsAny<Func<object, Exception, string>>()), Times.AtLeastOnce());
         }
     }

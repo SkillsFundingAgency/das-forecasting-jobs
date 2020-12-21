@@ -1,34 +1,35 @@
 ﻿using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Logging;
 using SFA.DAS.CommitmentsV2.Messages.Events;
+using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
 using SFA.DAS.NServiceBus.AzureFunction.Attributes;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions
 {
     public class ApprenticeshipStoppedFunction
     {
-        private readonly IForecastingDbContext _forecastingDbContext;
+        private readonly IApprenticeshipStoppedEventHandler _apprenticeshipStoppedEventHandler;
+        private readonly ILogger _logger;
 
-        public ApprenticeshipStoppedFunction(IForecastingDbContext forecastingDbContext)
+        public ApprenticeshipStoppedFunction(
+            IApprenticeshipStoppedEventHandler apprenticeshipStoppedEventHandler,
+            ILogger<ApprenticeshipStoppedFunction> logger)
         {
-            _forecastingDbContext = forecastingDbContext;
+            _apprenticeshipStoppedEventHandler = apprenticeshipStoppedEventHandler;         
+            _logger = logger;
         }
 
         [FunctionName("ApprenticeshipStopped")]
         public async Task Run(
             [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.ApprenticeshipStopped")] ApprenticeshipStoppedEvent message)
         {
-            var selectedApprenticeship = _forecastingDbContext.Commitment.FirstOrDefault(x => x.ApprenticeshipId == message.ApprenticeshipId);
-            if (selectedApprenticeship != null)
-            {
-                selectedApprenticeship.ActualEndDate = message.StopDate;
-                selectedApprenticeship.Status = Status.Stopped;
-                await _forecastingDbContext.SaveChangesAsync();
-            }
+            _logger.LogInformation($"Apprenticeship Stopped function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
+
+            await _apprenticeshipStoppedEventHandler.Handle(message);
+
+            _logger.LogInformation($"Apprenticeship Stopped function Finished at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
         }
     }
 }
