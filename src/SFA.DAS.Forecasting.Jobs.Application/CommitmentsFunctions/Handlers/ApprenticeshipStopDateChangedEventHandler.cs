@@ -4,6 +4,8 @@ using SFA.DAS.CommitmentsV2.Api.Client;
 using SFA.DAS.CommitmentsV2.Api.Types.Validation;
 using SFA.DAS.CommitmentsV2.Messages.Events;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
+using SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Models;
+using SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Services;
 using SFA.DAS.Forecasting.Jobs.Infrastructure;
 using System;
 using System.Linq;
@@ -14,18 +16,15 @@ namespace SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers
     public class ApprenticeshipStopDateChangedEventHandler : IApprenticeshipStopDateChangedEventHandler
     {
         private readonly IForecastingDbContext _forecastingDbContext;
-        private readonly IMapper _mapper;
-        private readonly ICommitmentsApiClient _commitmentsApiClient;
+        private readonly IGetApprenticeshipService _getApprenticeshipService;
         private readonly ILogger _logger;
 
         public ApprenticeshipStopDateChangedEventHandler(IForecastingDbContext forecastingDbContext,
-            ICommitmentsApiClient commitmentsApiClient,
-            IMapper mapper,
+            IGetApprenticeshipService getApprenticeshipService,
             ILogger<ApprenticeshipStopDateChangedEventHandler> logger)
         {
             _forecastingDbContext = forecastingDbContext;
-            _commitmentsApiClient = commitmentsApiClient;
-            _mapper = mapper;
+            _getApprenticeshipService = getApprenticeshipService;
             _logger = logger;
         }
 
@@ -36,11 +35,11 @@ namespace SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers
                 var selectedApprenticeship = _forecastingDbContext.Commitment.FirstOrDefault(x => x.ApprenticeshipId == message.ApprenticeshipId);
                 if (selectedApprenticeship == null)
                 {
-                    var apprenticeshipResponse = await _commitmentsApiClient.GetApprenticeship(message.ApprenticeshipId);
-                    selectedApprenticeship = _mapper.Map<Commitments>(apprenticeshipResponse);
+                    selectedApprenticeship = await _getApprenticeshipService.GetApprenticeshipDetails(message.ApprenticeshipId);
                     _forecastingDbContext.Commitment.Add(selectedApprenticeship);
                 }
 
+                selectedApprenticeship.UpdatedDateTime = DateTime.UtcNow;
                 selectedApprenticeship.Status = Status.Stopped;
                 selectedApprenticeship.ActualEndDate = message.StopDate;
                 await _forecastingDbContext.SaveChangesAsync();

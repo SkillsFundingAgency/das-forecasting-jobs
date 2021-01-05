@@ -1,9 +1,9 @@
-﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
-using SFA.DAS.CommitmentsV2.Api.Client;
+﻿using Microsoft.Extensions.Logging;
 using SFA.DAS.CommitmentsV2.Api.Types.Validation;
 using SFA.DAS.CommitmentsV2.Messages.Events;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
+using SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Models;
+using SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Services;
 using SFA.DAS.Forecasting.Jobs.Infrastructure;
 using System;
 using System.Linq;
@@ -14,18 +14,15 @@ namespace SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers
     public class ApprenticeshipCompletedEventHandler : IApprenticeshipCompletedEventHandler
     {
         private readonly IForecastingDbContext _forecastingDbContext;
-        private readonly IMapper _mapper;
-        private readonly ICommitmentsApiClient _commitmentsApiClient;
+        private readonly IGetApprenticeshipService _getApprenticeshipService;
         private readonly ILogger _logger;
 
         public ApprenticeshipCompletedEventHandler(IForecastingDbContext forecastingDbContext,
-            ICommitmentsApiClient commitmentsApiClient,
-            IMapper mapper,
+            IGetApprenticeshipService getApprenticeshipService,
             ILogger<ApprenticeshipCompletedEventHandler> logger)
         {
             _forecastingDbContext = forecastingDbContext;
-            _commitmentsApiClient = commitmentsApiClient;
-            _mapper = mapper;
+            _getApprenticeshipService = getApprenticeshipService;
             _logger = logger;
         }
 
@@ -34,19 +31,15 @@ namespace SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers
             try
             {
                 var selectedApprenticeship = _forecastingDbContext.Commitment.FirstOrDefault(x => x.ApprenticeshipId == message.ApprenticeshipId);
-                if (selectedApprenticeship != null)
+                if (selectedApprenticeship == null)
                 {
-                    selectedApprenticeship.ActualEndDate = message.CompletionDate;
-                    selectedApprenticeship.Status = Status.Completed;
+                    selectedApprenticeship =  await _getApprenticeshipService.GetApprenticeshipDetails(message.ApprenticeshipId);
+                    _forecastingDbContext.Commitment.Add(selectedApprenticeship);
                 }
-                else
-                {
-                    var apprenticeshipResponse = await _commitmentsApiClient.GetApprenticeship(message.ApprenticeshipId);
-                    var result = _mapper.Map<Commitments>(apprenticeshipResponse);
-                    result.Status = Status.Completed;
-                    result.ActualEndDate = message.CompletionDate;
-                    _forecastingDbContext.Commitment.Add(result);
-                }
+
+                selectedApprenticeship.UpdatedDateTime = DateTime.UtcNow;
+                selectedApprenticeship.Status = Status.Completed;
+                selectedApprenticeship.ActualEndDate = message.CompletionDate;
 
                 await _forecastingDbContext.SaveChangesAsync();                
             }
@@ -60,8 +53,6 @@ namespace SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers
                 _logger.LogError(ex, $"Apprenticeship Completed function Failed for ApprenticeshipId: [{message.ApprenticeshipId}] ");
                 throw;
             }
-
-            
         }
     }
 }
