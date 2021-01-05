@@ -98,7 +98,6 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
     {
         public Mock<IMessageHandlerContext> MessageHandlerContext { get; set; }
         public Mock<IGetApprenticeshipService> MockGetApprenticeship { get; set; }
-        public Mock<IMapper> MockMapper { get; set; }
         public Mock<ILogger<ApprenticeshipStopDateChangedEventHandler>> MockLogger { get; set; }
         public Mock<IApprenticeshipStopDateChangedEventHandler> MockApprenticeshipCompletionDateUpdatedEventHandler { get; set; }
         public ForecastingDbContext Db { get; set; }
@@ -113,7 +112,6 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
         {
             MessageHandlerContext = new Mock<IMessageHandlerContext>();
             MockGetApprenticeship = new Mock<IGetApprenticeshipService>();
-            MockMapper = new Mock<IMapper>();
             MockLogger = new Mock<ILogger<ApprenticeshipStopDateChangedEventHandler>>();
             MockApprenticeshipCompletionDateUpdatedEventHandler = new Mock<IApprenticeshipStopDateChangedEventHandler>();
             Fixture = new Fixture();
