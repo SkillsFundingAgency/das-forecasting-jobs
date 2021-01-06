@@ -126,7 +126,6 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
             Commitment.Status = Status.LiveOrWaitingToStart;
             Commitment.ApprenticeshipId = 1;
             Db.Commitment.Add(Commitment);
-           // if (SetState) { Db.Entry(Commitment).State = EntityState.Detached; }
 
             ApprenticeshipStopDateChangedEvent = Fixture.Create<ApprenticeshipStopDateChangedEvent>();
             ApprenticeshipStopDateChangedEvent.ApprenticeshipId = Commitment.ApprenticeshipId;

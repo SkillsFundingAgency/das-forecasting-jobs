@@ -32,7 +32,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers.Ser
             var apprenticeshipResponse = await _commitmentsApiClient.GetApprenticeship(apprenticeshipId);
             var apprenticeshipDetails = _mapper.Map<Commitments>(apprenticeshipResponse);
 
-            _logger.LogDebug($"Get details from cosmos db about couse : {apprenticeshipResponse.CourseCode}");
+            _logger.LogDebug($"Get details from cosmos db about course : {apprenticeshipResponse.CourseCode}");
             var courseDetails = await _documentSession.Get<ApprenticeshipCourse>(apprenticeshipResponse.CourseCode);
             apprenticeshipDetails.CourseLevel = courseDetails?.Level ?? 0;
 
