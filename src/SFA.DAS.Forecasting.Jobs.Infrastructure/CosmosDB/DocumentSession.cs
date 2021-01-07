@@ -87,6 +87,11 @@ namespace SFA.DAS.Forecasting.Jobs.Infrastructure.CosmosDB
 
     public class DocumentSessionConnectionString : DbConnectionStringBuilder
     {
+        public DocumentSessionConnectionString(string connectionString)
+        {
+            ConnectionString = connectionString;
+        }
+
         public string Database { get => (string)this["Database"]; set => this["Database"] = value; }
         public string AccountEndpoint { get => (string)this["AccountEndpoint"]; set => this["AccountEndpoint"] = value; }
         public string AccountKey { get => (string)this["AccountKey"]; set => this["AccountKey"] = value; }

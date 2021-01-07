@@ -148,7 +148,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             var connectionString = config["CosmosDbConnectionString"];
             if (string.IsNullOrEmpty(connectionString))
                 throw new InvalidOperationException("No 'DocumentConnectionString' connection string found.");
-            var documentConnectionString = new DocumentSessionConnectionString { ConnectionString = connectionString };
+            var documentConnectionString = new DocumentSessionConnectionString(connectionString);
 
             var client = new DocumentClient(new Uri(documentConnectionString.AccountEndpoint), documentConnectionString.AccountKey);
             client.CreateDatabaseIfNotExistsAsync(new Microsoft.Azure.Documents.Database { Id = documentConnectionString.Database }).Wait();
