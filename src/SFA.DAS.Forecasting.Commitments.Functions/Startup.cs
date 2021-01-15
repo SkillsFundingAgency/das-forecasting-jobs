@@ -17,6 +17,11 @@ using System;
 using System.IO;
 using System.Reflection;
 using SFA.DAS.Forecasting.Commitments.Functions.AppStart;
+using SFA.DAS.Forecasting.Jobs.Infrastructure.CosmosDB;
+using Microsoft.Azure.Documents.Client;
+using Microsoft.Azure.Documents;
+using SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Services;
+using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers.Services;
 
 [assembly: FunctionsStartup(typeof(SFA.DAS.Forecasting.Commitments.Functions.Startup))]
 namespace SFA.DAS.Forecasting.Commitments.Functions
@@ -92,10 +97,13 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
             builder.Services.AddScoped<IApprenticeshipCompletedEventHandler, ApprenticeshipCompletedEventHandler>();
             builder.Services.AddScoped<IApprenticeshipStoppedEventHandler, ApprenticeshipStoppedEventHandler>();
             builder.Services.AddScoped<IApprenticeshipStopDateChangedEventHandler, ApprenticeshipStopDateChangedEventHandler>();
-            builder.Services.AddScoped<IApprenticeshipCompletionDateUpdatedEventHandler, ApprenticeshipCompletionDateUpdatedEventHandler>(); 
+            builder.Services.AddScoped<IApprenticeshipCompletionDateUpdatedEventHandler, ApprenticeshipCompletionDateUpdatedEventHandler>();
+            builder.Services.AddScoped(_ => CreateDocumentSession(config));
+            builder.Services.AddScoped<IGetApprenticeshipService, GetApprenticeshipService>();
 
             builder.Services.AddSingleton<IConfiguration>(config);
             builder.Services.AddDatabaseRegistration(config, environment );
+            
         }
 
         private bool ConfigurationIsLocalOrDev(string environment)
@@ -133,7 +141,26 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
         {            
             _loggerFactory = new LoggerFactory();
             var logger = _loggerFactory.CreateLogger("Startup");            
-        }       
+        }
+
+        protected IDocumentSession CreateDocumentSession(IConfigurationRoot config)
+        {
+            var connectionString = config["CosmosDbConnectionString"];
+            if (string.IsNullOrEmpty(connectionString))
+                throw new InvalidOperationException("No 'DocumentConnectionString' connection string found.");
+            var documentConnectionString = new DocumentSessionConnectionString(connectionString);
+
+            var client = new DocumentClient(new Uri(documentConnectionString.AccountEndpoint), documentConnectionString.AccountKey);
+            client.CreateDatabaseIfNotExistsAsync(new Microsoft.Azure.Documents.Database { Id = documentConnectionString.Database }).Wait();
+
+            client.CreateDocumentCollectionIfNotExistsAsync(
+                UriFactory.CreateDatabaseUri(documentConnectionString.Database), new DocumentCollection
+                {
+                    Id = documentConnectionString.Collection
+                },
+                new RequestOptions { OfferThroughput = int.Parse(documentConnectionString.ThroughputOffer) }).Wait();
+            return new DocumentSession(client, documentConnectionString);
+        }
 
     }   
 }
