@@ -75,7 +75,7 @@
         },
         "functionsExtensionVersion": {
             "type": "string",
-            "defaultValue": "~2.0"
+            "defaultValue": "~3"
         },
         "sharedEnvVirtualNetworkName": {
             "type": "string"
