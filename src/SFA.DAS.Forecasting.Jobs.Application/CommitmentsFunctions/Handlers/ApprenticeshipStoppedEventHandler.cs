@@ -4,6 +4,8 @@ using SFA.DAS.CommitmentsV2.Api.Client;
 using SFA.DAS.CommitmentsV2.Api.Types.Validation;
 using SFA.DAS.CommitmentsV2.Messages.Events;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
+using SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Models;
+using SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Services;
 using SFA.DAS.Forecasting.Jobs.Infrastructure;
 using System;
 using System.Linq;
@@ -14,18 +16,15 @@ namespace SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers
     public class ApprenticeshipStoppedEventHandler : IApprenticeshipStoppedEventHandler
     {
         private readonly IForecastingDbContext _forecastingDbContext;
-        private readonly IMapper _mapper;
-        private readonly ICommitmentsApiClient _commitmentsApiClient;
+        private readonly IGetApprenticeshipService _getApprenticeshipService;
         private readonly ILogger _logger;
 
         public ApprenticeshipStoppedEventHandler(IForecastingDbContext forecastingDbContext,
-          ICommitmentsApiClient commitmentsApiClient,
-          IMapper mapper,
-          ILogger<ApprenticeshipStoppedEventHandler> logger)
+           IGetApprenticeshipService getApprenticeshipService,
+        ILogger<ApprenticeshipStoppedEventHandler> logger)
         {
             _forecastingDbContext = forecastingDbContext;
-            _commitmentsApiClient = commitmentsApiClient;
-            _mapper = mapper;
+            _getApprenticeshipService = getApprenticeshipService;
             _logger = logger;
         }
 
@@ -34,20 +33,15 @@ namespace SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers
             try
             {
                 var selectedApprenticeship = _forecastingDbContext.Commitment.FirstOrDefault(x => x.ApprenticeshipId == message.ApprenticeshipId);
-                if (selectedApprenticeship != null)
+                if (selectedApprenticeship == null)
                 {
-                    selectedApprenticeship.ActualEndDate = message.StopDate;
-                    selectedApprenticeship.Status = Status.Stopped;
-                }
-                else
-                {
-                    var apprenticeshipResponse = await _commitmentsApiClient.GetApprenticeship(message.ApprenticeshipId);
-                    var result = _mapper.Map<Commitments>(apprenticeshipResponse);
-                    result.Status = Status.Stopped;
-                    result.ActualEndDate = message.StopDate;
-                    _forecastingDbContext.Commitment.Add(result);
+                    selectedApprenticeship = await _getApprenticeshipService.GetApprenticeshipDetails(message.ApprenticeshipId);
+                    _forecastingDbContext.Commitment.Add(selectedApprenticeship);
                 }
 
+                selectedApprenticeship.UpdatedDateTime = DateTime.UtcNow;
+                selectedApprenticeship.ActualEndDate = message.StopDate;
+                selectedApprenticeship.Status = Status.Stopped;
                 await _forecastingDbContext.SaveChangesAsync();
             }
             catch (CommitmentsApiModelException commitmentException)
