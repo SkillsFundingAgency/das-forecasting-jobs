@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SFA.DAS.CommitmentsV2.Messages" Version="7.0.0" />
+    <PackageReference Include="SFA.DAS.CommitmentsV2.Messages" Version="7.1.0" />
     <PackageReference Include="SFA.DAS.EmployerFinance.Messages" Version="1.6.890" />
   </ItemGroup>
 
