@@ -74,9 +74,10 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests
         [Test]
         [Category("UnitTest")]
         [TestCase("1920-R01", 2019)]
-        [TestCase("1819-R12", 2018)]
+        [TestCase("1819-R12", 2019)]
         [TestCase("9899-R05", 2098)]
-        [TestCase("0001-R06", 2000)]
+        [TestCase("0001-R06", 2001)]
+        [TestCase("2021-R06", 2021)]
         public async Task Should_Calculate_Period_Year_From_PeriodEnd(string periodEnd, int expectedYear)
         {
             // Arrange 

@@ -29,7 +29,17 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
         {
             var periodYear = int.Parse("20" + periodId.Substring(0, 2));
             var periodIdMonthAsInt = int.Parse(periodId.Substring(6, 2));
-            var periodMonth = periodIdMonthAsInt > 5 ? periodIdMonthAsInt - 5 : periodIdMonthAsInt + 7;
+            int periodMonth;
+
+            if (periodIdMonthAsInt > 5)
+            {
+                periodYear += 1;
+                periodMonth = periodIdMonthAsInt - 5;
+            }
+            else
+            {
+                periodMonth = periodIdMonthAsInt + 7;
+            }
 
             return ((short)periodMonth, periodYear);
         }
