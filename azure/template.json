@@ -115,7 +115,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-06-01",
-            "name": "function-app-subnet",
+            "name": "forecasting-jobs-function-app-subnet",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "properties": {
                 "mode": "Incremental",
@@ -158,7 +158,7 @@
                         "value": "[parameters('sharedSQLServerName')]"
                     },
                     "subnetResourceIdList": {
-                        "value": "[createArray(reference('function-app-subnet').outputs.SubnetResourceId.value)]"
+                        "value": "[createArray(reference('forecasting-jobs-function-app-subnet').outputs.SubnetResourceId.value)]"
                     }
                 }
             }
@@ -275,7 +275,7 @@
                         "value": "[variables('resourceGroupName')]"
                     },
                     "subnetResourceId": {
-                        "value": "[reference('function-app-subnet').outputs.subnetResourceId.value]"
+                        "value": "[reference('forecasting-jobs-function-app-subnet').outputs.subnetResourceId.value]"
                     },
                     "functionAppAppSettings": {
                         "value": {
@@ -326,10 +326,8 @@
                 }
             },
             "dependsOn": [
-                "function-app-insights",
                 "storage-account",
-                "app-service-plan",
-                "function-app-subnet"
+                "app-service-plan"
             ]
         },
         {
@@ -354,7 +352,7 @@
                         "value": "[variables('resourceGroupName')]"
                     },
                     "subnetResourceId": {
-                        "value": "[reference('function-app-subnet').outputs.subnetResourceId.value]"
+                        "value": "[reference('forecasting-jobs-function-app-subnet').outputs.subnetResourceId.value]"
                     },
                     "functionAppAppSettings": {
                         "value": {
