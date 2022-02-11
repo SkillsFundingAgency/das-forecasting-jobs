@@ -23,14 +23,14 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.11" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.11" />
     <PackageReference Include="NLog.Extensions.Logging" Version="1.6.5" />
-    <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Client" Version="7.1.0" />
-    <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Types" Version="7.1.0" />
+    <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Client" Version="8.3.8" />
+    <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Types" Version="8.3.8" />
     <PackageReference Include="NServiceBus" Version="7.4.4" />
     <PackageReference Include="Scrutor" Version="3.3.0" />
-    <PackageReference Include="SFA.DAS.CommitmentsV2.Messages" Version="7.1.0" />
-    <PackageReference Include="SFA.DAS.CommitmentsV2.Types" Version="7.1.0" />
+    <PackageReference Include="SFA.DAS.CommitmentsV2.Messages" Version="8.3.8" />
+    <PackageReference Include="SFA.DAS.CommitmentsV2.Types" Version="8.3.8" />
     <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="3.0.84" />
-    <PackageReference Include="SFA.DAS.Http" Version="3.2.62" />
+    <PackageReference Include="SFA.DAS.Http" Version="3.2.65" />
     <PackageReference Include="SFA.DAS.NLog.Targets.Redis" Version="1.2.1" />
     <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="16.0.20" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />

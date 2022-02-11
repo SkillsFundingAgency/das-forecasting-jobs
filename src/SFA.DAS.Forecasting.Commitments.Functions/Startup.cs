@@ -120,10 +120,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions
                 commitmentsClientApiConfig = new CommitmentsClientApiConfiguration
                 {
                     ApiBaseUrl = config["CommitmentsV2ApiBaseUrl"],
-                    IdentifierUri = config["CommitmentsV2ApiIdentifierUri"],
-                    ClientId = config["CommitmentsV2ApiClientId"],
-                    ClientSecret = config["CommitmentsV2ApiClientSecret"],
-                    Tenant = config["CommitmentsV2ApiTenant"]
+                    IdentifierUri = config["CommitmentsV2ApiIdentifierUri"]
                 };
             }
             else

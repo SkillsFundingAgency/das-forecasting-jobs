@@ -26,6 +26,7 @@ namespace SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Models
         public DateTime? UpdatedDateTime { get; set; }
         public bool HasHadPayment { get; set; }
         public Status? Status { get; set; }
+        public int? PledgeApplicationId { get; set; }
     }
 
     public enum FundingSource : byte
