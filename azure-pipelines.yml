@@ -15,36 +15,7 @@ resources:
     ref: refs/tags/0.4.37
     endpoint: SkillsFundingAgency
 
-- template: azure-pipelines-templates/build/step/gitversion.yml@das-platform-building-blocks
-
-- template: azure-pipelines-templates/build/step/app-build.yml@das-platform-building-blocks
-  parameters:
-    SonarCloudProjectKey: SkillsFundingAgency_das-forecasting-jobs
-
-- task: DotNetCoreCLI@2
-  displayName: 'Publish'
-  inputs:
-    command: publish
-    publishWebProjects: false
-    projects: 'src/SFA.DAS.Forecasting.Triggers/SFA.DAS.Forecasting.Triggers.csproj'
-    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory) --no-restore --no-build'
-
-- task: DotNetCoreCLI@2
-  displayName: 'Publish'
-  inputs:
-    command: publish
-    publishWebProjects: false
-    projects: 'src/SFA.DAS.Forecasting.Commitments.Functions/SFA.DAS.Forecasting.Commitments.Functions.csproj'
-    arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory) --no-restore --no-build'
-
-- task: CopyFiles@2
-  displayName: 'Copy Files to: $(build.artifactstagingdirectory)'
-  inputs:
-    Contents: 'azure/**'
-    TargetFolder: '$(build.artifactstagingdirectory)'
-    OverWrite: true
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
-  inputs:
-    PathtoPublish: '$(build.artifactstagingdirectory)'
+stages:
+- stage: Build
+  jobs:
+  - template: pipeline-templates/job/code-build.yml
