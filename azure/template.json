@@ -88,6 +88,9 @@
         },
         "subnetDelegations": {
             "type": "array"
+        },
+        "sharedSQLServerName": {
+            "type": "string"
         }
     },
     "variables": {
@@ -112,7 +115,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-06-01",
-            "name": "function-app-subnet",
+            "name": "forecasting-jobs-function-app-subnet",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "properties": {
                 "mode": "Incremental",
@@ -135,6 +138,27 @@
                     },
                     "delegations": {
                         "value": "[parameters('subnetDelegations')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2021-04-01",
+            "name": "forecasting-jobs-worker-sql-firewall-rule",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'), 'sql-server-firewall-rules.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "serverName": {
+                        "value": "[parameters('sharedSQLServerName')]"
+                    },
+                    "subnetResourceIdList": {
+                        "value": "[createArray(reference('forecasting-jobs-function-app-subnet').outputs.SubnetResourceId.value)]"
                     }
                 }
             }
@@ -251,7 +275,7 @@
                         "value": "[variables('resourceGroupName')]"
                     },
                     "subnetResourceId": {
-                        "value": "[reference('function-app-subnet').outputs.subnetResourceId.value]"
+                        "value": "[reference('forecasting-jobs-function-app-subnet').outputs.subnetResourceId.value]"
                     },
                     "functionAppAppSettings": {
                         "value": {
@@ -302,10 +326,8 @@
                 }
             },
             "dependsOn": [
-                "function-app-insights",
                 "storage-account",
-                "app-service-plan",
-                "function-app-subnet"
+                "app-service-plan"
             ]
         },
         {
@@ -330,7 +352,7 @@
                         "value": "[variables('resourceGroupName')]"
                     },
                     "subnetResourceId": {
-                        "value": "[reference('function-app-subnet').outputs.subnetResourceId.value]"
+                        "value": "[reference('forecasting-jobs-function-app-subnet').outputs.subnetResourceId.value]"
                     },
                     "functionAppAppSettings": {
                         "value": {
