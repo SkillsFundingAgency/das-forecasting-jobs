@@ -89,6 +89,9 @@
         "subnetDelegations": {
             "type": "array"
         },
+        "workerAccessRestrictions": {
+            "type": "array"
+        },
         "sharedSQLServerName": {
             "type": "string"
         }
@@ -276,6 +279,9 @@
                     },
                     "subnetResourceId": {
                         "value": "[reference('forecasting-jobs-function-app-subnet').outputs.subnetResourceId.value]"
+                    },
+                    "ipSecurityRestrictions": {
+                        "value": "[parameters('workerAccessRestrictions')]"
                     },
                     "functionAppAppSettings": {
                         "value": {
