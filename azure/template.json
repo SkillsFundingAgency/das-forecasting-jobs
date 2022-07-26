@@ -360,6 +360,9 @@
                     "subnetResourceId": {
                         "value": "[reference('forecasting-jobs-function-app-subnet').outputs.subnetResourceId.value]"
                     },
+                    "ipSecurityRestrictions": {
+                        "value": "[parameters('workerAccessRestrictions')]"
+                    },
                     "functionAppAppSettings": {
                         "value": {
                             "array": [
