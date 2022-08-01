@@ -91,6 +91,10 @@
         },
         "sharedSQLServerName": {
             "type": "string"
+        },
+        "utcValue": {
+            "type": "string",
+            "defaultValue": "[utcNow('yyMMddHHmmss')]"
         }
     },
     "variables": {
@@ -115,7 +119,7 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2020-06-01",
-            "name": "forecasting-jobs-function-app-subnet",
+            "name": "[concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))]",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "properties": {
                 "mode": "Incremental",
@@ -144,7 +148,7 @@
         },
         {
             "apiVersion": "2021-04-01",
-            "name": "forecasting-jobs-worker-sql-firewall-rule",
+            "name": "[concat('forecasting-jobs-worker-sql-firewall-rule-', parameters('utcValue'))]",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -158,14 +162,14 @@
                         "value": "[parameters('sharedSQLServerName')]"
                     },
                     "subnetResourceIdList": {
-                        "value": "[createArray(reference('forecasting-jobs-function-app-subnet').outputs.SubnetResourceId.value)]"
+                        "value": "[createArray(reference(concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))).outputs.SubnetResourceId.value)]"
                     }
                 }
             }
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "function-app-insights",
+            "name": "[concat('function-app-insights-', parameters('utcValue'))]",
             "resourceGroup": "[variables('resourceGroupName')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -186,7 +190,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "commitments-function-app-insights",
+            "name": "[concat('commitments-function-app-insights-', parameters('utcValue'))]",
             "resourceGroup": "[variables('resourceGroupName')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -207,7 +211,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "storage-account",
+            "name": "[concat('storage-account-', parameters('utcValue'))]",
             "resourceGroup": "[variables('resourceGroupName')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -228,7 +232,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "app-service-plan",
+            "name": "[concat('app-service-plan-', parameters('utcValue'))]",
             "resourceGroup": "[variables('resourceGroupName')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -255,7 +259,7 @@
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "function-app",
+            "name": "[concat('function-app-', parameters('utcValue'))]",
             "resourceGroup": "[variables('resourceGroupName')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -275,22 +279,22 @@
                         "value": "[variables('resourceGroupName')]"
                     },
                     "subnetResourceId": {
-                        "value": "[reference('forecasting-jobs-function-app-subnet').outputs.subnetResourceId.value]"
+                        "value": "[reference(concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))).outputs.subnetResourceId.value]"
                     },
                     "functionAppAppSettings": {
                         "value": {
                             "array": [
                                 {
                                     "name": "AzureWebJobsStorage",
-                                    "value": "[reference('storage-account').outputs.storageConnectionString.value]"
+                                    "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
                                 },
                                 {
                                     "name": "AzureWebJobsDashboard",
-                                    "value": "[reference('storage-account').outputs.storageConnectionString.value]"
+                                    "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
                                 },
                                 {
                                     "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                    "value": "[reference('function-app-insights').outputs.InstrumentationKey.value]"
+                                    "value": "[reference(concat('function-app-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
                                 },
                                 {
                                     "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -326,13 +330,13 @@
                 }
             },
             "dependsOn": [
-                "storage-account",
-                "app-service-plan"
+                "[concat('storage-account-', parameters('utcValue'))]",
+                "[concat('app-service-plan-', parameters('utcValue'))]"
             ]
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "commitments-function-app",
+            "name": "[concat('commitments-function-app-', parameters('utcValue'))]",
             "resourceGroup": "[variables('resourceGroupName')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -352,22 +356,22 @@
                         "value": "[variables('resourceGroupName')]"
                     },
                     "subnetResourceId": {
-                        "value": "[reference('forecasting-jobs-function-app-subnet').outputs.subnetResourceId.value]"
+                        "value": "[reference(concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))).outputs.subnetResourceId.value]"
                     },
                     "functionAppAppSettings": {
                         "value": {
                             "array": [
                                 {
                                     "name": "AzureWebJobsStorage",
-                                    "value": "[reference('storage-account').outputs.storageConnectionString.value]"
+                                    "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
                                 },
                                 {
                                     "name": "AzureWebJobsDashboard",
-                                    "value": "[reference('storage-account').outputs.storageConnectionString.value]"
+                                    "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
                                 },
                                 {
                                     "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                    "value": "[reference('commitments-function-app-insights').outputs.InstrumentationKey.value]"
+                                    "value": "[reference(concat('commitments-function-app-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
                                 },
                                 {
                                     "name": "FUNCTIONS_EXTENSION_VERSION",
@@ -403,12 +407,12 @@
                 }
             },
             "dependsOn": [
-                "app-service-plan"
+                "[concat('app-service-plan-', parameters('utcValue'))]"
             ]
         },
         {
             "apiVersion": "2020-06-01",
-            "name": "[concat('role-assignment-commitments-function-app')]",
+            "name": "[concat('role-assignment-commitments-function-app-', parameters('utcValue'))]",
             "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
             "type": "Microsoft.Resources/deployments",
             "properties": {
@@ -419,7 +423,7 @@
                 },
                 "parameters": {
                     "principalId": {
-                        "value": "[reference('commitments-function-app').outputs.managedServiceIdentityId.value]"
+                        "value": "[reference(concat('commitments-function-app-', parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
                     },
                     "assignmentType": {
                         "value": "ServiceBusOwner"
