@@ -18,13 +18,10 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
 {
     public class WhenTiggeringPaymentForecast
     {
-        private IFixture Fixture => new Fixture();
         private ForecastingJobsConfiguration _config;
         private Mock<IHttpFunctionClient<PaymentDataCompleteTrigger>> _httpClientMock;
         private PaymentForecastService _sut;
-        private RefreshPaymentDataCompletedEvent _event;
         private Mock<ILogger<PaymentForecastService>> _loggerMock;
-        private Mock<IEncodingService> _encodingServiceMock;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
@@ -37,8 +34,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
         {
             _loggerMock = new Mock<ILogger<PaymentForecastService>>();
             _httpClientMock = new Mock<IHttpFunctionClient<PaymentDataCompleteTrigger>>();
-            _encodingServiceMock = new Mock<IEncodingService>();
-            _sut = new PaymentForecastService(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _loggerMock.Object);
+            _sut = new PaymentForecastService(Options.Create(_config), _httpClientMock.Object, _loggerMock.Object);
         }
 
         [Test]

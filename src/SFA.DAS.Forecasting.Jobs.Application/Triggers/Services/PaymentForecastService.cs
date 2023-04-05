@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Domain.Services;
@@ -15,18 +14,15 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Services
     {
         private ForecastingJobsConfiguration _configuration;
         private IHttpFunctionClient<PaymentDataCompleteTrigger> _httpFunctionClient;
-        private IEncodingService _encodingService;
         private ILogger<PaymentForecastService> _logger;
 
         public PaymentForecastService(
             IOptions<ForecastingJobsConfiguration> options, 
-            IHttpFunctionClient<PaymentDataCompleteTrigger> httpFunctionClient, 
-            IEncodingService encodingService, 
+            IHttpFunctionClient<PaymentDataCompleteTrigger> httpFunctionClient,  
             ILogger<PaymentForecastService> logger)
         {
             _configuration = options.Value;
             _httpFunctionClient = httpFunctionClient;
-            _encodingService = encodingService;
             _logger = logger;
             _httpFunctionClient.XFunctionsKey = _configuration.PaymentPreLoadHttpFunctionXFunctionKey;
         }
@@ -37,7 +33,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Services
             {
                 var triggerMessage = new PaymentDataCompleteTrigger
                 {
-                    EmployerAccountIds = new List<string> { _encodingService.Encode(accountId, EncodingType.AccountId) },
+                    EmployerAccountIds = new List<long> { accountId },
                     PeriodYear = periodYear,
                     PeriodMonth = periodMonth,
                     PeriodId = periodEnd
