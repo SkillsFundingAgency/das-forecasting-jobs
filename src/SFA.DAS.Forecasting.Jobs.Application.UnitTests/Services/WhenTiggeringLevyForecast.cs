@@ -7,7 +7,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Models;
@@ -23,7 +22,6 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
         private Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>> _httpClientMock;
         private LevyForecastService _sut;
         private Mock<ILogger<LevyForecastService>> _loggerMock;
-        private Mock<IEncodingService> _encodingServiceMock;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
@@ -36,8 +34,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
         {
             _loggerMock = new Mock<ILogger<LevyForecastService>>();
             _httpClientMock = new Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>>();
-            _encodingServiceMock = new Mock<IEncodingService>();
-            _sut = new LevyForecastService(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _loggerMock.Object);
+            _sut = new LevyForecastService(Options.Create(_config), _httpClientMock.Object, _loggerMock.Object);
         }
 
         [Test]

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Domain.Services;
@@ -16,18 +15,15 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Services
         private readonly IOptions<ForecastingJobsConfiguration> _configuration;
         private readonly IHttpFunctionClient<AccountLevyCompleteTrigger> _httpClient;
         private readonly ILogger<LevyForecastService> _logger;
-        private readonly IEncodingService _encodingService;
 
         public LevyForecastService(
             IOptions<ForecastingJobsConfiguration> configuration,
             IHttpFunctionClient<AccountLevyCompleteTrigger> httpClient,
-            IEncodingService encodingService,
             ILogger<LevyForecastService> logger)
         {
             _configuration = configuration;
             _httpClient = httpClient;
             _logger = logger;
-            _encodingService = encodingService;
             _httpClient.XFunctionsKey = _configuration.Value.LevyDeclarationPreLoadHttpFunctionXFunctionKey;
         }
 
@@ -37,7 +33,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Services
             {
                 var triggerMessage = new AccountLevyCompleteTrigger
                 {
-                    EmployerAccountIds = new List<string> { _encodingService.Encode(accountId, EncodingType.AccountId) },
+                    EmployerAccountIds = new List<long> { accountId },
                     PeriodYear = periodYear,
                     PeriodMonth = periodMonth
                 };
