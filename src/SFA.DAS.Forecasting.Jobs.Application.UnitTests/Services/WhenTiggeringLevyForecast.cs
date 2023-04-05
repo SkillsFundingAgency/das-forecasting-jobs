@@ -2,7 +2,6 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using AutoFixture;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -17,7 +16,6 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
     [TestFixture, Parallelizable]
     public class WhenTiggeringLevyForecast
     {
-        private IFixture Fixture => new Fixture();
         private ForecastingJobsConfiguration _config;
         private Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>> _httpClientMock;
         private LevyForecastService _sut;
