@@ -2,12 +2,10 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using AutoFixture;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Models;
@@ -18,12 +16,10 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
     [TestFixture, Parallelizable]
     public class WhenTiggeringLevyForecast
     {
-        private IFixture Fixture => new Fixture();
         private ForecastingJobsConfiguration _config;
         private Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>> _httpClientMock;
         private LevyForecastService _sut;
         private Mock<ILogger<LevyForecastService>> _loggerMock;
-        private Mock<IEncodingService> _encodingServiceMock;
 
         [OneTimeSetUp]
         public void OneTimeSetup()
@@ -36,8 +32,7 @@ namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
         {
             _loggerMock = new Mock<ILogger<LevyForecastService>>();
             _httpClientMock = new Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>>();
-            _encodingServiceMock = new Mock<IEncodingService>();
-            _sut = new LevyForecastService(Options.Create(_config), _httpClientMock.Object, _encodingServiceMock.Object, _loggerMock.Object);
+            _sut = new LevyForecastService(Options.Create(_config), _httpClientMock.Object, _loggerMock.Object);
         }
 
         [Test]
