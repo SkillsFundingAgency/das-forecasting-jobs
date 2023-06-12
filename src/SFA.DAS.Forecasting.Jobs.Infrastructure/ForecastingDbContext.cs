@@ -1,7 +1,7 @@
-﻿using System.Threading;
+﻿using System.Data.SqlClient;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Models;
