@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using NServiceBus;
 using SFA.DAS.EmployerFinance.Messages.Events;
-using SFA.DAS.NServiceBus;
-using SFA.DAS.NServiceBus.AzureServiceBus;
-using SFA.DAS.NServiceBus.NewtonsoftJsonSerializer;
+using SFA.DAS.NServiceBus.Configuration;
+using SFA.DAS.NServiceBus.Configuration.AzureServiceBus;
+using SFA.DAS.NServiceBus.Configuration.NewtonsoftJsonSerializer;
 
 namespace SFA.DAS.Forecasting.Trigger.TestConsole
 {

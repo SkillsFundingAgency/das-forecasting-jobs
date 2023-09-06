@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <AzureFunctionsVersion>v3</AzureFunctionsVersion>
+    <TargetFramework>net6.0</TargetFramework>
+    <AzureFunctionsVersion>v4</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="nlog.config" />
@@ -14,14 +14,14 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="10.1.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.5">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.21">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.5" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.11" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.11" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.11" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.21" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />
     <PackageReference Include="NLog.Extensions.Logging" Version="1.6.5" />
     <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Client" Version="7.1.0" />
     <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Types" Version="7.1.0" />
@@ -34,6 +34,8 @@
     <PackageReference Include="SFA.DAS.NLog.Targets.Redis" Version="1.2.1" />
     <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="16.0.20" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.Forecasting.Jobs.Application\SFA.DAS.Forecasting.Jobs.Application.csproj" />
