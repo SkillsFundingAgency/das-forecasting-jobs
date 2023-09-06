@@ -11,102 +11,101 @@ using SFA.DAS.Forecasting.Jobs.Infrastructure.CosmosDB;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services
+namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services;
+
+[TestFixture]
+public class WhenGettingApprenticeshipDetails
 {
-    [TestFixture]
-    public class WhenGettingApprenticeshipDetails
+    [Test]
+    public async Task Should_Call_CommitmentsApi_Once()
     {
-        [Test]
-        public async Task Should_Call_CommitmentsApi_Once()
+        var fixture = new WhenGettingApprenticeshipDetailsFixture();
+
+        await fixture.GetApprenticeshipDetails();
+
+        fixture.VeriyfCommitmentsApiCalledOnce();
+    }
+
+    [Test]
+    public async Task Should_Call_AutoMapper_Called_Once()
+    {
+        var fixture = new WhenGettingApprenticeshipDetailsFixture();
+
+        await fixture.GetApprenticeshipDetails();
+
+        fixture.VeriyfAutoMapperCalledOnce();
+    }
+
+    [Test]
+    public async Task Should_Call_DocumentStore_Once()
+    {
+        var fixture = new WhenGettingApprenticeshipDetailsFixture();
+
+        await fixture.GetApprenticeshipDetails();
+
+        fixture.VeriyfDocumentStoreCalledOnce();
+    }
+
+    [Test]
+    public async Task Should_Set_CourseLevel()
+    {
+        var fixture = new WhenGettingApprenticeshipDetailsFixture();
+
+        var result = await fixture.GetApprenticeshipDetails();
+
+        Assert.AreEqual(fixture.ApprenticeshipCourse.Level, result.CourseLevel);
+    }
+
+
+    public class WhenGettingApprenticeshipDetailsFixture
+    {
+        public GetApprenticeshipService Sut { get; set; }
+        public Mock<ICommitmentsApiClient> MockCommitmentsApiClient { get; set; }
+        public Mock<IDocumentSession> MockDocumentSession { get; set; }
+        public Mock<IMapper> MockMapper { get; set; }
+        public long ApprenticeshipId { get; set; }
+        public Commitments Commitments { get; set; }
+        public GetApprenticeshipResponse GetApprenticeshipResponse { get; set; }
+        public ApprenticeshipCourse ApprenticeshipCourse { get; set; }
+
+        public WhenGettingApprenticeshipDetailsFixture()
         {
-            var fixture = new WhenGettingApprenticeshipDetailsFixture();
+            var fixture = new Fixture();
+            ApprenticeshipId = fixture.Create<long>();
+            Commitments = fixture.Create<Commitments>();
+            GetApprenticeshipResponse = fixture.Create<GetApprenticeshipResponse>();
+            ApprenticeshipCourse = fixture.Create<ApprenticeshipCourse>();
 
-            await fixture.GetApprenticeshipDetails();
+            MockMapper = new Mock<IMapper>();
+            MockMapper.Setup(m => m.Map<Commitments>(It.IsAny<GetApprenticeshipResponse>())).Returns(Commitments); // mapping data
 
-            fixture.VeriyfCommitmentsApiCalledOnce();
+            MockDocumentSession = new Mock<IDocumentSession>();
+            MockDocumentSession.Setup(m => m.Get<ApprenticeshipCourse>(It.IsAny<string>())).ReturnsAsync(ApprenticeshipCourse);
+
+            MockCommitmentsApiClient = new Mock<ICommitmentsApiClient>();
+            MockCommitmentsApiClient.Setup(x => x.GetApprenticeship(It.IsAny<long>(), CancellationToken.None)).ReturnsAsync(GetApprenticeshipResponse);
+
+            Sut = new GetApprenticeshipService(MockCommitmentsApiClient.Object, MockMapper.Object, MockDocumentSession.Object, Mock.Of<ILogger<GetApprenticeshipService>>());
         }
 
-        [Test]
-        public async Task Should_Call_AutoMapper_Called_Once()
+        public Task<Commitments> GetApprenticeshipDetails()
         {
-            var fixture = new WhenGettingApprenticeshipDetailsFixture();
-
-            await fixture.GetApprenticeshipDetails();
-
-            fixture.VeriyfAutoMapperCalledOnce();
+            return Sut.GetApprenticeshipDetails(ApprenticeshipId);
         }
 
-        [Test]
-        public async Task Should_Call_DocumentStore_Once()
+        internal void VeriyfCommitmentsApiCalledOnce()
         {
-            var fixture = new WhenGettingApprenticeshipDetailsFixture();
-
-            await fixture.GetApprenticeshipDetails();
-
-            fixture.VeriyfDocumentStoreCalledOnce();
+            MockCommitmentsApiClient.Verify(x => x.GetApprenticeship(ApprenticeshipId, CancellationToken.None), Times.Once);
         }
 
-        [Test]
-        public async Task Should_Set_CourseLevel()
+        internal void VeriyfAutoMapperCalledOnce()
         {
-            var fixture = new WhenGettingApprenticeshipDetailsFixture();
-
-            var result = await fixture.GetApprenticeshipDetails();
-
-            Assert.AreEqual(fixture.ApprenticeshipCourse.Level, result.CourseLevel);
+            MockMapper.Verify(x => x.Map<Commitments>(GetApprenticeshipResponse), Times.Once);
         }
 
-
-        public class WhenGettingApprenticeshipDetailsFixture
+        internal void VeriyfDocumentStoreCalledOnce()
         {
-            public GetApprenticeshipService Sut { get; set; }
-            public Mock<ICommitmentsApiClient> MockCommitmentsApiClient { get; set; }
-            public Mock<IDocumentSession> MockDocumentSession { get; set; }
-            public Mock<IMapper> MockMapper { get; set; }
-            public long ApprenticeshipId { get; set; }
-            public Commitments Commitments { get; set; }
-            public GetApprenticeshipResponse GetApprenticeshipResponse { get; set; }
-            public ApprenticeshipCourse ApprenticeshipCourse { get; set; }
-
-            public WhenGettingApprenticeshipDetailsFixture()
-            {
-                var fixture = new Fixture();
-                ApprenticeshipId = fixture.Create<long>();
-                Commitments = fixture.Create<Commitments>();
-                GetApprenticeshipResponse = fixture.Create<GetApprenticeshipResponse>();
-                ApprenticeshipCourse = fixture.Create<ApprenticeshipCourse>();
-
-                MockMapper = new Mock<IMapper>();
-                MockMapper.Setup(m => m.Map<Commitments>(It.IsAny<GetApprenticeshipResponse>())).Returns(Commitments); // mapping data
-
-                MockDocumentSession = new Mock<IDocumentSession>();
-                MockDocumentSession.Setup(m => m.Get<ApprenticeshipCourse>(It.IsAny<string>())).ReturnsAsync(ApprenticeshipCourse);
-
-                MockCommitmentsApiClient = new Mock<ICommitmentsApiClient>();
-                MockCommitmentsApiClient.Setup(x => x.GetApprenticeship(It.IsAny<long>(), CancellationToken.None)).ReturnsAsync(GetApprenticeshipResponse);
-
-                Sut = new GetApprenticeshipService(MockCommitmentsApiClient.Object, MockMapper.Object, MockDocumentSession.Object, Mock.Of<ILogger<GetApprenticeshipService>>());
-            }
-
-            public Task<Commitments> GetApprenticeshipDetails()
-            {
-                return Sut.GetApprenticeshipDetails(ApprenticeshipId);
-            }
-
-            internal void VeriyfCommitmentsApiCalledOnce()
-            {
-                MockCommitmentsApiClient.Verify(x => x.GetApprenticeship(ApprenticeshipId, CancellationToken.None), Times.Once);
-            }
-
-            internal void VeriyfAutoMapperCalledOnce()
-            {
-                MockMapper.Verify(x => x.Map<Commitments>(GetApprenticeshipResponse), Times.Once);
-            }
-
-            internal void VeriyfDocumentStoreCalledOnce()
-            {
-                MockDocumentSession.Verify(x => x.Get<ApprenticeshipCourse>(GetApprenticeshipResponse.CourseCode), Times.Once);
-            }
+            MockDocumentSession.Verify(x => x.Get<ApprenticeshipCourse>(GetApprenticeshipResponse.CourseCode), Times.Once);
         }
     }
 }

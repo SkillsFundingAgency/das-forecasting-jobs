@@ -23,103 +23,102 @@ using SFA.DAS.Forecasting.Jobs.Infrastructure.Logging;
 using SFA.DAS.Forecasting.Triggers;
 
 [assembly: WebJobsStartup(typeof(Startup))]
-namespace SFA.DAS.Forecasting.Triggers
+namespace SFA.DAS.Forecasting.Triggers;
+
+internal class Startup : IWebJobsStartup
 {
-    internal class Startup : IWebJobsStartup
+    public void Configure(IWebJobsBuilder builder)
     {
-        public void Configure(IWebJobsBuilder builder)
-        {
-            builder.AddExecutionContextBinding();
-            builder.AddDependencyInjection<ServiceProviderBuilder>();
-            builder.AddExtension<NServiceBusExtensionConfig>();
-        }
+        builder.AddExecutionContextBinding();
+        builder.AddDependencyInjection<ServiceProviderBuilder>();
+        builder.AddExtension<NServiceBusExtensionConfig>();
     }
+}
 
-    internal class ServiceProviderBuilder : IServiceProviderBuilder
+internal class ServiceProviderBuilder : IServiceProviderBuilder
+{
+    private readonly ILoggerFactory _loggerFactory;
+    public IConfiguration Configuration { get; }
+    public ServiceProviderBuilder(ILoggerFactory loggerFactory, IConfiguration configuration)
     {
-        private readonly ILoggerFactory _loggerFactory;
-        public IConfiguration Configuration { get; }
-        public ServiceProviderBuilder(ILoggerFactory loggerFactory, IConfiguration configuration)
-        {
-            _loggerFactory = loggerFactory;
+        _loggerFactory = loggerFactory;
 
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("local.settings.json", true)
-                .AddEnvironmentVariables()
-                .AddAzureTableStorage(o =>
-                {
-                    var configKeys = configuration["ConfigNames"]
+        var config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("local.settings.json", true)
+            .AddEnvironmentVariables()
+            .AddAzureTableStorage(o =>
+            {
+                var configKeys = configuration["ConfigNames"]
                     .Split(',')
                     .Select(s => s.Trim())
                     .ToArray();
 
-                    o.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
-                    o.EnvironmentName = configuration["EnvironmentName"];
-                    o.ConfigurationKeys = configKeys;
-                    o.PreFixConfigurationKeys = false;
-                })
-                .Build();
+                o.StorageConnectionString = configuration["ConfigurationStorageConnectionString"];
+                o.EnvironmentName = configuration["EnvironmentName"];
+                o.ConfigurationKeys = configKeys;
+                o.PreFixConfigurationKeys = false;
+            })
+            .Build();
 
-            Configuration = config;
-        }
+        Configuration = config;
+    }
 
-        public IServiceProvider Build()
+    public IServiceProvider Build()
+    {
+
+        var services = new ServiceCollection();
+
+        services.Configure<ForecastingJobsConfiguration>(Configuration.GetSection("ForecastingJobs"));
+
+        var nLogConfiguration = new NLogConfiguration();
+
+        services.AddLogging((options) =>
         {
-
-            var services = new ServiceCollection();
-
-            services.Configure<ForecastingJobsConfiguration>(Configuration.GetSection("ForecastingJobs"));
-
-            var nLogConfiguration = new NLogConfiguration();
-
-            services.AddLogging((options) =>
+            options.AddConfiguration(Configuration.GetSection("Logging"));
+            options.SetMinimumLevel(LogLevel.Trace);
+            options.AddNLog(new NLogProviderOptions
             {
-                options.AddConfiguration(Configuration.GetSection("Logging"));
-                options.SetMinimumLevel(LogLevel.Trace);
-                options.AddNLog(new NLogProviderOptions
-                {
-                    CaptureMessageTemplates = true,
-                    CaptureMessageProperties = true
-                });
-
-                options.AddConsole();
-                options.AddDebug();
-
-                nLogConfiguration.ConfigureNLog(Configuration);
+                CaptureMessageTemplates = true,
+                CaptureMessageProperties = true
             });
 
-            services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
+            options.AddConsole();
+            options.AddDebug();
 
-            services.AddSingleton(_ => _loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
-            EncodingConfig encodingConfig = GetEncodingConfig();
+            nLogConfiguration.ConfigureNLog(Configuration);
+        });
 
-            services.AddSingleton(encodingConfig);
-            services.AddSingleton<IEncodingService, EncodingService>();
+        services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
-            services.AddSingleton<ILevyCompleteTriggerHandler, LevyCompleteTriggerHandler>();
-            services.AddSingleton<IRefreshPaymentDataCompletedTriggerHandler, PaymentCompleteTriggerHandler>();
-            services.AddSingleton<ILevyForecastService, LevyForecastService>();
-            services.AddSingleton<IPaymentForecastService, PaymentForecastService>();
-            services.AddSingleton(typeof(IHttpFunctionClient<>), typeof(HttpFunctionClient<>));
+        services.AddSingleton(_ => _loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
+        EncodingConfig encodingConfig = GetEncodingConfig();
 
-            return services.BuildServiceProvider();
-        }
+        services.AddSingleton(encodingConfig);
+        services.AddSingleton<IEncodingService, EncodingService>();
 
-        private EncodingConfig GetEncodingConfig()
-        {
-            var encodingConfig = new EncodingConfig();
-            encodingConfig.Encodings = Configuration
-                .GetSection("Encodings")
-                .GetChildren()
-                .Select(encConfig => new Encoding.Encoding
-                {
-                    EncodingType = encConfig["EncodingType"],
-                    Alphabet = encConfig["Alphabet"],
-                    MinHashLength = int.Parse(encConfig["MinHashLength"]),
-                    Salt = encConfig["Salt"],
-                }).ToList();
-            return encodingConfig;
-        }
+        services.AddSingleton<ILevyCompleteTriggerHandler, LevyCompleteTriggerHandler>();
+        services.AddSingleton<IRefreshPaymentDataCompletedTriggerHandler, PaymentCompleteTriggerHandler>();
+        services.AddSingleton<ILevyForecastService, LevyForecastService>();
+        services.AddSingleton<IPaymentForecastService, PaymentForecastService>();
+        services.AddSingleton(typeof(IHttpFunctionClient<>), typeof(HttpFunctionClient<>));
+
+        return services.BuildServiceProvider();
+    }
+
+    private EncodingConfig GetEncodingConfig()
+    {
+        var encodingConfig = new EncodingConfig();
+        encodingConfig.Encodings = Configuration
+            .GetSection("Encodings")
+            .GetChildren()
+            .Select(encConfig => new Encoding.Encoding
+            {
+                EncodingType = encConfig["EncodingType"],
+                Alphabet = encConfig["Alphabet"],
+                MinHashLength = int.Parse(encConfig["MinHashLength"]),
+                Salt = encConfig["Salt"],
+            }).ToList();
+        return encodingConfig;
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System.Threading.Tasks;
 using SFA.DAS.EmployerFinance.Messages.Events;
 
-namespace SFA.DAS.Forecasting.Domain.Triggers
+namespace SFA.DAS.Forecasting.Domain.Triggers;
+
+public interface ILevyCompleteTriggerHandler
 {
-    public interface ILevyCompleteTriggerHandler
-    {
-        Task Handle(RefreshEmployerLevyDataCompletedEvent accountLegalEntityAddedEvent);
-    }
+    Task Handle(RefreshEmployerLevyDataCompletedEvent accountLegalEntityAddedEvent);
 }

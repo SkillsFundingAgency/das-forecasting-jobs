@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace SFA.DAS.Forecasting.Domain.Infrastructure
+namespace SFA.DAS.Forecasting.Domain.Infrastructure;
+
+public interface IServiceProviderBuilder
 {
-    public interface IServiceProviderBuilder
-    {
-        IServiceProvider Build();
-    }
+    IServiceProvider Build();
 }

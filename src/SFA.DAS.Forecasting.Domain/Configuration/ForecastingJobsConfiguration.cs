@@ -1,10 +1,9 @@
-﻿namespace SFA.DAS.Forecasting.Domain.Configuration
-{
-    public class ForecastingJobsConfiguration
-    {   
-        public string LevyDeclarationPreLoadHttpFunctionBaseUrl { get; set; }
-        public string LevyDeclarationPreLoadHttpFunctionXFunctionKey { get; set; }
-        public string PaymentPreLoadHttpFunctionBaseUrl { get; set; }
-        public string PaymentPreLoadHttpFunctionXFunctionKey { get; set; }
-    }
+﻿namespace SFA.DAS.Forecasting.Domain.Configuration;
+
+public class ForecastingJobsConfiguration
+{   
+    public string LevyDeclarationPreLoadHttpFunctionBaseUrl { get; set; }
+    public string LevyDeclarationPreLoadHttpFunctionXFunctionKey { get; set; }
+    public string PaymentPreLoadHttpFunctionBaseUrl { get; set; }
+    public string PaymentPreLoadHttpFunctionXFunctionKey { get; set; }
 }

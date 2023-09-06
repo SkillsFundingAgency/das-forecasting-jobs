@@ -6,30 +6,29 @@ using SFA.DAS.NServiceBus.AzureFunction.Attributes;
 using System;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions
-{
-    public class ApprenticeshipCompletionDateUpdatedFunction
-    {       
-        private readonly IApprenticeshipCompletionDateUpdatedEventHandler _apprenticeshipCompletionDateUpdatedEventHandler;
-        private readonly ILogger<ApprenticeshipCompletionDateUpdatedFunction> _logger;
+namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions;
 
-        public ApprenticeshipCompletionDateUpdatedFunction(
-            IApprenticeshipCompletionDateUpdatedEventHandler apprenticeshipCompletionDateUpdatedEventHandler,
-            ILogger<ApprenticeshipCompletionDateUpdatedFunction> logger)
-        {          
-            _apprenticeshipCompletionDateUpdatedEventHandler = apprenticeshipCompletionDateUpdatedEventHandler;
-            _logger = logger;
-        }
+public class ApprenticeshipCompletionDateUpdatedFunction
+{       
+    private readonly IApprenticeshipCompletionDateUpdatedEventHandler _apprenticeshipCompletionDateUpdatedEventHandler;
+    private readonly ILogger<ApprenticeshipCompletionDateUpdatedFunction> _logger;
 
-        [FunctionName("ApprenticeshipCompletionDateUpdated")]
-        public async Task Run(
-            [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.ApprenticeshipCompletionDateUpdated")] ApprenticeshipCompletionDateUpdatedEvent message)             
-        {
-            _logger.LogInformation($"Apprenticeship Completion dated update function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
+    public ApprenticeshipCompletionDateUpdatedFunction(
+        IApprenticeshipCompletionDateUpdatedEventHandler apprenticeshipCompletionDateUpdatedEventHandler,
+        ILogger<ApprenticeshipCompletionDateUpdatedFunction> logger)
+    {          
+        _apprenticeshipCompletionDateUpdatedEventHandler = apprenticeshipCompletionDateUpdatedEventHandler;
+        _logger = logger;
+    }
 
-            await _apprenticeshipCompletionDateUpdatedEventHandler.Handle(message);
+    [FunctionName("ApprenticeshipCompletionDateUpdated")]
+    public async Task Run(
+        [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.ApprenticeshipCompletionDateUpdated")] ApprenticeshipCompletionDateUpdatedEvent message)             
+    {
+        _logger.LogInformation($"Apprenticeship Completion dated update function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
 
-            _logger.LogInformation($"Apprenticeship Completion date updated function Finished at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
-        }
+        await _apprenticeshipCompletionDateUpdatedEventHandler.Handle(message);
+
+        _logger.LogInformation($"Apprenticeship Completion date updated function Finished at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
     }
 }

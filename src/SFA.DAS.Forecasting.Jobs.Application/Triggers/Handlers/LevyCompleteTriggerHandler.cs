@@ -4,45 +4,44 @@ using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Services;
 using SFA.DAS.Forecasting.Domain.Triggers;
 
-namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers
+namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
+
+public class LevyCompleteTriggerHandler : ILevyCompleteTriggerHandler
 {
-    public class LevyCompleteTriggerHandler : ILevyCompleteTriggerHandler
+    private readonly ILevyForecastService _triggerLevyForecastService;
+
+    public LevyCompleteTriggerHandler(
+        ILevyForecastService triggerLevyForecastService)
     {
-        private readonly ILevyForecastService _triggerLevyForecastService;
+        _triggerLevyForecastService = triggerLevyForecastService;
+    }
 
-        public LevyCompleteTriggerHandler(
-            ILevyForecastService triggerLevyForecastService)
+    public async Task Handle(RefreshEmployerLevyDataCompletedEvent refreshEmployerLevyDataCompletedEvent)
+    {
+        if (!refreshEmployerLevyDataCompletedEvent.LevyImported)
         {
-            _triggerLevyForecastService = triggerLevyForecastService;
+            return;
         }
 
-        public async Task Handle(RefreshEmployerLevyDataCompletedEvent refreshEmployerLevyDataCompletedEvent)
-        {
-            if (!refreshEmployerLevyDataCompletedEvent.LevyImported)
-            {
-                return;
-            }
+        var periodMonth = refreshEmployerLevyDataCompletedEvent.PeriodMonth != 0 
+            ? refreshEmployerLevyDataCompletedEvent.PeriodMonth 
+            : GetTodayPeriodMonth(refreshEmployerLevyDataCompletedEvent.Created);
+        var periodYear = !string.IsNullOrEmpty(refreshEmployerLevyDataCompletedEvent.PeriodYear) 
+            ? refreshEmployerLevyDataCompletedEvent.PeriodYear 
+            : GetTodayPeriodYear(refreshEmployerLevyDataCompletedEvent.Created);
 
-            var periodMonth = refreshEmployerLevyDataCompletedEvent.PeriodMonth != 0 
-                ? refreshEmployerLevyDataCompletedEvent.PeriodMonth 
-                : GetTodayPeriodMonth(refreshEmployerLevyDataCompletedEvent.Created);
-            var periodYear = !string.IsNullOrEmpty(refreshEmployerLevyDataCompletedEvent.PeriodYear) 
-                ? refreshEmployerLevyDataCompletedEvent.PeriodYear 
-                : GetTodayPeriodYear(refreshEmployerLevyDataCompletedEvent.Created);
+        await _triggerLevyForecastService.Trigger(periodMonth, periodYear, refreshEmployerLevyDataCompletedEvent.AccountId);
+    }
 
-            await _triggerLevyForecastService.Trigger(periodMonth, periodYear, refreshEmployerLevyDataCompletedEvent.AccountId);
-        }
+    private string GetTodayPeriodYear(DateTime eventCreatedDate)
+    {
+        var twoDigitYear = int.Parse(eventCreatedDate.ToString("yy"));
+        return eventCreatedDate.Month <= 4 ? $"{twoDigitYear - 1}-{twoDigitYear}" : $"{twoDigitYear}-{twoDigitYear + 1}";
+    }
 
-        private string GetTodayPeriodYear(DateTime eventCreatedDate)
-        {
-            var twoDigitYear = int.Parse(eventCreatedDate.ToString("yy"));
-            return eventCreatedDate.Month <= 4 ? $"{twoDigitYear - 1}-{twoDigitYear}" : $"{twoDigitYear}-{twoDigitYear + 1}";
-        }
-
-        private short GetTodayPeriodMonth(DateTime eventCreatedDate)
-        {
-            var month = eventCreatedDate.Month;
-            return (short)(month >= 5 ? month - 4 : month + 8);
-        }
+    private short GetTodayPeriodMonth(DateTime eventCreatedDate)
+    {
+        var month = eventCreatedDate.Month;
+        return (short)(month >= 5 ? month - 4 : month + 8);
     }
 }
