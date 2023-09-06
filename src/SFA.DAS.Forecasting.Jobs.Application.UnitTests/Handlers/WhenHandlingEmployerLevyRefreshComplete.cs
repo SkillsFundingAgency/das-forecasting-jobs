@@ -1,11 +1,11 @@
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Services;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
+using System;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests;
 

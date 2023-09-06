@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using SFA.DAS.CommitmentsV2.Api.Types.Responses;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Models;
-using SFA.DAS.Forecasting.Jobs.Infrastructure;
 using System;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Mapper;

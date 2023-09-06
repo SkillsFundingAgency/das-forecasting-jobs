@@ -4,8 +4,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Forecasting.Jobs.Infrastructure;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SFA.DAS.Forecasting.Commitments.Functions.AppStart;
 

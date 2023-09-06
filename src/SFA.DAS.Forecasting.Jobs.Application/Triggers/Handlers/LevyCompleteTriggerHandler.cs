@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading.Tasks;
-using SFA.DAS.EmployerFinance.Messages.Events;
+﻿using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Services;
 using SFA.DAS.Forecasting.Domain.Triggers;
+using System;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
 
@@ -23,11 +23,11 @@ public class LevyCompleteTriggerHandler : ILevyCompleteTriggerHandler
             return;
         }
 
-        var periodMonth = refreshEmployerLevyDataCompletedEvent.PeriodMonth != 0 
-            ? refreshEmployerLevyDataCompletedEvent.PeriodMonth 
+        var periodMonth = refreshEmployerLevyDataCompletedEvent.PeriodMonth != 0
+            ? refreshEmployerLevyDataCompletedEvent.PeriodMonth
             : GetTodayPeriodMonth(refreshEmployerLevyDataCompletedEvent.Created);
-        var periodYear = !string.IsNullOrEmpty(refreshEmployerLevyDataCompletedEvent.PeriodYear) 
-            ? refreshEmployerLevyDataCompletedEvent.PeriodYear 
+        var periodYear = !string.IsNullOrEmpty(refreshEmployerLevyDataCompletedEvent.PeriodYear)
+            ? refreshEmployerLevyDataCompletedEvent.PeriodYear
             : GetTodayPeriodYear(refreshEmployerLevyDataCompletedEvent.Created);
 
         await _triggerLevyForecastService.Trigger(periodMonth, periodYear, refreshEmployerLevyDataCompletedEvent.AccountId);

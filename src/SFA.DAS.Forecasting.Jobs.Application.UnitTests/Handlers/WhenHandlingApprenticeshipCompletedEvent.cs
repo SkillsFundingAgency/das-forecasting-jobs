@@ -29,7 +29,7 @@ public class WhenHandlingApprenticeshipCompletedEvent
     {
         //Arrange
         var fixture = new ApprenticeshipCompletedEventTestsFixture();
-            
+
         //Act
         await fixture.Run();
 
@@ -42,7 +42,7 @@ public class WhenHandlingApprenticeshipCompletedEvent
     {
         //Arrange
         var fixture = new ApprenticeshipCompletedEventTestsFixture();
-            
+
         //Act
         await fixture.Run();
 
@@ -61,7 +61,7 @@ public class WhenHandlingApprenticeshipCompletedEvent
 
         //Assert
         fixture.AssertRecordCreated();
-    }       
+    }
 
 
     [Test]

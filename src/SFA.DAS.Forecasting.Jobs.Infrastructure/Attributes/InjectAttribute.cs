@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.Azure.WebJobs.Description;
+﻿using Microsoft.Azure.WebJobs.Description;
+using System;
 
 namespace SFA.DAS.Forecasting.Jobs.Infrastructure.Attributes;
 

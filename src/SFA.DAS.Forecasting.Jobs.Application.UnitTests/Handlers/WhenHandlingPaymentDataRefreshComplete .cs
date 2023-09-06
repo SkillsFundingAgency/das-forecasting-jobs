@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Moq;
@@ -7,6 +6,7 @@ using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Services;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Models;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests;
 
@@ -39,15 +39,15 @@ public class WhenHandlingPaymentDataRefreshComplete
         await _sut.Handle(_event);
 
         // Assert
-        _paymentForecastServiceMock.Verify(mock => mock.Trigger(It.IsAny<short>(), It.IsAny<int>(),  It.IsAny<string>(), It.IsAny<long>()), Times.Once);
+        _paymentForecastServiceMock.Verify(mock => mock.Trigger(It.IsAny<short>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<long>()), Times.Once);
     }
 
     [Test]
     [Category("UnitTest")]
-    [TestCase("1920-R01",8)]
-    [TestCase("1819-R12",7)]
-    [TestCase("9899-R05",12)]
-    [TestCase("0001-R06",1)]
+    [TestCase("1920-R01", 8)]
+    [TestCase("1819-R12", 7)]
+    [TestCase("9899-R05", 12)]
+    [TestCase("0001-R06", 1)]
     public async Task Should_Calculate_Period_Month_From_PeriodEnd(string periodEnd, short expectedMonth)
     {
         // Arrange 

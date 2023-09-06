@@ -1,6 +1,6 @@
-﻿using System.Threading;
+﻿using Microsoft.Azure.WebJobs.Host;
+using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Azure.WebJobs.Host;
 
 namespace SFA.DAS.Forecasting.Jobs.Infrastructure.DependencyInjection;
 

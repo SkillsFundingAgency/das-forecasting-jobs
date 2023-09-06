@@ -9,21 +9,21 @@ using System.Threading.Tasks;
 namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions;
 
 public class ApprenticeshipCompletionDateUpdatedFunction
-{       
+{
     private readonly IApprenticeshipCompletionDateUpdatedEventHandler _apprenticeshipCompletionDateUpdatedEventHandler;
     private readonly ILogger<ApprenticeshipCompletionDateUpdatedFunction> _logger;
 
     public ApprenticeshipCompletionDateUpdatedFunction(
         IApprenticeshipCompletionDateUpdatedEventHandler apprenticeshipCompletionDateUpdatedEventHandler,
         ILogger<ApprenticeshipCompletionDateUpdatedFunction> logger)
-    {          
+    {
         _apprenticeshipCompletionDateUpdatedEventHandler = apprenticeshipCompletionDateUpdatedEventHandler;
         _logger = logger;
     }
 
     [FunctionName("ApprenticeshipCompletionDateUpdated")]
     public async Task Run(
-        [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.ApprenticeshipCompletionDateUpdated")] ApprenticeshipCompletionDateUpdatedEvent message)             
+        [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.ApprenticeshipCompletionDateUpdated")] ApprenticeshipCompletionDateUpdatedEvent message)
     {
         _logger.LogInformation($"Apprenticeship Completion dated update function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
 

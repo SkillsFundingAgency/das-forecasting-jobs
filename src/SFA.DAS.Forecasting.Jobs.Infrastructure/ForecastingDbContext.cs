@@ -1,10 +1,10 @@
-﻿using System.Data.SqlClient;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Azure.Services.AppAuthentication;
+﻿using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Models;
+using System.Data.SqlClient;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Jobs.Infrastructure;
 
@@ -25,7 +25,7 @@ public class ForecastingDbContext : DbContext, IForecastingDbContext
     {
     }
 
-    public ForecastingDbContext (IConfiguration config, DbContextOptions options, AzureServiceTokenProvider azureServiceTokenProvider) : base(options)
+    public ForecastingDbContext(IConfiguration config, DbContextOptions options, AzureServiceTokenProvider azureServiceTokenProvider) : base(options)
     {
         _configuration = config;
         _azureServiceTokenProvider = azureServiceTokenProvider;

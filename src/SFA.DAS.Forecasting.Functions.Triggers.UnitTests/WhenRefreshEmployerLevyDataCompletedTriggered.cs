@@ -1,10 +1,10 @@
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Triggers;
 using SFA.DAS.Forecasting.Triggers;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests;
 

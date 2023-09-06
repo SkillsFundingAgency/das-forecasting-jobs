@@ -1,34 +1,32 @@
 ﻿using AutoMapper;
+using Microsoft.Azure.Documents;
+using Microsoft.Azure.Documents.Client;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using NLog.Extensions.Logging;
 using NServiceBus;
 using SFA.DAS.CommitmentsV2.Api.Client;
 using SFA.DAS.CommitmentsV2.Api.Client.Configuration;
 using SFA.DAS.Configuration.AzureTableStorage;
+using SFA.DAS.Forecasting.Commitments.Functions.AppStart;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
+using SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Services;
 using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers;
+using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers.Services;
 using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Mapper;
-using SFA.DAS.Http;
+using SFA.DAS.Forecasting.Jobs.Infrastructure.CosmosDB;
 using System;
 using System.IO;
 using System.Reflection;
-using SFA.DAS.Forecasting.Commitments.Functions.AppStart;
-using SFA.DAS.Forecasting.Jobs.Infrastructure.CosmosDB;
-using Microsoft.Azure.Documents.Client;
-using Microsoft.Azure.Documents;
-using SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Services;
-using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers.Services;
 
 [assembly: FunctionsStartup(typeof(SFA.DAS.Forecasting.Commitments.Functions.Startup))]
 namespace SFA.DAS.Forecasting.Commitments.Functions;
 
 public class Startup : FunctionsStartup
 {
-    private  ILoggerFactory _loggerFactory;
+    private ILoggerFactory _loggerFactory;
 
     public override void Configure(IFunctionsHostBuilder builder)
     {
@@ -86,10 +84,10 @@ public class Startup : FunctionsStartup
 
         ConfigureLogFactoy();
 
-        CommitmentsClientApiConfiguration commitmentsClientApiConfig = GetCommitmentsClientApiConfiguration(builder, serviceProvider, config, environment);            
+        CommitmentsClientApiConfiguration commitmentsClientApiConfig = GetCommitmentsClientApiConfiguration(builder, serviceProvider, config, environment);
         builder.Services.AddSingleton<ICommitmentsApiClientFactory>(x => new CommitmentsApiClientFactory(commitmentsClientApiConfig, _loggerFactory));
         builder.Services.AddTransient<ICommitmentsApiClient>(provider => provider.GetRequiredService<ICommitmentsApiClientFactory>().CreateClient());
-                                  
+
         var mapperConfig = new MapperConfiguration(config => { config.AddProfile<AutoMapperProfile>(); });
         IMapper mapper = mapperConfig.CreateMapper();
         builder.Services.AddSingleton(mapper);
@@ -102,8 +100,8 @@ public class Startup : FunctionsStartup
         builder.Services.AddScoped<IGetApprenticeshipService, GetApprenticeshipService>();
 
         builder.Services.AddSingleton<IConfiguration>(config);
-        builder.Services.AddDatabaseRegistration(config, environment );
-            
+        builder.Services.AddDatabaseRegistration(config, environment);
+
     }
 
     private bool ConfigurationIsLocalOrDev(string environment)
@@ -129,7 +127,7 @@ public class Startup : FunctionsStartup
         else
         {
             var section = config.GetSection("CommitmentsV2Api");
-            commitmentsClientApiConfig =  section.Get<CommitmentsClientApiConfiguration>();
+            commitmentsClientApiConfig = section.Get<CommitmentsClientApiConfiguration>();
             builder.Services.Configure<CommitmentsClientApiConfiguration>(section);
             builder.Services.AddSingleton(cfg => commitmentsClientApiConfig);
         }
@@ -138,9 +136,9 @@ public class Startup : FunctionsStartup
     }
 
     public void ConfigureLogFactoy()
-    {            
+    {
         _loggerFactory = new LoggerFactory();
-        var logger = _loggerFactory.CreateLogger("Startup");            
+        var logger = _loggerFactory.CreateLogger("Startup");
     }
 
     protected IDocumentSession CreateDocumentSession(IConfigurationRoot config)

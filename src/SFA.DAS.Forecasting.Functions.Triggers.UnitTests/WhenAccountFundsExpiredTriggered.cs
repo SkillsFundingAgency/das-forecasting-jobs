@@ -1,11 +1,11 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Triggers;
 using SFA.DAS.Forecasting.Triggers;
+using System;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests;
 
@@ -20,7 +20,7 @@ public class WhenAccountFundsExpiredTriggered
         //Arrange
         var createdDate = DateTime.Now;
         var handler = new Mock<ILevyCompleteTriggerHandler>();
-        var message = new AccountFundsExpiredEvent {AccountId = 123,Created = createdDate};
+        var message = new AccountFundsExpiredEvent { AccountId = 123, Created = createdDate };
 
         //Act
         await HandleAccountFundsExpiredEvent.Run(message, handler.Object, Mock.Of<ILogger<AccountFundsExpiredEvent>>());

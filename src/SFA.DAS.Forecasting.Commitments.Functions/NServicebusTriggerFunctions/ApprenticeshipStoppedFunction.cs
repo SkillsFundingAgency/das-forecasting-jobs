@@ -17,7 +17,7 @@ public class ApprenticeshipStoppedFunction
         IApprenticeshipStoppedEventHandler apprenticeshipStoppedEventHandler,
         ILogger<ApprenticeshipStoppedFunction> logger)
     {
-        _apprenticeshipStoppedEventHandler = apprenticeshipStoppedEventHandler;         
+        _apprenticeshipStoppedEventHandler = apprenticeshipStoppedEventHandler;
         _logger = logger;
     }
 

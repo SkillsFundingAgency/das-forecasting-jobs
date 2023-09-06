@@ -5,8 +5,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NServiceBus;
 using NUnit.Framework;
-using SFA.DAS.CommitmentsV2.Api.Client;
-using SFA.DAS.CommitmentsV2.Api.Types.Responses;
 using SFA.DAS.CommitmentsV2.Api.Types.Validation;
 using SFA.DAS.CommitmentsV2.Messages.Events;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
@@ -18,9 +16,8 @@ using SFA.DAS.Forecasting.Jobs.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-    
+
 namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers;
 
 [TestFixture]
@@ -32,7 +29,7 @@ public class WhenApprenticeshipStopDateChangedEvent
     {
         //Arrange
         var fixture = new ApprenticeshipStopDateChangedEventFixture();
-            
+
         //Act
         await fixture.Run();
 
@@ -45,7 +42,7 @@ public class WhenApprenticeshipStopDateChangedEvent
     {
         //Arrange
         var fixture = new ApprenticeshipStopDateChangedEventFixture();
-            
+
         //Act
         await fixture.Run();
 
@@ -64,7 +61,7 @@ public class WhenApprenticeshipStopDateChangedEvent
 
         //Assert
         fixture.AssertRecordCreated();
-    }       
+    }
 
 
     [Test]
@@ -106,7 +103,7 @@ public class ApprenticeshipStopDateChangedEventFixture
     public long CommitmentId { get; set; }
     public ApprenticeshipStopDateChangedEventHandler Sut { get; set; }
 
-    public ApprenticeshipStopDateChangedEvent ApprenticeshipStopDateChangedEvent{ get; set; }
+    public ApprenticeshipStopDateChangedEvent ApprenticeshipStopDateChangedEvent { get; set; }
 
     public ApprenticeshipStopDateChangedEventFixture()
     {

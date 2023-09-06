@@ -1,7 +1,3 @@
-using System;
-using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -10,6 +6,10 @@ using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Models;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Services;
+using System;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services;
 
@@ -24,7 +24,7 @@ public class WhenTiggeringLevyForecast
     [OneTimeSetUp]
     public void OneTimeSetup()
     {
-        _config = new ForecastingJobsConfiguration {LevyDeclarationPreLoadHttpFunctionBaseUrl = "FunctionBaseUrl"};
+        _config = new ForecastingJobsConfiguration { LevyDeclarationPreLoadHttpFunctionBaseUrl = "FunctionBaseUrl" };
     }
 
     [SetUp]

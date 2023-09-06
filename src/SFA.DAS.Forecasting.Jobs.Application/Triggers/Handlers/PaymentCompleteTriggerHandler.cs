@@ -1,7 +1,7 @@
-﻿using System.Threading.Tasks;
-using SFA.DAS.EmployerFinance.Messages.Events;
+﻿using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Services;
 using SFA.DAS.Forecasting.Domain.Triggers;
+using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
 
@@ -19,10 +19,10 @@ public class PaymentCompleteTriggerHandler : IRefreshPaymentDataCompletedTrigger
         var periodEndDates = GetPeriodDateFromPeriodId(refreshPaymentDataCompletedEvent.PeriodEnd);
 
         await _paymentForecastService.Trigger(
-            periodEndDates.PeriodMonth, 
+            periodEndDates.PeriodMonth,
             periodEndDates.PeriodYear,
             refreshPaymentDataCompletedEvent.PeriodEnd,
-            refreshPaymentDataCompletedEvent.AccountId);    
+            refreshPaymentDataCompletedEvent.AccountId);
     }
 
     private static (short PeriodMonth, int PeriodYear) GetPeriodDateFromPeriodId(string periodId)

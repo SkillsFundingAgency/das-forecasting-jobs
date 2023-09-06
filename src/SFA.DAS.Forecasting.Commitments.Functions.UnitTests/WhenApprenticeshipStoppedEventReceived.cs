@@ -6,7 +6,6 @@ using NUnit.Framework;
 using SFA.DAS.CommitmentsV2.Messages.Events;
 using SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
-using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers;
 using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Mapper;
 using System.Threading.Tasks;
 

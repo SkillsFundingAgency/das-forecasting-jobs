@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.Extensions.Logging;
-using SFA.DAS.CommitmentsV2.Api.Client;
+﻿using Microsoft.Extensions.Logging;
 using SFA.DAS.CommitmentsV2.Api.Types.Validation;
 using SFA.DAS.CommitmentsV2.Messages.Events;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;

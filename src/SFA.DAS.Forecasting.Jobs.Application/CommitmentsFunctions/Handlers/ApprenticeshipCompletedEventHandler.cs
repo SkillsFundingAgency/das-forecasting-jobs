@@ -33,7 +33,7 @@ public class ApprenticeshipCompletedEventHandler : IApprenticeshipCompletedEvent
             var selectedApprenticeship = _forecastingDbContext.Commitment.FirstOrDefault(x => x.ApprenticeshipId == message.ApprenticeshipId);
             if (selectedApprenticeship == null)
             {
-                selectedApprenticeship =  await _getApprenticeshipService.GetApprenticeshipDetails(message.ApprenticeshipId);
+                selectedApprenticeship = await _getApprenticeshipService.GetApprenticeshipDetails(message.ApprenticeshipId);
                 _forecastingDbContext.Commitment.Add(selectedApprenticeship);
             }
 
@@ -41,7 +41,7 @@ public class ApprenticeshipCompletedEventHandler : IApprenticeshipCompletedEvent
             selectedApprenticeship.Status = Status.Completed;
             selectedApprenticeship.ActualEndDate = message.CompletionDate;
 
-            await _forecastingDbContext.SaveChangesAsync();                
+            await _forecastingDbContext.SaveChangesAsync();
         }
         catch (CommitmentsApiModelException commitmentException)
         {

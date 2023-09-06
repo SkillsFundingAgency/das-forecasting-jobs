@@ -29,7 +29,7 @@ public class WhenApprenticeshipCompletionDateUpdatedEvent
     {
         //Arrange
         var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false);
-            
+
         //Act
         await fixture.Run();
 
@@ -42,7 +42,7 @@ public class WhenApprenticeshipCompletionDateUpdatedEvent
     {
         //Arrange
         var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false);
-            
+
         //Act
         await fixture.Run();
 
@@ -187,9 +187,9 @@ public class ApprenticeshipCompletionDateUpdatedEventFixture
 
     internal void AssertRecordCreated()
     {
-            
+
         Assert.AreEqual(1, Db.Commitment.Where(x => x.ApprenticeshipId == 2).Count());
-    }       
+    }
 
     internal void VerifyExceptionLogged()
     {

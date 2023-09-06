@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Concurrent;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace SFA.DAS.Forecasting.Jobs.Infrastructure.DependencyInjection;
 

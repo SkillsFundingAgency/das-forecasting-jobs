@@ -1,9 +1,9 @@
-﻿using System;
-using Microsoft.Azure.WebJobs;
+﻿using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
+using System;
 
 namespace SFA.DAS.Forecasting.Jobs.Infrastructure.DependencyInjection;
 
