@@ -65,7 +65,7 @@ public class WhenTiggeringPaymentForecast
         Assert.ThrowsAsync<Exception>(() => _sut.Trigger(1, 19, "18-19R10", 1));
         _loggerMock.Verify(
             x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.Is<Exception>(e => e.Message == "Its Broken"),
-                It.IsAny<Func<object, Exception, string>>()), Times.Once);
+                (Func<object, Exception, string>)It.IsAny<object>()), Times.Once);
     }
 
     [Test]
@@ -87,6 +87,6 @@ public class WhenTiggeringPaymentForecast
         // Assert
         _loggerMock.Verify(
             x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(),
-                It.IsAny<Func<object, Exception, string>>()), Times.AtLeastOnce());
+                (Func<object, Exception, string>)It.IsAny<object>()), Times.AtLeastOnce());
     }
 }

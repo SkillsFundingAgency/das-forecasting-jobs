@@ -191,13 +191,13 @@ public class ApprenticeshipStoppedEventTestsFixture
     {
         MockLogger.Verify(
             x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(),
-                It.IsAny<Func<object, Exception, string>>()), Times.AtLeastOnce());
+                (Func<object, Exception, string>)It.IsAny<object>()), Times.AtLeastOnce());
     }
 
     internal void VerifyCommitmentsApiModelExceptionExceptionLogged()
     {
         MockLogger.Verify(
             x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<CommitmentsApiModelException>(),
-                It.IsAny<Func<object, Exception, string>>()), Times.AtLeastOnce());
+                (Func<object, Exception, string>)It.IsAny<object>()), Times.AtLeastOnce());
     }
 }
