@@ -12,7 +12,7 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="10.1.1" />
+    <PackageReference Include="AutoMapper" Version="12.0.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.21">
       <PrivateAssets>all</PrivateAssets>
@@ -26,7 +26,7 @@
     <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Client" Version="7.1.0" />
     <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Types" Version="7.1.0" />
     <PackageReference Include="NServiceBus" Version="7.4.4" />
-    <PackageReference Include="Scrutor" Version="3.3.0" />
+    <PackageReference Include="Scrutor" Version="4.2.2" />
     <PackageReference Include="SFA.DAS.CommitmentsV2.Messages" Version="7.1.0" />
     <PackageReference Include="SFA.DAS.CommitmentsV2.Types" Version="7.1.0" />
     <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="3.0.84" />
@@ -34,7 +34,7 @@
     <PackageReference Include="SFA.DAS.NLog.Targets.Redis" Version="1.2.1" />
     <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="16.0.20" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-	  <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 
   </ItemGroup>
   <ItemGroup>
