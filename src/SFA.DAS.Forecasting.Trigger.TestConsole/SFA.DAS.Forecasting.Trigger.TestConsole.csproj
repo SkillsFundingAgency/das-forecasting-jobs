@@ -14,7 +14,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="6.0.0" />
     <PackageReference Include="NServiceBus.Transport.AzureServiceBus" Version="1.8.0" />
-    <PackageReference Include="SFA.DAS.EmployerFinance.Messages" Version="1.6.890" />
+    <PackageReference Include="SFA.DAS.EmployerFinance.Messages" Version="1.6.3195" />
     <PackageReference Include="SFA.DAS.NServiceBus" Version="16.0.21" />
     <PackageReference Include="SFA.DAS.NServiceBus.SqlServer" Version="16.0.21" />
   </ItemGroup>
