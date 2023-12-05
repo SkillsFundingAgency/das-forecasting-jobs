@@ -1,8 +1,8 @@
-﻿using SFA.DAS.EmployerFinance.Messages.Events;
+﻿using System;
+using System.Threading.Tasks;
+using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Services;
 using SFA.DAS.Forecasting.Domain.Triggers;
-using System;
-using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
 
@@ -33,13 +33,13 @@ public class LevyCompleteTriggerHandler : ILevyCompleteTriggerHandler
         await _triggerLevyForecastService.Trigger(periodMonth, periodYear, refreshEmployerLevyDataCompletedEvent.AccountId);
     }
 
-    private string GetTodayPeriodYear(DateTime eventCreatedDate)
+    private static string GetTodayPeriodYear(DateTime eventCreatedDate)
     {
         var twoDigitYear = int.Parse(eventCreatedDate.ToString("yy"));
         return eventCreatedDate.Month <= 4 ? $"{twoDigitYear - 1}-{twoDigitYear}" : $"{twoDigitYear}-{twoDigitYear + 1}";
     }
 
-    private short GetTodayPeriodMonth(DateTime eventCreatedDate)
+    private static short GetTodayPeriodMonth(DateTime eventCreatedDate)
     {
         var month = eventCreatedDate.Month;
         return (short)(month >= 5 ? month - 4 : month + 8);
