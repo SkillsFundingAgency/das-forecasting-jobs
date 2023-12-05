@@ -7,6 +7,7 @@
   <ItemGroup>
     <PackageReference Include="SFA.DAS.CommitmentsV2.Messages" Version="100.0.30" />
     <PackageReference Include="SFA.DAS.EmployerFinance.Messages" Version="1.6.3195" />
+    <PackageReference Include="SFA.DAS.NServiceBus" Version="16.0.21" />
   </ItemGroup>
 
 </Project>
