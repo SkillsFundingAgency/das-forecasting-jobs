@@ -11,13 +11,15 @@ namespace SFA.DAS.Forecasting.Triggers;
 
 public static class HandleRefreshPaymentDataCompletedEvent
 {
-    [FunctionName("HandleRefreshPaymentDataCompletedEvent")]
+    [FunctionName(FunctionNames.HandleRefreshPaymentDataCompletedEvent)]
     public static async Task Run(
-        [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.Jobs.PaymentDataRefreshed")] RefreshPaymentDataCompletedEvent message,
+        [NServiceBusTrigger(Endpoint = EndpointNames.PaymentDataRefreshed)]
+        RefreshPaymentDataCompletedEvent message,
         [Inject] IRefreshPaymentDataCompletedTriggerHandler handler,
         [Inject] ILogger<RefreshPaymentDataCompletedEvent> log)
     {
         log.LogInformation($"NServiceBus {nameof(RefreshPaymentDataCompletedEvent)} trigger function executed at: {DateTime.Now}");
+        
         await handler.Handle(message);
     }
 }

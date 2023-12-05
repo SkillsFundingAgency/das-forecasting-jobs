@@ -11,13 +11,15 @@ namespace SFA.DAS.Forecasting.Triggers;
 
 public static class HandleAccountFundsExpiredEvent
 {
-    [FunctionName("HandleAccountFundsExpiredEvent")]
+    [FunctionName(FunctionNames.HandleAccountFundsExpiredEvent)]
     public static async Task Run(
-        [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.Jobs.FundsExpired")] AccountFundsExpiredEvent message,
+        [NServiceBusTrigger(Endpoint = EndpointNames.FundsExpired)]
+        AccountFundsExpiredEvent message,
         [Inject] ILevyCompleteTriggerHandler handler,
         [Inject] ILogger<AccountFundsExpiredEvent> log)
     {
         log.LogInformation($"NServiceBus {nameof(AccountFundsExpiredEvent)} trigger function executed at: {DateTime.Now}");
+
         var convertedMessage = new RefreshEmployerLevyDataCompletedEvent
         {
             AccountId = message.AccountId,
@@ -26,6 +28,6 @@ public static class HandleAccountFundsExpiredEvent
             LevyImported = true
         };
 
-       await handler.Handle(convertedMessage);
+        await handler.Handle(convertedMessage);
     }
 }

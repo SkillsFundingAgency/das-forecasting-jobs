@@ -11,15 +11,15 @@ namespace SFA.DAS.Forecasting.Triggers;
 
 public static class HandleRefreshEmployerLevyDataCompleted
 {
-    [FunctionName("HandleRefreshEmployerLevyDataCompleted")]
+    [FunctionName(FunctionNames.HandleRefreshEmployerLevyDataCompleted)]
     public static async Task Run(
-        [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.Jobs.EmployerLevyDataRefreshed")]
+        [NServiceBusTrigger(Endpoint = EndpointNames.EmployerLevyDataRefreshed)]
         RefreshEmployerLevyDataCompletedEvent message,
         [Inject] ILevyCompleteTriggerHandler handler,
         [Inject] ILogger<RefreshEmployerLevyDataCompletedEvent> log)
     {
-        log.LogInformation(
-            $"NServiceBus {nameof(RefreshEmployerLevyDataCompletedEvent)} trigger function executed at: {DateTime.Now}");
+        log.LogInformation($"NServiceBus {nameof(RefreshEmployerLevyDataCompletedEvent)} trigger function executed at: {DateTime.Now}");
+        
         await handler.Handle(message);
     }
 }

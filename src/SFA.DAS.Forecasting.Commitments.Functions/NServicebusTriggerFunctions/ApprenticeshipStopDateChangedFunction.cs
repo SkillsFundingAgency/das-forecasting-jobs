@@ -21,14 +21,17 @@ public class ApprenticeshipStopDateChangedFunction
         _logger = logger;
     }
 
-    [FunctionName("ApprenticeshipStopDateChanged")]
+    [FunctionName(FunctionNames.ApprenticeshipStopDateChanged)]
     public async Task Run(
-        [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.ApprenticeshipStopDateChanged")] ApprenticeshipStopDateChangedEvent message)
+        [NServiceBusTrigger(Endpoint = EndpointNames.ApprenticeshipStopDateChanged)]
+        ApprenticeshipStopDateChangedEvent message)
     {
-        _logger.LogInformation($"Apprenticeship update approved function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
+        _logger.LogInformation(
+            $"Apprenticeship update approved function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
 
         await _apprenticeshipStopDateChangedEventHandler.Handle(message);
 
-        _logger.LogInformation($"Apprenticeshipupdate update approved  function Finished at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
+        _logger.LogInformation(
+            $"Apprenticeshipupdate update approved  function Finished at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
     }
 }

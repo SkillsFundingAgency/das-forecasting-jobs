@@ -21,14 +21,17 @@ public class ApprenticeshipCompletedFunction
         _logger = logger;
     }
 
-    [FunctionName("ApprenticeshipCompleted")]
+    [FunctionName(FunctionNames.ApprenticeshipCompleted)]
     public async Task Run(
-        [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.ApprenticeshipCompletedEvent")] ApprenticeshipCompletedEvent message)
+        [NServiceBusTrigger(Endpoint = EndpointNames.ApprenticeshipCompletedEvent)]
+        ApprenticeshipCompletedEvent message)
     {
-        _logger.LogInformation($"Apprenticeship Completed function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
+        _logger.LogInformation(
+            $"Apprenticeship Completed function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
 
         await _apprenticeshipCompletedEventHandler.Handle(message);
 
-        _logger.LogInformation($"Apprenticeship Completed function Finished at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
+        _logger.LogInformation(
+            $"Apprenticeship Completed function Finished at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
     }
 }
