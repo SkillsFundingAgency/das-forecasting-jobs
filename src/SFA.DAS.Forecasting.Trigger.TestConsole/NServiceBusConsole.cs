@@ -20,13 +20,16 @@ public class NServiceBusConsole
 
     public async Task Run()
     {
-        var endpointConfiguration = new EndpointConfiguration("SFA.DAS.Forecasting.Triggers.TestConsole")
-            .UseAzureServiceBusTransport(_configuration["ServiceBusConnectionString"], r =>
-            {
-                // for testing messages rather than event 
-                // r.RouteToEndpoint(typeof(TestEvent), "TestQueue");
-            })
-            .UseErrorQueue()
+        const string  endpointName = "SFA.DAS.Forecasting.Triggers.TestConsole";
+        
+        var endpointConfiguration = new EndpointConfiguration(endpointName)
+            // .UseAzureServiceBusTransport(_configuration["ServiceBusConnectionString"], r =>
+            // {
+            //     // for testing messages rather than event 
+            //     // r.RouteToEndpoint(typeof(TestEvent), "TestQueue");
+            // })
+            .UseLearningTransport()
+            .UseErrorQueue($"{endpointName}-errors")
             .UseInstallers()
             .UseMessageConventions()
             .UseNewtonsoftJsonSerializer();
