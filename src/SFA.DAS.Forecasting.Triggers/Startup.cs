@@ -1,4 +1,7 @@
-﻿using Microsoft.Azure.WebJobs;
+﻿using System;
+using System.IO;
+using System.Linq;
+using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 using Microsoft.Azure.WebJobs.Logging;
 using Microsoft.Extensions.Configuration;
@@ -17,10 +20,7 @@ using SFA.DAS.Forecasting.Jobs.Application.Triggers.Services;
 using SFA.DAS.Forecasting.Jobs.Infrastructure.DependencyInjection;
 using SFA.DAS.Forecasting.Jobs.Infrastructure.Logging;
 using SFA.DAS.Forecasting.Triggers;
-using SFA.DAS.NServiceBus.AzureFunction.Infrastructure;
-using System;
-using System.IO;
-using System.Linq;
+using SFA.DAS.NServiceBus.AzureFunction.Hosting;
 
 [assembly: WebJobsStartup(typeof(Startup))]
 namespace SFA.DAS.Forecasting.Triggers;
@@ -31,7 +31,7 @@ internal class Startup : IWebJobsStartup
     {
         builder.AddExecutionContextBinding();
         builder.AddDependencyInjection<ServiceProviderBuilder>();
-        builder.AddExtension<NServiceBusExtensionConfig>();
+        builder.AddExtension<NServiceBusExtensionConfigProvider>();
     }
 }
 
