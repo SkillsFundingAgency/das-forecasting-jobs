@@ -9,9 +9,9 @@ using SFA.DAS.NLog.Targets.Redis.DotNetCore;
 
 namespace SFA.DAS.Forecasting.Jobs.Infrastructure.Logging;
 
-public class NLogConfiguration
+public static class NLogConfiguration
 {
-    public static void ConfigureNLog(IConfiguration configuration)
+    public static void ConfigureNLog(this IConfiguration configuration)
     {
         var appName = configuration.GetConnectionStringOrSetting("AppName");
         var env = configuration.GetConnectionStringOrSetting("EnvironmentName");

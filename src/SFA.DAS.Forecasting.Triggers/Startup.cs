@@ -71,8 +71,6 @@ internal class ServiceProviderBuilder : IServiceProviderBuilder
 
         services.Configure<ForecastingJobsConfiguration>(_configuration.GetSection("ForecastingJobs"));
 
-        var nLogConfiguration = new NLogConfiguration();
-
         services.AddLogging((options) =>
         {
             options.AddConfiguration(_configuration.GetSection("Logging"));
@@ -86,7 +84,7 @@ internal class ServiceProviderBuilder : IServiceProviderBuilder
             options.AddConsole();
             options.AddDebug();
 
-            NLogConfiguration.ConfigureNLog(_configuration);
+            _configuration.ConfigureNLog();
         });
 
         services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));

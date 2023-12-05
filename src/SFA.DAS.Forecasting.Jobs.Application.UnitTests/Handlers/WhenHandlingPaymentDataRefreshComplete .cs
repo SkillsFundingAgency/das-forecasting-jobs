@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using AutoFixture;
 using FluentAssertions;
 using Moq;
@@ -6,13 +7,12 @@ using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Services;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Models;
-using System.Threading.Tasks;
 
-namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests;
+namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers;
 
 public class WhenHandlingPaymentDataRefreshComplete
 {
-    private IFixture Fixture => new Fixture();
+    private readonly IFixture _fixture = new Fixture();
     private PaymentCompleteTriggerHandler _sut;
     private RefreshPaymentDataCompletedEvent _event;
     private Mock<IPaymentForecastService> _paymentForecastServiceMock;
@@ -22,7 +22,7 @@ public class WhenHandlingPaymentDataRefreshComplete
     {
         _paymentForecastServiceMock = new Mock<IPaymentForecastService>();
         _sut = new PaymentCompleteTriggerHandler(_paymentForecastServiceMock.Object);
-        _event = Fixture
+        _event = _fixture
             .Build<RefreshPaymentDataCompletedEvent>()
             .With(e => e.PaymentsProcessed, true)
             .With(e => e.PeriodEnd, "1819-R10")
