@@ -4,6 +4,9 @@ using Microsoft.Extensions.Logging;
 using SFA.DAS.NServiceBus.AzureFunction.Configuration;
 using SFA.DAS.NServiceBus.AzureFunction.Hosting;
 using System;
+using System.IO;
+using System.Reflection;
+using NLog.Extensions.Logging;
 
 namespace SFA.DAS.Forecasting.Commitments.Functions.AppStart;
 
@@ -46,5 +49,17 @@ public static class ServiceCollectionExtensions
         webBuilder.AddExtension(new NServiceBusExtensionConfigProvider(options));
 
         return serviceCollection;
+    }
+
+    public static IServiceCollection AddDasLogging(this IServiceCollection services)
+    {
+        services.AddLogging(logBuilder =>
+        {
+            logBuilder.AddFilter(typeof(Startup).Namespace, LogLevel.Information); // this is because all logging is filtered out by default
+            var rootDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), ".."));
+            logBuilder.AddNLog(Directory.GetFiles(rootDirectory, "nlog.config", SearchOption.AllDirectories)[0]);
+        });
+        
+        return services;
     }
 }
