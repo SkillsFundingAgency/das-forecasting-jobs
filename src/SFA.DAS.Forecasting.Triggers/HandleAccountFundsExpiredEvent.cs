@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using SFA.DAS.EmployerFinance.Messages.Events;
@@ -11,7 +12,7 @@ namespace SFA.DAS.Forecasting.Triggers;
 public static class HandleAccountFundsExpiredEvent
 {
     [FunctionName("HandleAccountFundsExpiredEvent")]
-    public static void Run(
+    public static async Task Run(
         [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.Jobs.FundsExpired")] AccountFundsExpiredEvent message,
         [Inject] ILevyCompleteTriggerHandler handler,
         [Inject] ILogger<AccountFundsExpiredEvent> log)
@@ -25,6 +26,6 @@ public static class HandleAccountFundsExpiredEvent
             LevyImported = true
         };
 
-       handler.Handle(convertedMessage);
+       await handler.Handle(convertedMessage);
     }
 }
