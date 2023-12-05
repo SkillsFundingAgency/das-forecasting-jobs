@@ -82,14 +82,14 @@ public class Startup : FunctionsStartup
                 });
         }
 
-        ConfigureLogFactoy();
+        ConfigureLogFactory();
 
-        CommitmentsClientApiConfiguration commitmentsClientApiConfig = GetCommitmentsClientApiConfiguration(builder, serviceProvider, config, environment);
+        var commitmentsClientApiConfig = GetCommitmentsClientApiConfiguration(builder, serviceProvider, config, environment);
         builder.Services.AddSingleton<ICommitmentsApiClientFactory>(x => new CommitmentsApiClientFactory(commitmentsClientApiConfig, _loggerFactory));
         builder.Services.AddTransient<ICommitmentsApiClient>(provider => provider.GetRequiredService<ICommitmentsApiClientFactory>().CreateClient());
 
         var mapperConfig = new MapperConfiguration(config => { config.AddProfile<AutoMapperProfile>(); });
-        IMapper mapper = mapperConfig.CreateMapper();
+        var mapper = mapperConfig.CreateMapper();
         builder.Services.AddSingleton(mapper);
 
         builder.Services.AddScoped<IApprenticeshipCompletedEventHandler, ApprenticeshipCompletedEventHandler>();
@@ -104,13 +104,13 @@ public class Startup : FunctionsStartup
 
     }
 
-    private bool ConfigurationIsLocalOrDev(string environment)
+    private static bool ConfigurationIsLocalOrDev(string environment)
     {
         return environment.Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase) ||
                environment.Equals("DEV", StringComparison.CurrentCultureIgnoreCase);
     }
 
-    private CommitmentsClientApiConfiguration GetCommitmentsClientApiConfiguration(IFunctionsHostBuilder builder, ServiceProvider serviceProvider, IConfigurationRoot config, string environment)
+    private static CommitmentsClientApiConfiguration GetCommitmentsClientApiConfiguration(IFunctionsHostBuilder builder, ServiceProvider serviceProvider, IConfigurationRoot config, string environment)
     {
         CommitmentsClientApiConfiguration commitmentsClientApiConfig;
         if (ConfigurationIsLocalOrDev(environment))
@@ -135,17 +135,21 @@ public class Startup : FunctionsStartup
         return commitmentsClientApiConfig;
     }
 
-    public void ConfigureLogFactoy()
+    private void ConfigureLogFactory()
     {
         _loggerFactory = new LoggerFactory();
         var logger = _loggerFactory.CreateLogger("Startup");
     }
 
-    protected IDocumentSession CreateDocumentSession(IConfigurationRoot config)
+    private static IDocumentSession CreateDocumentSession(IConfigurationRoot config)
     {
         var connectionString = config["CosmosDbConnectionString"];
+
         if (string.IsNullOrEmpty(connectionString))
+        {
             throw new InvalidOperationException("No 'DocumentConnectionString' connection string found.");
+        }
+
         var documentConnectionString = new DocumentSessionConnectionString(connectionString);
 
         var client = new DocumentClient(new Uri(documentConnectionString.AccountEndpoint), documentConnectionString.AccountKey);
@@ -157,7 +161,7 @@ public class Startup : FunctionsStartup
                 Id = documentConnectionString.Collection
             },
             new RequestOptions { OfferThroughput = int.Parse(documentConnectionString.ThroughputOffer) }).Wait();
+        
         return new DocumentSession(client, documentConnectionString);
     }
-
 }

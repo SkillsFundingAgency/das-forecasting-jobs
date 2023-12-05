@@ -86,7 +86,7 @@ internal class ServiceProviderBuilder : IServiceProviderBuilder
             options.AddConsole();
             options.AddDebug();
 
-            nLogConfiguration.ConfigureNLog(_configuration);
+            NLogConfiguration.ConfigureNLog(_configuration);
         });
 
         services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));

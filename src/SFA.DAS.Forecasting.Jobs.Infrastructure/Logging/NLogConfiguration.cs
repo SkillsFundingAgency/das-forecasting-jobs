@@ -1,17 +1,17 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using System.IO;
+using Microsoft.Extensions.Configuration;
 using NLog;
 using NLog.Common;
 using NLog.Config;
 using NLog.Targets;
 using SFA.DAS.NLog.Targets.Redis.DotNetCore;
-using System;
-using System.IO;
 
 namespace SFA.DAS.Forecasting.Jobs.Infrastructure.Logging;
 
 public class NLogConfiguration
 {
-    public void ConfigureNLog(IConfiguration configuration)
+    public static void ConfigureNLog(IConfiguration configuration)
     {
         var appName = configuration.GetConnectionStringOrSetting("AppName");
         var env = configuration.GetConnectionStringOrSetting("EnvironmentName");
