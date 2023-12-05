@@ -38,7 +38,8 @@ internal class Startup : IWebJobsStartup
 internal class ServiceProviderBuilder : IServiceProviderBuilder
 {
     private readonly ILoggerFactory _loggerFactory;
-    public IConfiguration Configuration { get; }
+    private readonly IConfiguration _configuration;
+
     public ServiceProviderBuilder(ILoggerFactory loggerFactory, IConfiguration configuration)
     {
         _loggerFactory = loggerFactory;
@@ -61,21 +62,20 @@ internal class ServiceProviderBuilder : IServiceProviderBuilder
             })
             .Build();
 
-        Configuration = config;
+        _configuration = config;
     }
 
     public IServiceProvider Build()
     {
-
         var services = new ServiceCollection();
 
-        services.Configure<ForecastingJobsConfiguration>(Configuration.GetSection("ForecastingJobs"));
+        services.Configure<ForecastingJobsConfiguration>(_configuration.GetSection("ForecastingJobs"));
 
         var nLogConfiguration = new NLogConfiguration();
 
         services.AddLogging((options) =>
         {
-            options.AddConfiguration(Configuration.GetSection("Logging"));
+            options.AddConfiguration(_configuration.GetSection("Logging"));
             options.SetMinimumLevel(LogLevel.Trace);
             options.AddNLog(new NLogProviderOptions
             {
@@ -86,13 +86,13 @@ internal class ServiceProviderBuilder : IServiceProviderBuilder
             options.AddConsole();
             options.AddDebug();
 
-            nLogConfiguration.ConfigureNLog(Configuration);
+            nLogConfiguration.ConfigureNLog(_configuration);
         });
 
         services.AddSingleton(typeof(ILogger<>), typeof(Logger<>));
 
         services.AddSingleton(_ => _loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
-        EncodingConfig encodingConfig = GetEncodingConfig();
+        var encodingConfig = GetEncodingConfig();
 
         services.AddSingleton(encodingConfig);
         services.AddSingleton<IEncodingService, EncodingService>();
@@ -109,7 +109,8 @@ internal class ServiceProviderBuilder : IServiceProviderBuilder
     private EncodingConfig GetEncodingConfig()
     {
         var encodingConfig = new EncodingConfig();
-        encodingConfig.Encodings = Configuration
+        
+        encodingConfig.Encodings = _configuration
             .GetSection("Encodings")
             .GetChildren()
             .Select(encConfig => new Encoding.Encoding
@@ -119,6 +120,7 @@ internal class ServiceProviderBuilder : IServiceProviderBuilder
                 MinHashLength = int.Parse(encConfig["MinHashLength"]),
                 Salt = encConfig["Salt"],
             }).ToList();
+
         return encodingConfig;
     }
 }
