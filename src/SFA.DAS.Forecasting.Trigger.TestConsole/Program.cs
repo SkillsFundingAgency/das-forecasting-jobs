@@ -16,7 +16,7 @@ class Program
         Run(args).Wait();
     }
 
-    public static async Task Run(string[] args)
+    private static async Task Run(string[] args)
     {
         var host = new HostBuilder()
             .UseEnvironment("local")
