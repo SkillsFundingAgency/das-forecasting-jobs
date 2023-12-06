@@ -21,7 +21,6 @@
     <PackageReference Include="SFA.DAS.Encoding" Version="1.1.76" />
     <PackageReference Include="NServiceBus.Newtonsoft.Json" Version="2.4.0" />
     <PackageReference Include="SFA.DAS.NServiceBus.AzureFunction" Version="16.0.21" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SFA.DAS.Forecasting.Domain\SFA.DAS.Forecasting.Domain.csproj" />
