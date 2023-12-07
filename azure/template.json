@@ -32,6 +32,12 @@
                 "description": "Name of the environment's shared resource group"
             }
         },
+        "nServiceBusConnectionString": {
+            "type": "securestring"
+        },
+        "nServiceBusLicense": {
+            "type": "securestring"
+        },
         "sharedServiceBusName": {
             "type": "string",
             "metadata": {
@@ -377,12 +383,12 @@
                                     "value": "~4"
                                 },
                                 {
-                                    "name": "FUNCTIONS_WORKER_RUNTIME",
-                                    "value": "dotnet"
+                                    "name": "NServiceBusConnectionString",
+                                    "value": "[parameters('nServiceBusConnectionString')]"
                                 },
                                 {
-                                    "name": "Version",
-                                    "value": "1.0"
+                                    "name": "NServiceBusLicense",
+                                    "value": "[parameters('nServiceBusLicense')]"
                                 },
                                 {
                                     "name": "EnvironmentName",
