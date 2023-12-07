@@ -387,6 +387,14 @@
                                     "value": "~4"
                                 },
                                 {
+                                    "name": "FUNCTIONS_WORKER_RUNTIME",
+                                    "value": "dotnet"
+                                },
+                                {
+                                    "name": "Version",
+                                    "value": "1.0"
+                                },
+                                {
                                     "name": "EnvironmentName",
                                     "value": "[toUpper(parameters('environmentName'))]"
                                 },
@@ -401,14 +409,6 @@
                                 {
                                     "name": "ConfigNames",
                                     "value": "[parameters('commitmentsConfigNames')]"
-                                },
-                                {
-                                    "name": "NServiceBusConnectionString",
-                                    "value": "[parameters('nServiceBusConnectionString')]"
-                                },
-                                {
-                                    "name": "NServiceBusLicense",
-                                    "value": "[parameters('nServiceBusLicense')]"
                                 }
                             ]
                         }
