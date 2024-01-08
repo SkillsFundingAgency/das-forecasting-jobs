@@ -1,60 +1,59 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using System.Threading;
+using System.Threading.Tasks;
 
-namespace SFA.DAS.Forecasting.Trigger.TestConsole
+namespace SFA.DAS.Forecasting.Trigger.TestConsole;
+
+internal class LifetimeEventsHostedService : IHostedService
 {
-    internal class LifetimeEventsHostedService : IHostedService
+    private readonly ILogger _logger;
+    private readonly IApplicationLifetime _appLifetime;
+    private readonly NServiceBusConsole _console;
+
+    public LifetimeEventsHostedService(
+        ILogger<LifetimeEventsHostedService> logger,
+        IApplicationLifetime appLifetime,
+        NServiceBusConsole console)
     {
-        private readonly ILogger _logger;
-        private readonly IApplicationLifetime _appLifetime;
-        private readonly NServiceBusConsole _console;
+        _logger = logger;
+        _appLifetime = appLifetime;
+        _console = console;
+    }
 
-        public LifetimeEventsHostedService(
-            ILogger<LifetimeEventsHostedService> logger,
-            IApplicationLifetime appLifetime,
-            NServiceBusConsole console)
-        {
-            _logger = logger;
-            _appLifetime = appLifetime;
-            _console = console;
-        }
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        _appLifetime.ApplicationStarted.Register(OnStarted);
+        _appLifetime.ApplicationStopping.Register(OnStopping);
+        _appLifetime.ApplicationStopped.Register(OnStopped);
 
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            _appLifetime.ApplicationStarted.Register(OnStarted);
-            _appLifetime.ApplicationStopping.Register(OnStopping);
-            _appLifetime.ApplicationStopped.Register(OnStopped);
+        return Task.CompletedTask;
+    }
 
-            return Task.CompletedTask;
-        }
+    public Task StopAsync(CancellationToken cancellationToken)
+    {
+        return Task.CompletedTask;
+    }
 
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            return Task.CompletedTask;
-        }
+    private void OnStarted()
+    {
+        _logger.LogInformation("OnStarted has been called.");
+        _console.Run().Wait();
 
-        private void OnStarted()
-        {
-            _logger.LogInformation("OnStarted has been called.");
-            _console.Run().Wait();
+        // Perform post-startup activities here
+    }
 
-            // Perform post-startup activities here
-        }
+    private void OnStopping()
+    {
+        _logger.LogInformation("OnStopping has been called.");
 
-        private void OnStopping()
-        {
-            _logger.LogInformation("OnStopping has been called.");
+        // Perform on-stopping activities here
+    }
 
-            // Perform on-stopping activities here
-        }
+    private void OnStopped()
+    {
+        _logger.LogInformation("OnStopped has been called.");
 
-        private void OnStopped()
-        {
-            _logger.LogInformation("OnStopped has been called.");
-
-            // Perform post-stopped activities here
-        }
+        // Perform post-stopped activities here
     }
 }

@@ -18,192 +18,190 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers
+namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers;
+
+[TestFixture]
+public class WhenApprenticeshipCompletionDateUpdatedEvent
 {
-    [TestFixture]
-    public class WhenApprenticeshipCompletionDateUpdatedEvent
+
+    [Test]
+    public async Task Then_Update_ActualEndDate()
     {
+        //Arrange
+        var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false);
 
-        [Test]
-        public async Task Then_Update_ActualEndDate()
-        {
-            //Arrange
-            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false);
-            
-            //Act
-            await fixture.Run();
+        //Act
+        await fixture.Run();
 
-            //Assert
-            fixture.AssertActualEndDate();
-        }
-
-        [Test]
-        public async Task Then_Update_Status()
-        {
-            //Arrange
-            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false);
-            
-            //Act
-            await fixture.Run();
-
-            //Assert
-            fixture.AssertStatus();
-        }
-
-        [Test]
-        public async Task If_Apprenticeship_NotExists_Then_CreateRecord()
-        {
-            //Arrange
-            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(true).SetGetApprenticeshipService();
-
-            //Act
-            await fixture.Run();
-
-            //Assert
-            fixture.AssertRecordCreated();
-        }
-
-
-        [Test]
-        public void If_Event_Errors_Should_Log_Error()
-        {
-            //Arrange            
-            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false).SetGetApprenticeshipService().SetException();
-
-            //Act
-            fixture.RunEventWithException();
-
-            //Assert
-            fixture.VerifyExceptionLogged();
-        }
-
-        [Test]
-        public void If_Api_Call_Unsuccesful_Should_Log_Error()
-        {
-            //Arrange            
-            var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false).SetGetApprenticeshipService().SetCommitmentsApiModelException();
-
-            //Act
-            fixture.RunEventWithCommitmentsApiModelException();
-
-            //Assert
-            fixture.VerifyCommitmentsApiModelExceptionExceptionLogged();
-        }
+        //Assert
+        fixture.AssertActualEndDate();
     }
 
-    public class ApprenticeshipCompletionDateUpdatedEventFixture
+    [Test]
+    public async Task Then_Update_Status()
     {
-        public Mock<IMessageHandlerContext> MessageHandlerContext { get; set; }
-        public Mock<IGetApprenticeshipService> MockGetApprenticeship { get; set; }
-        public Mock<ILogger<ApprenticeshipCompletionDateUpdatedEventHandler>> MockLogger { get; set; }
-        public Mock<IApprenticeshipCompletionDateUpdatedEventHandler> MockApprenticeshipCompletionDateUpdatedEventHandler { get; set; }
-        public ForecastingDbContext Db { get; set; }
-        public Commitments Commitment { get; set; }
-        public Fixture Fixture { get; set; }
-        public long CommitmentId { get; set; }
-        public ApprenticeshipCompletionDateUpdatedEventHandler Sut { get; set; }
+        //Arrange
+        var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false);
 
-        public ApprenticeshipCompletionDateUpdatedEvent ApprenticeshipCompletionDateUpdatedEvent { get; set; }
+        //Act
+        await fixture.Run();
 
-        public ApprenticeshipCompletionDateUpdatedEventFixture(bool SetState)
-        {
-            MessageHandlerContext = new Mock<IMessageHandlerContext>();
-            MockGetApprenticeship = new Mock<IGetApprenticeshipService>();
-            MockLogger = new Mock<ILogger<ApprenticeshipCompletionDateUpdatedEventHandler>>();
-            MockApprenticeshipCompletionDateUpdatedEventHandler = new Mock<IApprenticeshipCompletionDateUpdatedEventHandler>();
-            Fixture = new Fixture();
+        //Assert
+        fixture.AssertStatus();
+    }
 
-            Db = new ForecastingDbContext(new DbContextOptionsBuilder<ForecastingDbContext>()
-              .UseInMemoryDatabase(Guid.NewGuid().ToString())
-              .EnableSensitiveDataLogging()
-              .Options);
-            Commitment = Fixture.Create<Commitments>();
-            Commitment.Id = CommitmentId = 101;
-            Commitment.ActualEndDate = null;
-            Commitment.Status = Status.LiveOrWaitingToStart;
-            Commitment.ApprenticeshipId = 1;
-            Db.Commitment.Add(Commitment);
-            if (SetState) { Db.Entry(Commitment).State = EntityState.Detached; }
+    [Test]
+    public async Task If_Apprenticeship_NotExists_Then_CreateRecord()
+    {
+        //Arrange
+        var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(true).SetGetApprenticeshipService();
 
-            ApprenticeshipCompletionDateUpdatedEvent = Fixture.Create<ApprenticeshipCompletionDateUpdatedEvent>();
-            ApprenticeshipCompletionDateUpdatedEvent.ApprenticeshipId = Commitment.ApprenticeshipId;
+        //Act
+        await fixture.Run();
 
-            var configuration = new MapperConfiguration(cfg => cfg.AddProfile<AutoMapperProfile>());
-            var mapper = new Mapper(configuration);
+        //Assert
+        fixture.AssertRecordCreated();
+    }
 
-            Sut = new ApprenticeshipCompletionDateUpdatedEventHandler(Db, MockGetApprenticeship.Object, MockLogger.Object);
-            Db.SaveChanges();
-        }
 
-        public ApprenticeshipCompletionDateUpdatedEventFixture SetGetApprenticeshipService()
-        {
-            ApprenticeshipCompletionDateUpdatedEvent.ApprenticeshipId = 2;
-           Commitment = Fixture.Create<Commitments>();
-            Commitment.Id = 0;
-            Commitment.ApprenticeshipId = 2;
-            MockGetApprenticeship.Setup(x => x.GetApprenticeshipDetails(It.IsAny<long>())).ReturnsAsync(Commitment);
-            return this;
-        }
+    [Test]
+    public void If_Event_Errors_Should_Log_Error()
+    {
+        //Arrange            
+        var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false).SetGetApprenticeshipService().SetException();
 
-        public ApprenticeshipCompletionDateUpdatedEventFixture SetCommitmentsApiModelException()
-        {
-            MockGetApprenticeship.Setup(s => s.GetApprenticeshipDetails(It.IsAny<long>()))
-                    .Throws(new CommitmentsApiModelException(new List<ErrorDetail>()));
+        //Act
+        fixture.RunEventWithException();
 
-            return this;
-        }
+        //Assert
+        fixture.VerifyExceptionLogged();
+    }
 
-        public ApprenticeshipCompletionDateUpdatedEventFixture SetException()
-        {
-            MockGetApprenticeship.Setup(x => x.GetApprenticeshipDetails(It.IsAny<long>())).ThrowsAsync(new Exception());
+    [Test]
+    public void If_Api_Call_Unsuccesful_Should_Log_Error()
+    {
+        //Arrange            
+        var fixture = new ApprenticeshipCompletionDateUpdatedEventFixture(false).SetGetApprenticeshipService().SetCommitmentsApiModelException();
 
-            return this;
-        }
+        //Act
+        fixture.RunEventWithCommitmentsApiModelException();
 
-        public async Task Run()
-        {
-            await Sut.Handle(ApprenticeshipCompletionDateUpdatedEvent);
-        }
+        //Assert
+        fixture.VerifyCommitmentsApiModelExceptionExceptionLogged();
+    }
+}
 
-        public void RunEventWithException()
-        {
-           Assert.ThrowsAsync<Exception>(() => Sut.Handle(ApprenticeshipCompletionDateUpdatedEvent));
-        }
+public class ApprenticeshipCompletionDateUpdatedEventFixture
+{
+    public Mock<IMessageHandlerContext> MessageHandlerContext { get; set; }
+    public Mock<IGetApprenticeshipService> MockGetApprenticeship { get; set; }
+    public Mock<ILogger<ApprenticeshipCompletionDateUpdatedEventHandler>> MockLogger { get; set; }
+    public Mock<IApprenticeshipCompletionDateUpdatedEventHandler> MockApprenticeshipCompletionDateUpdatedEventHandler { get; set; }
+    public ForecastingDbContext Db { get; set; }
+    public Commitments Commitment { get; set; }
+    public Fixture Fixture { get; set; }
+    public long CommitmentId { get; set; }
+    public ApprenticeshipCompletionDateUpdatedEventHandler Sut { get; set; }
 
-        public void RunEventWithCommitmentsApiModelException()
-        {
-            Assert.ThrowsAsync<CommitmentsApiModelException>(() => Sut.Handle(ApprenticeshipCompletionDateUpdatedEvent));
-        }
+    public ApprenticeshipCompletionDateUpdatedEvent ApprenticeshipCompletionDateUpdatedEvent { get; set; }
 
-        internal void AssertActualEndDate()
-        {
-            Assert.AreEqual(ApprenticeshipCompletionDateUpdatedEvent.CompletionDate, Db.Commitment.Where(x => x.Id == CommitmentId).First().ActualEndDate);
-        }
+    public ApprenticeshipCompletionDateUpdatedEventFixture(bool SetState)
+    {
+        MessageHandlerContext = new Mock<IMessageHandlerContext>();
+        MockGetApprenticeship = new Mock<IGetApprenticeshipService>();
+        MockLogger = new Mock<ILogger<ApprenticeshipCompletionDateUpdatedEventHandler>>();
+        MockApprenticeshipCompletionDateUpdatedEventHandler = new Mock<IApprenticeshipCompletionDateUpdatedEventHandler>();
+        Fixture = new Fixture();
 
-        internal void AssertStatus()
-        {
-            Assert.AreEqual(Status.Completed, Db.Commitment.Where(x => x.Id == CommitmentId).First().Status);
-        }
+        Db = new ForecastingDbContext(new DbContextOptionsBuilder<ForecastingDbContext>()
+            .UseInMemoryDatabase(Guid.NewGuid().ToString())
+            .EnableSensitiveDataLogging()
+            .Options);
+        Commitment = Fixture.Create<Commitments>();
+        Commitment.Id = CommitmentId = 101;
+        Commitment.ActualEndDate = null;
+        Commitment.Status = Status.LiveOrWaitingToStart;
+        Commitment.ApprenticeshipId = 1;
+        Db.Commitment.Add(Commitment);
+        if (SetState) { Db.Entry(Commitment).State = EntityState.Detached; }
 
-        internal void AssertRecordCreated()
-        {
-            
-            Assert.AreEqual(1, Db.Commitment.Where(x => x.ApprenticeshipId == 2).Count());
-        }       
+        ApprenticeshipCompletionDateUpdatedEvent = Fixture.Create<ApprenticeshipCompletionDateUpdatedEvent>();
+        ApprenticeshipCompletionDateUpdatedEvent.ApprenticeshipId = Commitment.ApprenticeshipId;
 
-        internal void VerifyExceptionLogged()
-        {
-            MockLogger.Verify(
-             x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(),
-                 It.IsAny<Func<object, Exception, string>>()), Times.AtLeastOnce());
-        }
+        var configuration = new MapperConfiguration(cfg => cfg.AddProfile<AutoMapperProfile>());
+        var mapper = new Mapper(configuration);
 
-        internal void VerifyCommitmentsApiModelExceptionExceptionLogged()
-        {
-            MockLogger.Verify(
-             x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<CommitmentsApiModelException>(),
-                 It.IsAny<Func<object, Exception, string>>()), Times.AtLeastOnce());
-        }
-    }    
+        Sut = new ApprenticeshipCompletionDateUpdatedEventHandler(Db, MockGetApprenticeship.Object, MockLogger.Object);
+        Db.SaveChanges();
+    }
 
+    public ApprenticeshipCompletionDateUpdatedEventFixture SetGetApprenticeshipService()
+    {
+        ApprenticeshipCompletionDateUpdatedEvent.ApprenticeshipId = 2;
+        Commitment = Fixture.Create<Commitments>();
+        Commitment.Id = 0;
+        Commitment.ApprenticeshipId = 2;
+        MockGetApprenticeship.Setup(x => x.GetApprenticeshipDetails(It.IsAny<long>())).ReturnsAsync(Commitment);
+        return this;
+    }
+
+    public ApprenticeshipCompletionDateUpdatedEventFixture SetCommitmentsApiModelException()
+    {
+        MockGetApprenticeship.Setup(s => s.GetApprenticeshipDetails(It.IsAny<long>()))
+            .Throws(new CommitmentsApiModelException(new List<ErrorDetail>()));
+
+        return this;
+    }
+
+    public ApprenticeshipCompletionDateUpdatedEventFixture SetException()
+    {
+        MockGetApprenticeship.Setup(x => x.GetApprenticeshipDetails(It.IsAny<long>())).ThrowsAsync(new Exception());
+
+        return this;
+    }
+
+    public async Task Run()
+    {
+        await Sut.Handle(ApprenticeshipCompletionDateUpdatedEvent);
+    }
+
+    public void RunEventWithException()
+    {
+        Assert.ThrowsAsync<Exception>(() => Sut.Handle(ApprenticeshipCompletionDateUpdatedEvent));
+    }
+
+    public void RunEventWithCommitmentsApiModelException()
+    {
+        Assert.ThrowsAsync<CommitmentsApiModelException>(() => Sut.Handle(ApprenticeshipCompletionDateUpdatedEvent));
+    }
+
+    internal void AssertActualEndDate()
+    {
+        Assert.AreEqual(ApprenticeshipCompletionDateUpdatedEvent.CompletionDate, Db.Commitment.Where(x => x.Id == CommitmentId).First().ActualEndDate);
+    }
+
+    internal void AssertStatus()
+    {
+        Assert.AreEqual(Status.Completed, Db.Commitment.Where(x => x.Id == CommitmentId).First().Status);
+    }
+
+    internal void AssertRecordCreated()
+    {
+
+        Assert.AreEqual(1, Db.Commitment.Where(x => x.ApprenticeshipId == 2).Count());
+    }
+
+    internal void VerifyExceptionLogged()
+    {
+        MockLogger.Verify(
+            x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<Exception>(),
+                (Func<object, Exception, string>)It.IsAny<object>()), Times.AtLeastOnce());
+    }
+
+    internal void VerifyCommitmentsApiModelExceptionExceptionLogged()
+    {
+        MockLogger.Verify(
+            x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.IsAny<CommitmentsApiModelException>(),
+                (Func<object, Exception, string>)It.IsAny<object>()), Times.AtLeastOnce());
+    }
 }

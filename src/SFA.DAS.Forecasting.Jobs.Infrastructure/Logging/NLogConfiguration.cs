@@ -7,57 +7,56 @@ using NLog.Config;
 using NLog.Targets;
 using SFA.DAS.NLog.Targets.Redis.DotNetCore;
 
-namespace SFA.DAS.Forecasting.Jobs.Infrastructure.Logging
+namespace SFA.DAS.Forecasting.Jobs.Infrastructure.Logging;
+
+public static class NLogConfiguration
 {
-    public class NLogConfiguration
+    public static void ConfigureNLog(this IConfiguration configuration)
     {
-        public void ConfigureNLog(IConfiguration configuration)
+        var appName = configuration.GetConnectionStringOrSetting("AppName");
+        var env = configuration.GetConnectionStringOrSetting("EnvironmentName");
+        var config = new LoggingConfiguration();
+
+        if (string.IsNullOrEmpty(env) || env.Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
         {
-            var appName = configuration.GetConnectionStringOrSetting("AppName");
-            var env = configuration.GetConnectionStringOrSetting("EnvironmentName");
-            var config = new LoggingConfiguration();
-
-            if (string.IsNullOrEmpty(env) || env.Equals("LOCAL", StringComparison.CurrentCultureIgnoreCase))
-            {
-                AddLocalTarget(config, appName);
-            }
-            else
-            {
-                AddRedisTarget(config, appName);
-            }
-
-            LogManager.Configuration = config;
+            AddLocalTarget(config, appName);
+        }
+        else
+        {
+            AddRedisTarget(config, appName);
         }
 
-        private static void AddLocalTarget(LoggingConfiguration config, string appName)
-        {
-            InternalLogger.LogFile = Path.Combine(Directory.GetCurrentDirectory(), $"{appName}\\nlog-internal.{appName}.log");
-            var fileTarget = new FileTarget("Disk")
-            {
-                FileName = Path.Combine(Directory.GetCurrentDirectory(), $"{appName}\\{appName}.${{shortdate}}.log"),
-                Layout = "${longdate} [${uppercase:${level}}] [${logger}] - ${message} ${onexception:${exception:format=tostring}}"
-            };
-            config.AddTarget(fileTarget);
-
-            config.AddRule(GetMinLogLevel(), LogLevel.Fatal, "Disk");
-        }
-
-        private static void AddRedisTarget(LoggingConfiguration config, string appName)
-        {
-            var target = new RedisTarget
-            {
-                Name = "RedisLog",
-                AppName = appName,
-                EnvironmentKeyName = "EnvironmentName",
-                ConnectionStringName = "LoggingRedisConnectionString",
-                IncludeAllProperties = true,
-                Layout = "${message}"
-            };
-
-            config.AddTarget(target);
-            config.AddRule(GetMinLogLevel(), LogLevel.Fatal, "RedisLog");
-        }
-
-        private static LogLevel GetMinLogLevel() => LogLevel.FromString("Info");
+        LogManager.Configuration = config;
     }
+
+    private static void AddLocalTarget(LoggingConfiguration config, string appName)
+    {
+        InternalLogger.LogFile = Path.Combine(Directory.GetCurrentDirectory(), $"{appName}\\nlog-internal.{appName}.log");
+        var fileTarget = new FileTarget("Disk")
+        {
+            FileName = Path.Combine(Directory.GetCurrentDirectory(), $"{appName}\\{appName}.${{shortdate}}.log"),
+            Layout = "${longdate} [${uppercase:${level}}] [${logger}] - ${message} ${onexception:${exception:format=tostring}}"
+        };
+        config.AddTarget(fileTarget);
+
+        config.AddRule(GetMinLogLevel(), LogLevel.Fatal, "Disk");
+    }
+
+    private static void AddRedisTarget(LoggingConfiguration config, string appName)
+    {
+        var target = new RedisTarget
+        {
+            Name = "RedisLog",
+            AppName = appName,
+            EnvironmentKeyName = "EnvironmentName",
+            ConnectionStringName = "LoggingRedisConnectionString",
+            IncludeAllProperties = true,
+            Layout = "${message}"
+        };
+
+        config.AddTarget(target);
+        config.AddRule(GetMinLogLevel(), LogLevel.Fatal, "RedisLog");
+    }
+
+    private static LogLevel GetMinLogLevel() => LogLevel.FromString("Info");
 }

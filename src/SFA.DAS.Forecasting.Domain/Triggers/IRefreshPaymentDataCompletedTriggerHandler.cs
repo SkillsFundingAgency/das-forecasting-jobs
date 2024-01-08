@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using SFA.DAS.EmployerFinance.Messages.Events;
 using System.Threading.Tasks;
-using SFA.DAS.EmployerFinance.Messages.Events;
 
-namespace SFA.DAS.Forecasting.Domain.Triggers
+namespace SFA.DAS.Forecasting.Domain.Triggers;
+
+public interface IRefreshPaymentDataCompletedTriggerHandler
 {
-    public interface IRefreshPaymentDataCompletedTriggerHandler
-    {
-        Task Handle(RefreshPaymentDataCompletedEvent refreshPaymentDataCompletedEvent);
-    }
+    Task Handle(RefreshPaymentDataCompletedEvent refreshPaymentDataCompletedEvent);
 }

@@ -7,7 +7,7 @@
 
 ## Requirements
 
-DotNet Core 2.2 and any supported IDE for DEV running. Azure function SDK v2 is also required.
+DotNet 6.0 and any supported IDE for DEV running. Azure function SDK v4 is also required.
 
 ## About
 
@@ -49,7 +49,7 @@ You will also require a local settings file like the following:
     "ConfigNames": "SFA.DAS.Forecasting.Jobs,SFA.DAS.Encoding",
     "ConfigurationStorageConnectionString": "UseDevelopmentStorage=true",
     "EnvironmentName": "LOCAL",
-    "FUNCTIONS_EXTENSION_VERSION": "~2",
+    "FUNCTIONS_EXTENSION_VERSION": "~4",
     "LoggingRedisConnectionString": "",
     "NServiceBusLicense": "[NServiceBusLicense]",
     "ServiceBusConnectionString": "[ServiceBusConnectionString]"

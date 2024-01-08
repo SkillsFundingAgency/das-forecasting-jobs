@@ -1,10 +1,9 @@
 ﻿using SFA.DAS.CommitmentsV2.Messages.Events;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.Forecasting.Domain.CommitmentsFunctions
+namespace SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
+
+public interface IApprenticeshipStopDateChangedEventHandler
 {
-    public interface IApprenticeshipStopDateChangedEventHandler
-    {
-        Task Handle(ApprenticeshipStopDateChangedEvent apprenticeshipCompletedEvent);
-    }
+    Task Handle(ApprenticeshipStopDateChangedEvent apprenticeshipCompletedEvent);
 }

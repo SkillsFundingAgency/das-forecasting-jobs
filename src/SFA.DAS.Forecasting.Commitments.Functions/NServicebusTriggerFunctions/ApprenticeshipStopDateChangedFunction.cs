@@ -6,30 +6,32 @@ using SFA.DAS.NServiceBus.AzureFunction.Attributes;
 using System;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions
+namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions;
+
+public class ApprenticeshipStopDateChangedFunction
 {
-    public class ApprenticeshipStopDateChangedFunction
+    private readonly IApprenticeshipStopDateChangedEventHandler _apprenticeshipStopDateChangedEventHandler;
+    private readonly ILogger<ApprenticeshipStopDateChangedFunction> _logger;
+
+    public ApprenticeshipStopDateChangedFunction(
+        IApprenticeshipStopDateChangedEventHandler apprenticeshipCompletionDateUpdatedEventHandler,
+        ILogger<ApprenticeshipStopDateChangedFunction> logger)
     {
-        private readonly IApprenticeshipStopDateChangedEventHandler _apprenticeshipStopDateChangedEventHandler;
-        private readonly ILogger<ApprenticeshipStopDateChangedFunction> _logger;
+        _apprenticeshipStopDateChangedEventHandler = apprenticeshipCompletionDateUpdatedEventHandler;
+        _logger = logger;
+    }
 
-        public ApprenticeshipStopDateChangedFunction(
-            IApprenticeshipStopDateChangedEventHandler apprenticeshipCompletionDateUpdatedEventHandler,
-            ILogger<ApprenticeshipStopDateChangedFunction> logger)
-        {
-            _apprenticeshipStopDateChangedEventHandler = apprenticeshipCompletionDateUpdatedEventHandler;
-            _logger = logger;
-        }
+    [FunctionName(FunctionNames.ApprenticeshipStopDateChanged)]
+    public async Task Run(
+        [NServiceBusTrigger(Endpoint = EndpointNames.ApprenticeshipStopDateChanged)]
+        ApprenticeshipStopDateChangedEvent message)
+    {
+        _logger.LogInformation(
+            $"Apprenticeship update approved function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
 
-        [FunctionName("ApprenticeshipStopDateChanged")]
-        public async Task Run(
-            [NServiceBusTrigger(Endpoint = "SFA.DAS.Fcast.ApprenticeshipStopDateChanged")] ApprenticeshipStopDateChangedEvent message)
-        {
-            _logger.LogInformation($"Apprenticeship update approved function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
+        await _apprenticeshipStopDateChangedEventHandler.Handle(message);
 
-            await _apprenticeshipStopDateChangedEventHandler.Handle(message);
-
-            _logger.LogInformation($"Apprenticeshipupdate update approved  function Finished at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
-        }
+        _logger.LogInformation(
+            $"Apprenticeshipupdate update approved  function Finished at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
     }
 }

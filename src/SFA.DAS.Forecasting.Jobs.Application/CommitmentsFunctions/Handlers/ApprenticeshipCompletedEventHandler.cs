@@ -9,50 +9,49 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers
+namespace SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers;
+
+public class ApprenticeshipCompletedEventHandler : IApprenticeshipCompletedEventHandler
 {
-    public class ApprenticeshipCompletedEventHandler : IApprenticeshipCompletedEventHandler
+    private readonly IForecastingDbContext _forecastingDbContext;
+    private readonly IGetApprenticeshipService _getApprenticeshipService;
+    private readonly ILogger _logger;
+
+    public ApprenticeshipCompletedEventHandler(IForecastingDbContext forecastingDbContext,
+        IGetApprenticeshipService getApprenticeshipService,
+        ILogger<ApprenticeshipCompletedEventHandler> logger)
     {
-        private readonly IForecastingDbContext _forecastingDbContext;
-        private readonly IGetApprenticeshipService _getApprenticeshipService;
-        private readonly ILogger _logger;
+        _forecastingDbContext = forecastingDbContext;
+        _getApprenticeshipService = getApprenticeshipService;
+        _logger = logger;
+    }
 
-        public ApprenticeshipCompletedEventHandler(IForecastingDbContext forecastingDbContext,
-            IGetApprenticeshipService getApprenticeshipService,
-            ILogger<ApprenticeshipCompletedEventHandler> logger)
+    public async Task Handle(ApprenticeshipCompletedEvent message)
+    {
+        try
         {
-            _forecastingDbContext = forecastingDbContext;
-            _getApprenticeshipService = getApprenticeshipService;
-            _logger = logger;
+            var selectedApprenticeship = _forecastingDbContext.Commitment.FirstOrDefault(x => x.ApprenticeshipId == message.ApprenticeshipId);
+            if (selectedApprenticeship == null)
+            {
+                selectedApprenticeship = await _getApprenticeshipService.GetApprenticeshipDetails(message.ApprenticeshipId);
+                _forecastingDbContext.Commitment.Add(selectedApprenticeship);
+            }
+
+            selectedApprenticeship.UpdatedDateTime = DateTime.UtcNow;
+            selectedApprenticeship.Status = Status.Completed;
+            selectedApprenticeship.ActualEndDate = message.CompletionDate;
+
+            await _forecastingDbContext.SaveChangesAsync();
         }
-
-        public async Task Handle(ApprenticeshipCompletedEvent message)
+        catch (CommitmentsApiModelException commitmentException)
         {
-            try
-            {
-                var selectedApprenticeship = _forecastingDbContext.Commitment.FirstOrDefault(x => x.ApprenticeshipId == message.ApprenticeshipId);
-                if (selectedApprenticeship == null)
-                {
-                    selectedApprenticeship =  await _getApprenticeshipService.GetApprenticeshipDetails(message.ApprenticeshipId);
-                    _forecastingDbContext.Commitment.Add(selectedApprenticeship);
-                }
-
-                selectedApprenticeship.UpdatedDateTime = DateTime.UtcNow;
-                selectedApprenticeship.Status = Status.Completed;
-                selectedApprenticeship.ActualEndDate = message.CompletionDate;
-
-                await _forecastingDbContext.SaveChangesAsync();                
-            }
-            catch (CommitmentsApiModelException commitmentException)
-            {
-                _logger.LogError(commitmentException, $"Apprenticeship Completed function Failure to retrieve  ApprenticeshipId: [{message.ApprenticeshipId}]");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Apprenticeship Completed function Failed for ApprenticeshipId: [{message.ApprenticeshipId}] ");
-                throw;
-            }
+            _logger.LogError(commitmentException, $"Apprenticeship Completed function Failure to retrieve  ApprenticeshipId: [{message.ApprenticeshipId}]");
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Apprenticeship Completed function Failed for ApprenticeshipId: [{message.ApprenticeshipId}] ");
+            throw;
         }
     }
 }

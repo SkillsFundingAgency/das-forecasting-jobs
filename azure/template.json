@@ -32,6 +32,12 @@
                 "description": "Name of the environment's shared resource group"
             }
         },
+        "nServiceBusConnectionString": {
+            "type": "securestring"
+        },
+        "nServiceBusLicense": {
+            "type": "securestring"
+        },
         "sharedServiceBusName": {
             "type": "string",
             "metadata": {
@@ -55,12 +61,6 @@
             "type": "string",
             "defaultValue": "Standard"
         },
-        "nServiceBusConnectionString": {
-            "type": "securestring"
-        },
-        "nServiceBusLicense": {
-            "type": "securestring"
-        },
         "loggingRedisConnectionString": {
             "type": "securestring"
         },
@@ -72,10 +72,6 @@
         },
         "commitmentsConfigNames": {
             "type": "string"
-        },
-        "functionsExtensionVersion": {
-            "type": "string",
-            "defaultValue": "~3"
         },
         "sharedEnvVirtualNetworkName": {
             "type": "string"
@@ -304,11 +300,7 @@
                                 },
                                 {
                                     "name": "FUNCTIONS_EXTENSION_VERSION",
-                                    "value": "[parameters('functionsExtensionVersion')]"
-                                },
-                                {
-                                    "name": "EnvironmentName",
-                                    "value": "[toUpper(parameters('environmentName'))]"
+                                    "value": "~4"
                                 },
                                 {
                                     "name": "NServiceBusConnectionString",
@@ -317,6 +309,18 @@
                                 {
                                     "name": "NServiceBusLicense",
                                     "value": "[parameters('nServiceBusLicense')]"
+                                },
+                                {
+                                    "name": "FUNCTIONS_WORKER_RUNTIME",
+                                    "value": "dotnet"
+                                },
+                                {
+                                    "name": "Version",
+                                    "value": "1.0"
+                                },
+                                {
+                                    "name": "EnvironmentName",
+                                    "value": "[toUpper(parameters('environmentName'))]"
                                 },
                                 {
                                     "name": "LoggingRedisConnectionString",
@@ -384,7 +388,15 @@
                                 },
                                 {
                                     "name": "FUNCTIONS_EXTENSION_VERSION",
-                                    "value": "~3"
+                                    "value": "~4"
+                                },
+                                {
+                                    "name": "NServiceBusConnectionString",
+                                    "value": "[parameters('nServiceBusConnectionString')]"
+                                },
+                                {
+                                    "name": "NServiceBusLicense",
+                                    "value": "[parameters('nServiceBusLicense')]"
                                 },
                                 {
                                     "name": "EnvironmentName",
@@ -401,14 +413,6 @@
                                 {
                                     "name": "ConfigNames",
                                     "value": "[parameters('commitmentsConfigNames')]"
-                                },
-                                {
-                                    "name": "NServiceBusConnectionString",
-                                    "value": "[parameters('nServiceBusConnectionString')]"
-                                },
-                                {
-                                    "name": "NServiceBusLicense",
-                                    "value": "[parameters('nServiceBusLicense')]"
                                 }
                             ]
                         }
@@ -433,6 +437,30 @@
                 "parameters": {
                     "principalId": {
                         "value": "[reference(concat('commitments-function-app-', parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
+                    },
+                    "assignmentType": {
+                        "value": "ServiceBusOwner"
+                    },
+                    "resourceName": {
+                        "value": "[parameters('sharedServiceBusName')]"
+                    }
+                }
+            }
+        },
+        {
+            "apiVersion": "2020-06-01",
+            "name": "[concat('role-assignment-', variables('functionAppName'), '-', parameters('utcValue'))]",
+            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignments/role-assignment-service-bus.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "principalId": {
+                        "value": "[reference(concat('function-app-', parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
                     },
                     "assignmentType": {
                         "value": "ServiceBusOwner"
