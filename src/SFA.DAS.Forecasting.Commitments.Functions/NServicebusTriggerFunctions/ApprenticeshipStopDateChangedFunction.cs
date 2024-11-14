@@ -1,37 +1,23 @@
-﻿using Microsoft.Azure.WebJobs;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using NServiceBus;
 using SFA.DAS.CommitmentsV2.Messages.Events;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
-using SFA.DAS.NServiceBus.AzureFunction.Attributes;
-using System;
-using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions;
 
-public class ApprenticeshipStopDateChangedFunction
+public class ApprenticeshipStopDateChangedFunction(
+    IApprenticeshipStopDateChangedEventHandler apprenticeshipCompletionDateUpdatedEventHandler,
+    ILogger<ApprenticeshipStopDateChangedFunction> logger)
+    : IHandleMessages<ApprenticeshipStopDateChangedEvent>
 {
-    private readonly IApprenticeshipStopDateChangedEventHandler _apprenticeshipStopDateChangedEventHandler;
-    private readonly ILogger<ApprenticeshipStopDateChangedFunction> _logger;
-
-    public ApprenticeshipStopDateChangedFunction(
-        IApprenticeshipStopDateChangedEventHandler apprenticeshipCompletionDateUpdatedEventHandler,
-        ILogger<ApprenticeshipStopDateChangedFunction> logger)
+    public async Task Handle(ApprenticeshipStopDateChangedEvent message, IMessageHandlerContext context)
     {
-        _apprenticeshipStopDateChangedEventHandler = apprenticeshipCompletionDateUpdatedEventHandler;
-        _logger = logger;
-    }
+        logger.LogInformation($"Apprenticeship update approved function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
 
-    [FunctionName(FunctionNames.ApprenticeshipStopDateChanged)]
-    public async Task Run(
-        [NServiceBusTrigger(Endpoint = EndpointNames.ApprenticeshipStopDateChanged)]
-        ApprenticeshipStopDateChangedEvent message)
-    {
-        _logger.LogInformation(
-            $"Apprenticeship update approved function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
+        await apprenticeshipCompletionDateUpdatedEventHandler.Handle(message);
 
-        await _apprenticeshipStopDateChangedEventHandler.Handle(message);
-
-        _logger.LogInformation(
-            $"Apprenticeshipupdate update approved  function Finished at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
+        logger.LogInformation($"ApprenticeshipUpdate update approved  function Finished at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
     }
 }

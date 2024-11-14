@@ -1,37 +1,23 @@
-﻿using Microsoft.Azure.WebJobs;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using NServiceBus;
 using SFA.DAS.CommitmentsV2.Messages.Events;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
-using SFA.DAS.NServiceBus.AzureFunction.Attributes;
-using System;
-using System.Threading.Tasks;
 
 namespace SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions;
 
-public class ApprenticeshipCompletedFunction
+public sealed class ApprenticeshipCompletedFunction(
+    IApprenticeshipCompletedEventHandler apprenticeshipCompletedEventHandler,
+    ILogger<ApprenticeshipCompletedFunction> logger)
+    : IHandleMessages<ApprenticeshipCompletedEvent>
 {
-    private readonly IApprenticeshipCompletedEventHandler _apprenticeshipCompletedEventHandler;
-    private readonly ILogger<ApprenticeshipCompletedFunction> _logger;
-
-    public ApprenticeshipCompletedFunction(
-        IApprenticeshipCompletedEventHandler apprenticeshipCompletedEventHandler,
-        ILogger<ApprenticeshipCompletedFunction> logger)
+    public async Task Handle(ApprenticeshipCompletedEvent message, IMessageHandlerContext context)
     {
-        _apprenticeshipCompletedEventHandler = apprenticeshipCompletedEventHandler;
-        _logger = logger;
-    }
+        logger.LogInformation($"Apprenticeship Completed function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
 
-    [FunctionName(FunctionNames.ApprenticeshipCompleted)]
-    public async Task Run(
-        [NServiceBusTrigger(Endpoint = EndpointNames.ApprenticeshipCompletedEvent)]
-        ApprenticeshipCompletedEvent message)
-    {
-        _logger.LogInformation(
-            $"Apprenticeship Completed function Begin at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
+        await apprenticeshipCompletedEventHandler.Handle(message);
 
-        await _apprenticeshipCompletedEventHandler.Handle(message);
-
-        _logger.LogInformation(
-            $"Apprenticeship Completed function Finished at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
+        logger.LogInformation($"Apprenticeship Completed function Finished at: [{DateTime.UtcNow}] UTC, event with ApprenticeshipId: [{message.ApprenticeshipId}].");
     }
 }
