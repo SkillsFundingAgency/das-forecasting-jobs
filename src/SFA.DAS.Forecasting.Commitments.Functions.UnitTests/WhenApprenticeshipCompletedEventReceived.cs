@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.CommitmentsV2.Messages.Events;
-using SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
 using System.Threading.Tasks;
+using SFA.DAS.Forecasting.Commitments.Functions.Functions;
 
 namespace SFA.DAS.Forecasting.Commitments.Functions.UnitTests;
 

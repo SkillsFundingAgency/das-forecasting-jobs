@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
@@ -11,7 +10,7 @@ public sealed class HandleRefreshEmployerLevyDataCompleted(ILogger log, ILevyCom
 {
     public async Task Handle(RefreshEmployerLevyDataCompletedEvent @event, IMessageHandlerContext context)
     {
-        log.LogInformation($"NServiceBus {nameof(RefreshEmployerLevyDataCompletedEvent)} trigger function executed at: {DateTime.Now}");
+        log.LogInformation("NServiceBus {TypeName} trigger function executed.", nameof(RefreshEmployerLevyDataCompletedEvent));
         
         await handler.Handle(@event);
     }

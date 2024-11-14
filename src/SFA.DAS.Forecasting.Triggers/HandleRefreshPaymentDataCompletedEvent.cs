@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
@@ -11,7 +10,7 @@ public sealed class HandleRefreshPaymentDataCompletedEvent (ILogger log,IRefresh
 {
     public async Task Handle(RefreshPaymentDataCompletedEvent message, IMessageHandlerContext context)
     {
-        log.LogInformation($"NServiceBus {nameof(RefreshPaymentDataCompletedEvent)} trigger function executed at: {DateTime.Now}");
+        log.LogInformation("NServiceBus {TypeName} trigger function executed.", nameof(RefreshPaymentDataCompletedEvent));
         
         await handler.Handle(message);
     }

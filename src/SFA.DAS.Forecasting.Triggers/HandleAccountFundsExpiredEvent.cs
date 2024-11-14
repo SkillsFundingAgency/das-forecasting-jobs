@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NServiceBus;
@@ -11,7 +10,7 @@ public sealed class HandleAccountFundsExpiredEvent(ILogger log, ILevyCompleteTri
 {
     public async Task Handle(AccountFundsExpiredEvent @event, IMessageHandlerContext context)
     {
-        log.LogInformation($"NServiceBus {nameof(AccountFundsExpiredEvent)} trigger function executed at: {DateTime.Now}");
+        log.LogInformation("NServiceBus {TypeName} trigger function executed.", nameof(AccountFundsExpiredEvent));
 
         var convertedMessage = new RefreshEmployerLevyDataCompletedEvent
         {
