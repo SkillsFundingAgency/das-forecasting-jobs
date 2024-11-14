@@ -5,11 +5,11 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Hosting;
 using NServiceBus;
 
-namespace SFA.DAS.Forecasting.Commitments.Functions.StartupExtensions;
+namespace SFA.DAS.Forecasting.Triggers.StartupExtensions;
 
 public static class ConfigureNServiceBusExtension
 {
-    private const string EndpointName = "SFA.DAS.Forecasting.Functions";
+    private const string EndpointName = "SFA.DAS.Forecasting.Jobs";
     private const string ErrorEndpointName = $"{EndpointName}-error";
 
     public static IHostBuilder ConfigureNServiceBus(this IHostBuilder hostBuilder)

@@ -2,8 +2,10 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
+    <OutputType>Exe</OutputType>
     <LangVersion>default</LangVersion>
   </PropertyGroup>
+  
   <PropertyGroup>
     <GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
   </PropertyGroup>
@@ -19,7 +21,6 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
-    <PackageReference Include="NLog.Extensions.Logging" Version="1.6.5" />
     <PackageReference Include="NServiceBus.AzureFunctions.Worker.ServiceBus" Version="5.2.0" />
     <PackageReference Include="NServiceBus.Extensions.Hosting" Version="3.0.0" />
     <PackageReference Include="NServiceBus.Newtonsoft.Json" Version="4.0.0" />

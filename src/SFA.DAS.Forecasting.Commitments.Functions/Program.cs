@@ -12,7 +12,7 @@ using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers;
 using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers.Services;
 using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Mapper;
 
-[assembly: NServiceBusTriggerFunction("SFA.DAS.Forecasting.Commitments.Functions")]
+[assembly: NServiceBusTriggerFunction("SFA.DAS.Forecasting.Functions")]
 
 var host = new HostBuilder()
     .ConfigureFunctionsWebApplication()
