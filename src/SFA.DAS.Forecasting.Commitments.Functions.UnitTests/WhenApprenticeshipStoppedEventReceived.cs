@@ -7,6 +7,7 @@ using SFA.DAS.CommitmentsV2.Messages.Events;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
 using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Mapper;
 using System.Threading.Tasks;
+using NServiceBus;
 using SFA.DAS.Forecasting.Commitments.Functions.Functions;
 
 namespace SFA.DAS.Forecasting.Commitments.Functions.UnitTests;
@@ -49,10 +50,7 @@ public class ApprenticeshipStoppedEventTestsFixture
         Sut = new ApprenticeshipStoppedFunction(MockpprenticeshipStoppedEventHandler.Object, MockLogger.Object);
     }
 
-    public async Task Run()
-    {
-        await Sut.Run(ApprenticeshipStoppedEvent);
-    }
+    public async Task Run() => await Sut.Handle(ApprenticeshipStoppedEvent, Mock.Of<IMessageHandlerContext>());
 
     internal void AssertHandler()
     {

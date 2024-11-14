@@ -5,6 +5,7 @@ using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Triggers;
 using SFA.DAS.Forecasting.Triggers;
 using System.Threading.Tasks;
+using NServiceBus;
 
 namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests;
 
@@ -19,9 +20,10 @@ public class WhenRefreshEmployerLevyDataCompletedTriggered
         //Arrange
         var handler = new Mock<ILevyCompleteTriggerHandler>();
         var message = new RefreshEmployerLevyDataCompletedEvent { AccountId = 123 };
+        var function = new HandleRefreshEmployerLevyDataCompleted(Mock.Of<ILogger<HandleRefreshPaymentDataCompletedEvent>>(), handler.Object);
 
         //Act
-        await HandleRefreshEmployerLevyDataCompleted.Run(message, handler.Object, Mock.Of<ILogger<RefreshEmployerLevyDataCompletedEvent>>());
+        await function.Handle(message, Mock.Of<IMessageHandlerContext>());
 
         //Assert
         handler.Verify(s => s.Handle(It.Is<RefreshEmployerLevyDataCompletedEvent>(c => c.AccountId.Equals(message.AccountId))), Times.Once);
