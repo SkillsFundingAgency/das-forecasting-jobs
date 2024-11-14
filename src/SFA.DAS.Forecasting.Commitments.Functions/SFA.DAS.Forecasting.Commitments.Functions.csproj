@@ -3,22 +3,10 @@
         <TargetFramework>net8.0</TargetFramework>
         <AzureFunctionsVersion>v4</AzureFunctionsVersion>
         <OutputType>Exe</OutputType>
-        <LangVersion>latestmajor</LangVersion>
+        <LangVersion>default</LangVersion>
     </PropertyGroup>
     <ItemGroup>
         <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext"/>
-    </ItemGroup>
-    <ItemGroup>
-        <None Remove="nlog.config" />
-        <None Update="local.settings.json">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-          <CopyToPublishDirectory>Never</CopyToPublishDirectory>
-        </None>
-    </ItemGroup>
-    <ItemGroup>
-        <Content Include="nlog.config">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="12.0.1" />
