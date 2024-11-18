@@ -6,33 +6,33 @@
         <LangVersion>default</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext"/>
+        <Using Include="System.Threading.ExecutionContext" Alias="ExecutionContext" />
     </ItemGroup>
     <PropertyGroup>
         <GenerateRuntimeConfigDevFile>true</GenerateRuntimeConfigDevFile>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.22.0" />
-        <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.22.0"/>
-        <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.0.0"/>
-        <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="2.0.0"/>
-        <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore" Version="2.0.0"/>
-        <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.0"/>
-        <PackageReference Include="Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator" Version="4.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.1"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1"/>
-        <PackageReference Include="NServiceBus.AzureFunctions.Worker.ServiceBus" Version="5.2.0"/>
-        <PackageReference Include="NServiceBus.Extensions.Hosting" Version="3.0.0"/>
-        <PackageReference Include="NServiceBus.Newtonsoft.Json" Version="4.0.0"/>
+        <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.22.0" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker" Version="2.0.0" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.ApplicationInsights" Version="2.0.0" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.Extensions.Http.AspNetCore" Version="2.0.0" />
+        <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.0" />
+        <PackageReference Include="Microsoft.Azure.WebJobs.Script.ExtensionsMetadataGenerator" Version="4.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
+        <PackageReference Include="NServiceBus.AzureFunctions.Worker.ServiceBus" Version="5.2.0" />
+        <PackageReference Include="NServiceBus.Extensions.Hosting" Version="3.0.0" />
+        <PackageReference Include="NServiceBus.Newtonsoft.Json" Version="4.0.0" />
         <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="17.1.113" />
-        <PackageReference Include="SFA.DAS.Encoding" Version="1.1.76"/>
+        <PackageReference Include="SFA.DAS.Encoding" Version="1.1.76" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\SFA.DAS.EmployerFinance.Messages\SFA.DAS.EmployerFinance.Messages.csproj"/>
-        <ProjectReference Include="..\SFA.DAS.Forecasting.Domain\SFA.DAS.Forecasting.Domain.csproj"/>
-        <ProjectReference Include="..\SFA.DAS.Forecasting.Jobs.Application\SFA.DAS.Forecasting.Jobs.Application.csproj"/>
-        <ProjectReference Include="..\SFA.DAS.Forecasting.Jobs.Infrastructure\SFA.DAS.Forecasting.Jobs.Infrastructure.csproj"/>
+        <ProjectReference Include="..\SFA.DAS.EmployerFinance.Messages\SFA.DAS.EmployerFinance.Messages.csproj" />
+        <ProjectReference Include="..\SFA.DAS.Forecasting.Domain\SFA.DAS.Forecasting.Domain.csproj" />
+        <ProjectReference Include="..\SFA.DAS.Forecasting.Jobs.Application\SFA.DAS.Forecasting.Jobs.Application.csproj" />
+        <ProjectReference Include="..\SFA.DAS.Forecasting.Jobs.Infrastructure\SFA.DAS.Forecasting.Jobs.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>
