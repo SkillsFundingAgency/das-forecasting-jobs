@@ -1,11 +1,9 @@
-﻿using Microsoft.Azure.Services.AppAuthentication;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions.Models;
-using System.Data.SqlClient;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
 
 namespace SFA.DAS.Forecasting.Jobs.Infrastructure;
 
@@ -17,36 +15,31 @@ public interface IForecastingDbContext
 
 public class ForecastingDbContext : DbContext, IForecastingDbContext
 {
-    private const string AzureResource = "https://database.windows.net/";
-
     private readonly IConfiguration _configuration;
-    private readonly AzureServiceTokenProvider _azureServiceTokenProvider;
+
+    public DbSet<Commitments> Commitment { get; set; }
 
     public ForecastingDbContext(DbContextOptions options) : base(options)
     {
     }
 
-    public ForecastingDbContext(IConfiguration config, DbContextOptions options, AzureServiceTokenProvider azureServiceTokenProvider) : base(options)
+    public ForecastingDbContext(IConfiguration config, DbContextOptions options) : base(options)
     {
         _configuration = config;
-        _azureServiceTokenProvider = azureServiceTokenProvider;
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        if (_configuration == null || _azureServiceTokenProvider == null)
+        if (_configuration == null)
         {
             return;
         }
 
         var connection = new SqlConnection
         {
-            ConnectionString = _configuration["DatabaseConnectionString"],
-            AccessToken = _azureServiceTokenProvider.GetAccessTokenAsync(AzureResource).Result
+            ConnectionString = _configuration["DatabaseConnectionString"]!,
         };
 
         optionsBuilder.UseSqlServer(connection);
     }
-
-    public DbSet<Commitments> Commitment { get; set; }
 }

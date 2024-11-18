@@ -18,7 +18,6 @@ public static class AddDatabaseExtension
         }
         else
         {
-            services.AddSingleton(new AzureServiceTokenProvider());
             services.AddDbContext<ForecastingDbContext>(ServiceLifetime.Transient);
         }
 
