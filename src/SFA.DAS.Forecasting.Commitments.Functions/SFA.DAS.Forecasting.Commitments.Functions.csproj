@@ -27,7 +27,6 @@
         <PackageReference Include="NServiceBus.Newtonsoft.Json" Version="4.0.0" />
         <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Client" Version="7.1.0" />
         <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Types" Version="100.0.30" />
-        <PackageReference Include="Scrutor" Version="4.2.2" />
         <PackageReference Include="SFA.DAS.CommitmentsV2.Messages" Version="100.0.30" />
         <PackageReference Include="SFA.DAS.CommitmentsV2.Types" Version="100.0.30" />
         <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="3.0.84" />
