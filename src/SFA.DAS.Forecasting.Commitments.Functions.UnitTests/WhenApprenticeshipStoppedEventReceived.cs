@@ -43,10 +43,6 @@ public class ApprenticeshipStoppedEventTestsFixture
         Fixture = new Fixture();
 
         ApprenticeshipStoppedEvent = Fixture.Create<ApprenticeshipStoppedEvent>();
-
-        var configuration = new MapperConfiguration(cfg => cfg.AddProfile<AutoMapperProfile>());
-        var mapper = new Mapper(configuration);
-
         Sut = new ApprenticeshipStoppedFunction(MockpprenticeshipStoppedEventHandler.Object, MockLogger.Object);
     }
 

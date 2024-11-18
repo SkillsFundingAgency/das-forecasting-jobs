@@ -25,7 +25,7 @@
         <PackageReference Include="NServiceBus.AzureFunctions.Worker.ServiceBus" Version="5.2.0"/>
         <PackageReference Include="NServiceBus.Extensions.Hosting" Version="3.0.0"/>
         <PackageReference Include="NServiceBus.Newtonsoft.Json" Version="4.0.0"/>
-        <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="3.0.84"/>
+        <PackageReference Include="SFA.DAS.Configuration.AzureTableStorage" Version="17.1.113" />
         <PackageReference Include="SFA.DAS.Encoding" Version="1.1.76"/>
     </ItemGroup>
     <ItemGroup>
@@ -36,9 +36,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <None Update="Directory.Build.Targets">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
         <None Update="host.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>

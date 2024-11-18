@@ -101,7 +101,7 @@ public class WhenHandlingEmployerLevyRefreshComplete
         _event.PeriodMonth = 0;
         _event.PeriodYear = string.Empty;
         _event.Created = new DateTime(currentYear, currentMonth, 6);
-        string actualPeriodYear = string.Empty;
+        var actualPeriodYear = string.Empty;
 
         _levyForecastServiceMock
             .Setup(mock => mock.Trigger(It.IsAny<short>(), It.IsAny<string>(), It.IsAny<long>()))
