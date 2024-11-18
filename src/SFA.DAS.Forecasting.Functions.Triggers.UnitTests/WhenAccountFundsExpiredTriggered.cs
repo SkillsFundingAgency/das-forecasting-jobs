@@ -3,10 +3,10 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Triggers;
-using SFA.DAS.Forecasting.Triggers;
 using System;
 using System.Threading.Tasks;
 using NServiceBus;
+using SFA.DAS.Forecasting.Triggers.Functions;
 
 namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests;
 

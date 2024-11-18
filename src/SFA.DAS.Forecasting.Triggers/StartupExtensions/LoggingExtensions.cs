@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Azure.Functions.Worker;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.ApplicationInsights;
 
@@ -17,7 +18,12 @@ public static class LoggingExtensions
             builder.SetMinimumLevel(LogLevel.Trace);
             builder.AddConsole();
         });
-        
+
+
+        services
+            .AddApplicationInsightsTelemetryWorkerService()
+            .ConfigureFunctionsApplicationInsights();
+
         return services;
     }
 }

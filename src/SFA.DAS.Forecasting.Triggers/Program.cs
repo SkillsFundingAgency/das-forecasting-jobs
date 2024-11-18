@@ -1,4 +1,7 @@
+using AutoMapper;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using NServiceBus;
 using SFA.DAS.Encoding;
@@ -6,6 +9,7 @@ using SFA.DAS.Forecasting.Domain.Configuration;
 using SFA.DAS.Forecasting.Domain.Infrastructure;
 using SFA.DAS.Forecasting.Domain.Services;
 using SFA.DAS.Forecasting.Domain.Triggers;
+using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Mapper;
 using SFA.DAS.Forecasting.Jobs.Application.Services;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Handlers;
 using SFA.DAS.Forecasting.Jobs.Application.Triggers.Services;
@@ -19,12 +23,21 @@ var host = new HostBuilder()
     .ConfigureNServiceBus()
     .ConfigureServices((context, services) =>
     {
+        services.AddDasLogging();
+
         var configuration = context.Configuration;
+
+        services.Replace(ServiceDescriptor.Singleton(typeof(IConfiguration), configuration));
+        services.AddOptions();
+
         services.Configure<ForecastingJobsConfiguration>(configuration.GetSection("ForecastingJobs"));
 
-        services.AddDasLogging();
-        
-        var encodingConfig =  configuration.GetEncodingConfig();
+        var mapperConfig = new MapperConfiguration(x => x.AddProfile<AutoMapperProfile>());
+
+        var mapper = mapperConfig.CreateMapper();
+        services.AddSingleton(mapper);
+
+        var encodingConfig = configuration.GetEncodingConfig();
 
         services.AddSingleton(encodingConfig);
         services.AddSingleton<IEncodingService, EncodingService>();
@@ -34,8 +47,8 @@ var host = new HostBuilder()
         services.AddSingleton<ILevyForecastService, LevyForecastService>();
         services.AddSingleton<IPaymentForecastService, PaymentForecastService>();
         services.AddSingleton(typeof(IHttpFunctionClient<>), typeof(HttpFunctionClient<>));
-        
+
     })
     .Build();
 
-host.Run();
+await host.RunAsync();

@@ -4,9 +4,9 @@ using NServiceBus;
 using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Triggers;
 
-namespace SFA.DAS.Forecasting.Triggers;
+namespace SFA.DAS.Forecasting.Triggers.Functions;
 
-public sealed class HandleAccountFundsExpiredEvent(ILogger log, ILevyCompleteTriggerHandler handler): IHandleMessages<AccountFundsExpiredEvent>
+public sealed class HandleAccountFundsExpiredEvent(ILogger log, ILevyCompleteTriggerHandler handler) : IHandleMessages<AccountFundsExpiredEvent>
 {
     public async Task Handle(AccountFundsExpiredEvent @event, IMessageHandlerContext context)
     {
