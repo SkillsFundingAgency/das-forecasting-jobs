@@ -18,7 +18,7 @@ public class ForecastingDbContext : DbContext, IForecastingDbContext
 {
     private const string AzureResource = "https://database.windows.net/";
     private readonly AzureServiceTokenProvider _azureServiceTokenProvider;
-    private readonly IConfiguration _configuration;x
+    private readonly IConfiguration _configuration;
 
     public DbSet<Commitments> Commitment { get; set; }
 
