@@ -1,7 +1,5 @@
-using Microsoft.Azure.WebJobs.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using NServiceBus;
 using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
@@ -26,8 +24,6 @@ var host = new HostBuilder()
 
         services.AddDasLogging();
         
-        var loggerFactory = new LoggerFactory();
-        services.AddSingleton(_ => loggerFactory.CreateLogger(LogCategories.CreateFunctionUserCategory("Common")));
         var encodingConfig =  configuration.GetEncodingConfig();
 
         services.AddSingleton(encodingConfig);
