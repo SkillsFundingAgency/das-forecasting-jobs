@@ -99,7 +99,7 @@
             "type": "string",
             "defaultValue": "TLS1_2"
         },
-        "SharedServiceBusFqdn": {
+        "SharedServiceBusFQDN": {
             "type": "string"
         }
     },
@@ -346,7 +346,7 @@
                                 },
                                 {
                                     "name": "AzureWebJobsServiceBus__fullyQualifiedNamespace",
-                                    "value": "[parameters('SharedServiceBusFqdn')]"
+                                    "value": "[parameters('SharedServiceBusFQDN')]"
                                 }
                             ]
                         }
@@ -434,7 +434,7 @@
                                 },
                                 {
                                     "name": "AzureWebJobsServiceBus__fullyQualifiedNamespace",
-                                    "value": "[parameters('SharedServiceBusFqdn')]"
+                                    "value": "[parameters('SharedServiceBusFQDN')]"
                                 }
                             ]
                         }
