@@ -47,6 +47,7 @@ stages:
   variables:
   - group: DevTest Management Resources
   - group: AT DevTest Shared Resources
+  - group: AT das-forecasting-jobs
   jobs:
   - template: pipeline-templates/job/deploy.yml
     parameters:
@@ -61,6 +62,7 @@ stages:
   variables:
   - group: DevTest Management Resources
   - group: TEST DevTest Shared Resources
+  - group: TEST das-forecasting-jobs
   jobs:
   - template: pipeline-templates/job/deploy.yml
     parameters:
@@ -75,6 +77,7 @@ stages:
   variables:
   - group: DevTest Management Resources
   - group: TEST2 DevTest Shared Resources
+  - group: TEST2 das-forecasting-jobs
   jobs:
   - template: pipeline-templates/job/deploy.yml
     parameters:
