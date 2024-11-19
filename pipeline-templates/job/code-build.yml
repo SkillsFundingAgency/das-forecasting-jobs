@@ -40,7 +40,7 @@ jobs:
       OverWrite: true
 
   - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact - ReservationJobs'
+    displayName: 'Publish Artifact - ForecastingJobs'
     inputs:
       PathtoPublish: '$(build.artifactstagingdirectory)/publish'
       artifactName: ${{ parameters.SolutionBaseName }}
