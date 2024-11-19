@@ -44,6 +44,9 @@
                 "description": "Name of the environment's shared service bus namespace"
             }
         },
+        "sharedServiceBusFqdn": {
+            "type": "string"
+        },
         "appServicePlanSize": {
             "type": "string",
             "allowedValues": [
@@ -98,9 +101,6 @@
         "minimumTlsVersion": {
             "type": "string",
             "defaultValue": "TLS1_2"
-        },
-        "SharedServiceBusFQDN": {
-            "type": "string"
         }
     },
     "variables": {
@@ -346,7 +346,7 @@
                                 },
                                 {
                                     "name": "AzureWebJobsServiceBus__fullyQualifiedNamespace",
-                                    "value": "[parameters('SharedServiceBusFQDN')]"
+                                    "value": "[parameters('sharedServiceBusFqdn')]"
                                 }
                             ]
                         }
@@ -434,7 +434,7 @@
                                 },
                                 {
                                     "name": "AzureWebJobsServiceBus__fullyQualifiedNamespace",
-                                    "value": "[parameters('SharedServiceBusFQDN')]"
+                                    "value": "[parameters('sharedServiceBusFqdn')]"
                                 }
                             ]
                         }
