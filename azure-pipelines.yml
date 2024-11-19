@@ -92,6 +92,7 @@ stages:
   variables:
   - group: PREPROD Management Resources
   - group: PREPROD Shared Resources
+  - group: PREPROD das-apprentice-accounts-jobs
   jobs:
   - template: pipeline-templates/job/deploy.yml
     parameters:
@@ -121,6 +122,7 @@ stages:
   variables:
   - group: MO Management Resources
   - group: MO Shared Resources
+  - group: MO das-apprentice-accounts-jobs
   jobs:
   - template: pipeline-templates/job/deploy.yml
     parameters:
@@ -135,6 +137,7 @@ stages:
   variables:
   - group: DevTest Management Resources
   - group: DEMO DevTest Shared Resources
+  - group: DEMO das-apprentice-accounts-jobs
   jobs:
   - template: pipeline-templates/job/deploy.yml
     parameters:
