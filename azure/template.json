@@ -322,10 +322,6 @@
                                     "value": "[parameters('nServiceBusLicense')]"
                                 },
                                 {
-                                    "name": "FUNCTIONS_WORKER_RUNTIME",
-                                    "value": "dotnet"
-                                },
-                                {
                                     "name": "Version",
                                     "value": "1.0"
                                 },
