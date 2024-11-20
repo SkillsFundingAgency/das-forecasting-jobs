@@ -155,7 +155,7 @@
       },
       {
         "apiVersion": "2021-04-01",
-        "name": "[concat('reservations-jobs-sql-firewall-rule-', parameters('utcValue'))]",
+        "name": "[concat('forecasting-jobs-sql-firewall-rule-', parameters('utcValue'))]",
         "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
         "type": "Microsoft.Resources/deployments",
         "properties": {
@@ -255,17 +255,14 @@
             "appServicePlanName": {
               "value": "[variables('appServicePlanName')]"
             },
-            "aseHostingEnvironmentName": {
-              "value": "[parameters('aseHostingEnvironmentName')]"
-            },
-            "aseResourceGroup": {
-              "value": "[parameters('aseResourceGroup')]"
-            },
             "aspSize": {
               "value": "[parameters('appServicePlanSize')]"
             },
             "aspInstances": {
               "value": "[parameters('appServicePlanInstances')]"
+            },
+            "nonASETier": {
+              "value": "[parameters('appServicePlanTier')]"
             }
           }
         }
@@ -283,7 +280,7 @@
           },
           "parameters": {
             "functionAppName": {
-              "value": "[variables('functionAppNameLegalEntities')]"
+              "value": "[variables('functionAppNameForecasting')]"
             },
             "appServicePlanName": {
               "value": "[variables('appServicePlanName')]"
@@ -292,7 +289,7 @@
               "value": "[variables('resourceGroupName')]"
             },
             "subnetResourceId": {
-              "value": "[reference(concat('reservations-jobs-subnet-', parameters('utcValue'))).outputs.SubnetResourceId.value]"
+              "value": "[reference(concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))).outputs.SubnetResourceId.value]"
             },
             "ipSecurityRestrictions": {
               "value": "[parameters('workerAccessRestrictions')]"
@@ -301,8 +298,20 @@
               "value": {
                 "array": [
                   {
-                    "name": "ConfigurationStorageConnectionString",
-                    "value": "[parameters('configurationStorageConnectionString')]"
+                    "name": "AzureWebJobsStorage",
+                    "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
+                  },
+                  {
+                    "name": "AzureWebJobsDashboard",
+                    "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
+                  },
+                  {
+                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                    "value": "[reference(concat('function-app-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
+                  },
+                  {
+                    "name": "FUNCTIONS_EXTENSION_VERSION",
+                    "value": "~4"
                   },
                   {
                     "name": "NServiceBusConnectionString",
@@ -313,49 +322,33 @@
                     "value": "[parameters('nServiceBusLicense')]"
                   },
                   {
-                    "name": "ConfigNames",
-                    "value": "[parameters('configNames')]"
-                  },
-                  {
-                    "name": "EnvironmentName",
-                    "value": "[parameters('environmentName')]"
+                    "name": "FUNCTIONS_WORKER_RUNTIME",
+                    "value": "dotnet"
                   },
                   {
                     "name": "Version",
-                    "value": "[parameters('version')]"
+                    "value": "1.0"
                   },
                   {
-                    "name": "AzureWebJobsStorage",
-                    "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
+                   "name": "EnvironmentName",
+                   "value": "[toUpper(parameters('environmentName'))]"
                   },
                   {
-                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                    "value": "[reference(concat('function-app-insights-lgle-', parameters('utcValue'))).outputs.ConnectionString.value]"
+                  "name": "LoggingRedisConnectionString",
+                  "value": "[parameters('loggingRedisConnectionString')]"
                   },
                   {
-                    "name": "FUNCTIONS_EXTENSION_VERSION",
-                    "value": "[parameters('functionsExtensionVersion')]"
+                  "name": "ConfigurationStorageConnectionString",
+                  "value": "[parameters('configurationStorageConnectionString')]"
                   },
                   {
-                    "name": "AppName",
-                    "value": "das-reservations-jobs-legal-entities"
-                  },
-                  {
-                    "name": "FUNCTIONS_WORKER_RUNTIME",
-                    "value": "dotnet-isolated"
-                  },
-                  {
-                    "name": "WEBSITE_RUN_FROM_PACKAGE",
-                    "value": "1"
-                  },
-                  {
-                    "name": "AzureWebJobsServiceBus__fullyQualifiedNamespace",
-                    "value": "[parameters('SharedServiceBusFqdn')]"
+                  "name": "ConfigNames",
+                  "value": "[parameters('configNames')]"
                   }
-                ]
-              }
+              ]
             }
           }
+         }
         },
         "dependsOn": [
           "[concat('storage-account-', parameters('utcValue'))]",
