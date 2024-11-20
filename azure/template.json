@@ -38,8 +38,10 @@
         "type": "securestring"
       },
       "configNames": {
-        "type": "string",
-        "defaultValue": "SFA.DAS.Reservations.Jobs,SFA.DAS.Encoding"
+        "type": "string"
+      },
+      "commitmentsConfigNames": {
+        "type": "string"
       },
       "environmentName": {
         "type": "string"
@@ -377,7 +379,7 @@
               "value": "[variables('resourceGroupName')]"
             },
             "subnetResourceId": {
-              "value": "[reference(concat('reservations-jobs-subnet-', parameters('utcValue'))).outputs.SubnetResourceId.value]"
+              "value": "[reference(concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))).outputs.SubnetResourceId.value]"
             },
             "ipSecurityRestrictions": {
               "value": "[parameters('workerAccessRestrictions')]"
@@ -386,57 +388,45 @@
               "value": {
                 "array": [
                   {
-                    "name": "ConfigurationStorageConnectionString",
-                    "value": "[parameters('configurationStorageConnectionString')]"
-                  },
-                  {
-                    "name": "NServiceBusConnectionString",
-                    "value": "[parameters('nServiceBusConnectionString')]"
-                  },
-                  {
-                    "name": "NServiceBusLicense",
-                    "value": "[parameters('nServiceBusLicense')]"
-                  },
-                  {
-                    "name": "ConfigNames",
-                    "value": "[parameters('configNames')]"
-                  },
-                  {
-                    "name": "EnvironmentName",
-                    "value": "[parameters('environmentName')]"
-                  },
-                  {
-                    "name": "Version",
-                    "value": "[parameters('version')]"
-                  },
-                  {
                     "name": "AzureWebJobsStorage",
                     "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
-                  },
-                  {
-                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
-                    "value": "[reference(concat('function-app-insights-prv-', parameters('utcValue'))).outputs.ConnectionString.value]"
-                  },
-                  {
+                },
+                {
+                    "name": "AzureWebJobsDashboard",
+                    "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
+                },
+                {
+                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                    "value": "[reference(concat('commitments-function-app-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
+                },
+                {
                     "name": "FUNCTIONS_EXTENSION_VERSION",
-                    "value": "[parameters('functionsExtensionVersion')]"
-                  },
-                  {
-                    "name": "FUNCTIONS_WORKER_RUNTIME",
-                    "value": "dotnet-isolated"
-                  },
-                  {
-                    "name": "AppName",
-                    "value": "das-reservations-jobs-reservation-provider"
-                  },
-                  {
-                    "name": "WEBSITE_RUN_FROM_PACKAGE",
-                    "value": "1"
-                  },
-                  {
-                    "name": "AzureWebJobsServiceBus__fullyQualifiedNamespace",
-                    "value": "[parameters('SharedServiceBusFqdn')]"
-                  }
+                    "value": "~4"
+                },
+                {
+                    "name": "NServiceBusConnectionString",
+                    "value": "[parameters('nServiceBusConnectionString')]"
+                },
+                {
+                    "name": "NServiceBusLicense",
+                    "value": "[parameters('nServiceBusLicense')]"
+                },
+                {
+                    "name": "EnvironmentName",
+                    "value": "[toUpper(parameters('environmentName'))]"
+                },
+                {
+                    "name": "LoggingRedisConnectionString",
+                    "value": "[parameters('loggingRedisConnectionString')]"
+                },
+                {
+                    "name": "ConfigurationStorageConnectionString",
+                    "value": "[parameters('configurationStorageConnectionString')]"
+                },
+                {
+                    "name": "ConfigNames",
+                    "value": "[parameters('commitmentsConfigNames')]"
+                }
                 ]
               }
             }
