@@ -47,13 +47,7 @@ jobs:
             ConfigurationSecrets:
               AzureWebJobsStorage: $(AzureWebJobsStorage)
               NServiceBusLicense: $(NServiceBusLicense)
-              ServiceBusConnectionString: $(ServiceBusConnectionString)
-        - template: azure-pipelines-templates/deploy/step/app-role-assignments.yml@das-platform-building-blocks
-          parameters:
-            ServiceConnection: ${{ parameters.AppRoleAssignmentsServiceConnection }}
-            ResourceName: $(FunctionAppName)
-            Tenant: $(Tenant)
-            IsMultiRepoCheckout: true            
+              ServiceBusConnectionString: $(ServiceBusConnectionString)      
         - template: azure-pipelines-templates/deploy/step/function-deploy.yml@das-platform-building-blocks
           parameters:
             ServiceConnection: ${{ parameters.ServiceConnection }}
