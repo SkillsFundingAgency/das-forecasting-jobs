@@ -1,496 +1,511 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-        "tags": {
-            "type": "object"
-        },
-        "resourceGroupLocation": {
-            "type": "string"
-        },
-        "environmentName": {
-            "type": "string",
-            "metadata": {
-                "description": "Short name of the environment. Used for the reference of the environment in table storage"
-            }
-        },
-        "resourceEnvironmentName": {
-            "type": "string",
-            "metadata": {
-                "description": "Short name of the environment. Used for the name of resources created"
-            }
-        },
-        "serviceName": {
-            "type": "string",
-            "metadata": {
-                "description": "Short name of the service. Used for the name of resources created"
-            }
-        },
-        "sharedEnvResourceGroup": {
-            "type": "string",
-            "metadata": {
-                "description": "Name of the environment's shared resource group"
-            }
-        },
-        "nServiceBusConnectionString": {
-            "type": "securestring"
-        },
-        "nServiceBusLicense": {
-            "type": "securestring"
-        },
-        "sharedServiceBusName": {
-            "type": "string",
-            "metadata": {
-                "description": "Name of the environment's shared service bus namespace"
-            }
-        },
-        "appServicePlanSize": {
-            "type": "string",
-            "allowedValues": [
-                "1",
-                "2",
-                "3"
-            ],
-            "defaultValue": "1"
-        },
-        "appServicePlanInstances": {
-            "type": "int",
-            "defaultValue": 1
-        },
-        "appServicePlanTier": {
-            "type": "string",
-            "defaultValue": "Standard"
-        },
-        "loggingRedisConnectionString": {
-            "type": "securestring"
-        },
-        "configurationStorageConnectionString": {
-            "type": "securestring"
-        },
-        "configNames": {
-            "type": "string"
-        },
-        "commitmentsConfigNames": {
-            "type": "string"
-        },
-        "sharedEnvVirtualNetworkName": {
-            "type": "string"
-        },
-        "subnetObject": {
-            "type": "object"
-        },
-        "subnetServiceEndpointList": {
-            "type": "array"
-        },
-        "subnetDelegations": {
-            "type": "array"
-        },
-        "workerAccessRestrictions": {
-            "type": "array"
-        },
-        "sharedSQLServerName": {
-            "type": "string"
-        },
-        "utcValue": {
-            "type": "string",
-            "defaultValue": "[utcNow('yyMMddHHmmss')]"
-        },
-        "minimumTlsVersion": {
-            "type": "string",
-            "defaultValue": "TLS1_2"
-        }
-    },
-    "variables": {
-        "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
-        "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
-        "resourceGroupName": "[concat(variables('resourceNamePrefix'), '-rg')]",
-        "functionAppName": "[concat(variables('resourceNamePrefix'),'-fa')]",
-        "commitmentsFunctionAppName": "[concat(variables('resourceNamePrefix'),'-comt-fa')]",
-        "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
-        "storageAccountName": "[concat('das',toLower(parameters('resourceEnvironmentName')),toLower(parameters('serviceName')),'str')]"
-    },
-    "resources": [
-        {
-            "apiVersion": "2020-06-01",
-            "name": "[variables('resourceGroupName')]",
-            "type": "Microsoft.Resources/resourceGroups",
-            "location": "[parameters('resourceGroupLocation')]",
-            "tags": "[parameters('tags')]",
-            "properties": {
-            }
-        },
-        {
-            "type": "Microsoft.Resources/deployments",
-            "apiVersion": "2020-06-01",
-            "name": "[concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))]",
-            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'subnet.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "virtualNetworkName": {
-                        "value": "[parameters('sharedEnvVirtualNetworkName')]"
-                    },
-                    "subnetName": {
-                        "value": "[parameters('subnetObject').name]"
-                    },
-                    "subnetAddressPrefix": {
-                        "value": "[parameters('subnetObject').addressSpace]"
-                    },
-                    "serviceEndpointList": {
-                        "value": "[parameters('subnetServiceEndpointList')]"
-                    },
-                    "delegations": {
-                        "value": "[parameters('subnetDelegations')]"
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "2021-04-01",
-            "name": "[concat('forecasting-jobs-worker-sql-firewall-rule-', parameters('utcValue'))]",
-            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'), 'sql-server-firewall-rules.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "serverName": {
-                        "value": "[parameters('sharedSQLServerName')]"
-                    },
-                    "subnetResourceIdList": {
-                        "value": "[createArray(reference(concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))).outputs.SubnetResourceId.value)]"
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "2020-06-01",
-            "name": "[concat('function-app-insights-', parameters('utcValue'))]",
-            "resourceGroup": "[variables('resourceGroupName')]",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "appInsightsName": {
-                        "value": "[variables('functionAppName')]"
-                    },
-                    "attachedService": {
-                        "value": "[variables('functionAppName')]"
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "2020-06-01",
-            "name": "[concat('commitments-function-app-insights-', parameters('utcValue'))]",
-            "resourceGroup": "[variables('resourceGroupName')]",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "appInsightsName": {
-                        "value": "[variables('commitmentsFunctionAppName')]"
-                    },
-                    "attachedService": {
-                        "value": "[variables('commitmentsFunctionAppName')]"
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "2020-06-01",
-            "name": "[concat('storage-account-', parameters('utcValue'))]",
-            "resourceGroup": "[variables('resourceGroupName')]",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'storage-account-arm.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "storageAccountName": {
-                        "value": "[variables('storageAccountName')]"
-                    },
-                    "allowSharedKeyAccess": {
-                        "value": true
-                    },
-                    "minimumTlsVersion": {
-                        "value": "[parameters('minimumTlsVersion')]"
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "2020-06-01",
-            "name": "[concat('app-service-plan-', parameters('utcValue'))]",
-            "resourceGroup": "[variables('resourceGroupName')]",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'app-service-plan.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "appServicePlanName": {
-                        "value": "[variables('appServicePlanName')]"
-                    },
-                    "aspSize": {
-                        "value": "[parameters('appServicePlanSize')]"
-                    },
-                    "aspInstances": {
-                        "value": "[parameters('appServicePlanInstances')]"
-                    },
-                    "nonASETier": {
-                        "value": "[parameters('appServicePlanTier')]"
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "2020-06-01",
-            "name": "[concat('function-app-', parameters('utcValue'))]",
-            "resourceGroup": "[variables('resourceGroupName')]",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'function-app-v2.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "functionAppName": {
-                        "value": "[variables('functionAppName')]"
-                    },
-                    "appServicePlanName": {
-                        "value": "[variables('appServicePlanName')]"
-                    },
-                    "appServicePlanResourceGroup": {
-                        "value": "[variables('resourceGroupName')]"
-                    },
-                    "subnetResourceId": {
-                        "value": "[reference(concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))).outputs.subnetResourceId.value]"
-                    },
-                    "ipSecurityRestrictions": {
-                        "value": "[parameters('workerAccessRestrictions')]"
-                    },
-                    "functionAppAppSettings": {
-                        "value": {
-                            "array": [
-                                {
-                                    "name": "AzureWebJobsStorage",
-                                    "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
-                                },
-                                {
-                                    "name": "AzureWebJobsDashboard",
-                                    "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
-                                },
-                                {
-                                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                    "value": "[reference(concat('function-app-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
-                                },
-                                {
-                                    "name": "FUNCTIONS_EXTENSION_VERSION",
-                                    "value": "~4"
-                                },
-                                {
-                                    "name": "NServiceBusConnectionString",
-                                    "value": "[parameters('nServiceBusConnectionString')]"
-                                },
-                                {
-                                    "name": "NServiceBusLicense",
-                                    "value": "[parameters('nServiceBusLicense')]"
-                                },
-                                {
-                                    "name": "FUNCTIONS_WORKER_RUNTIME",
-                                    "value": "dotnet"
-                                },
-                                {
-                                    "name": "Version",
-                                    "value": "1.0"
-                                },
-                                {
-                                    "name": "EnvironmentName",
-                                    "value": "[toUpper(parameters('environmentName'))]"
-                                },
-                                {
-                                    "name": "LoggingRedisConnectionString",
-                                    "value": "[parameters('loggingRedisConnectionString')]"
-                                },
-                                {
-                                    "name": "ConfigurationStorageConnectionString",
-                                    "value": "[parameters('configurationStorageConnectionString')]"
-                                },
-                                {
-                                    "name": "ConfigNames",
-                                    "value": "[parameters('configNames')]"
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            "dependsOn": [
-                "[concat('storage-account-', parameters('utcValue'))]",
-                "[concat('app-service-plan-', parameters('utcValue'))]"
-            ]
-        },
-        {
-            "apiVersion": "2020-06-01",
-            "name": "[concat('commitments-function-app-', parameters('utcValue'))]",
-            "resourceGroup": "[variables('resourceGroupName')]",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'function-app-v2.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "functionAppName": {
-                        "value": "[variables('commitmentsFunctionAppName')]"
-                    },
-                    "appServicePlanName": {
-                        "value": "[variables('appServicePlanName')]"
-                    },
-                    "appServicePlanResourceGroup": {
-                        "value": "[variables('resourceGroupName')]"
-                    },
-                    "subnetResourceId": {
-                        "value": "[reference(concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))).outputs.subnetResourceId.value]"
-                    },
-                    "ipSecurityRestrictions": {
-                        "value": "[parameters('workerAccessRestrictions')]"
-                    },
-                    "functionAppAppSettings": {
-                        "value": {
-                            "array": [
-                                {
-                                    "name": "AzureWebJobsStorage",
-                                    "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
-                                },
-                                {
-                                    "name": "AzureWebJobsDashboard",
-                                    "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
-                                },
-                                {
-                                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                    "value": "[reference(concat('commitments-function-app-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
-                                },
-                                {
-                                    "name": "FUNCTIONS_EXTENSION_VERSION",
-                                    "value": "~4"
-                                },
-                                {
-                                    "name": "NServiceBusConnectionString",
-                                    "value": "[parameters('nServiceBusConnectionString')]"
-                                },
-                                {
-                                    "name": "NServiceBusLicense",
-                                    "value": "[parameters('nServiceBusLicense')]"
-                                },
-                                {
-                                    "name": "EnvironmentName",
-                                    "value": "[toUpper(parameters('environmentName'))]"
-                                },
-                                {
-                                    "name": "LoggingRedisConnectionString",
-                                    "value": "[parameters('loggingRedisConnectionString')]"
-                                },
-                                {
-                                    "name": "ConfigurationStorageConnectionString",
-                                    "value": "[parameters('configurationStorageConnectionString')]"
-                                },
-                                {
-                                    "name": "ConfigNames",
-                                    "value": "[parameters('commitmentsConfigNames')]"
-                                }
-                            ]
-                        }
-                    }
-                }
-            },
-            "dependsOn": [
-                "[concat('app-service-plan-', parameters('utcValue'))]"
-            ]
-        },
-        {
-            "apiVersion": "2020-06-01",
-            "name": "[concat('role-assignment-commitments-function-app-', parameters('utcValue'))]",
-            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignments/role-assignment-service-bus.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "principalId": {
-                        "value": "[reference(concat('commitments-function-app-', parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
-                    },
-                    "assignmentType": {
-                        "value": "ServiceBusOwner"
-                    },
-                    "resourceName": {
-                        "value": "[parameters('sharedServiceBusName')]"
-                    }
-                }
-            }
-        },
-        {
-            "apiVersion": "2020-06-01",
-            "name": "[concat('role-assignment-', variables('functionAppName'), '-', parameters('utcValue'))]",
-            "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[concat(variables('deploymentUrlBase'),'role-assignments/role-assignment-service-bus.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "principalId": {
-                        "value": "[reference(concat('function-app-', parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
-                    },
-                    "assignmentType": {
-                        "value": "ServiceBusOwner"
-                    },
-                    "resourceName": {
-                        "value": "[parameters('sharedServiceBusName')]"
-                    }
-                }
-            }
-        }
-    ],
-    "outputs": {
-        "ResourceGroupName": {
-            "type": "string",
-            "value": "[variables('resourceGroupName')]"
-        },
-        "FunctionAppName": {
-            "type": "string",
-            "value": "[variables('functionAppName')]"
-        },
-        "CommitmentsFunctionAppName": {
-            "type": "string",
-            "value": "[variables('commitmentsFunctionAppName')]"
-        }
-    }
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+      "tags": {
+          "type": "object"
+      },
+      "resourceGroupLocation": {
+          "type": "string"
+      },
+      "environmentName": {
+          "type": "string",
+          "metadata": {
+              "description": "Short name of the environment. Used for the reference of the environment in table storage"
+          }
+      },
+      "resourceEnvironmentName": {
+          "type": "string",
+          "metadata": {
+              "description": "Short name of the environment. Used for the name of resources created"
+          }
+      },
+      "serviceName": {
+          "type": "string",
+          "metadata": {
+              "description": "Short name of the service. Used for the name of resources created"
+          }
+      },
+      "sharedEnvResourceGroup": {
+          "type": "string",
+          "metadata": {
+              "description": "Name of the environment's shared resource group"
+          }
+      },
+      "nServiceBusConnectionString": {
+          "type": "securestring"
+      },
+      "nServiceBusLicense": {
+          "type": "securestring"
+      },
+      "sharedServiceBusName": {
+          "type": "string",
+          "metadata": {
+              "description": "Name of the environment's shared service bus namespace"
+          }
+      },
+      "sharedServiceBusFqdn": {
+          "type": "string"
+      },
+      "appServicePlanSize": {
+          "type": "string",
+          "allowedValues": [
+              "1",
+              "2",
+              "3"
+          ],
+          "defaultValue": "1"
+      },
+      "appServicePlanInstances": {
+          "type": "int",
+          "defaultValue": 1
+      },
+      "appServicePlanTier": {
+          "type": "string",
+          "defaultValue": "Standard"
+      },
+      "loggingRedisConnectionString": {
+          "type": "securestring"
+      },
+      "configurationStorageConnectionString": {
+          "type": "securestring"
+      },
+      "configNames": {
+          "type": "string"
+      },
+      "commitmentsConfigNames": {
+          "type": "string"
+      },
+      "sharedEnvVirtualNetworkName": {
+          "type": "string"
+      },
+      "subnetObject": {
+          "type": "object"
+      },
+      "subnetServiceEndpointList": {
+          "type": "array"
+      },
+      "subnetDelegations": {
+          "type": "array"
+      },
+      "workerAccessRestrictions": {
+          "type": "array"
+      },
+      "sharedSQLServerName": {
+          "type": "string"
+      },
+      "utcValue": {
+          "type": "string",
+          "defaultValue": "[utcNow('yyMMddHHmmss')]"
+      },
+      "minimumTlsVersion": {
+          "type": "string",
+          "defaultValue": "TLS1_2"
+      }
+  },
+  "variables": {
+      "deploymentUrlBase": "https://raw.githubusercontent.com/SkillsFundingAgency/das-platform-building-blocks/master/templates/",
+      "resourceNamePrefix": "[toLower(concat('das-', parameters('resourceEnvironmentName'),'-', parameters('serviceName')))]",
+      "resourceGroupName": "[concat(variables('resourceNamePrefix'), '-rg')]",
+      "functionAppName": "[concat(variables('resourceNamePrefix'),'-fa')]",
+      "commitmentsFunctionAppName": "[concat(variables('resourceNamePrefix'),'-comt-fa')]",
+      "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
+      "storageAccountName": "[concat('das',toLower(parameters('resourceEnvironmentName')),toLower(parameters('serviceName')),'str')]"
+  },
+  "resources": [
+      {
+          "apiVersion": "2020-06-01",
+          "name": "[variables('resourceGroupName')]",
+          "type": "Microsoft.Resources/resourceGroups",
+          "location": "[parameters('resourceGroupLocation')]",
+          "tags": "[parameters('tags')]",
+          "properties": {
+          }
+      },
+      {
+          "type": "Microsoft.Resources/deployments",
+          "apiVersion": "2020-06-01",
+          "name": "[concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))]",
+          "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+          "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                  "uri": "[concat(variables('deploymentUrlBase'),'subnet.json')]",
+                  "contentVersion": "1.0.0.0"
+              },
+              "parameters": {
+                  "virtualNetworkName": {
+                      "value": "[parameters('sharedEnvVirtualNetworkName')]"
+                  },
+                  "subnetName": {
+                      "value": "[parameters('subnetObject').name]"
+                  },
+                  "subnetAddressPrefix": {
+                      "value": "[parameters('subnetObject').addressSpace]"
+                  },
+                  "serviceEndpointList": {
+                      "value": "[parameters('subnetServiceEndpointList')]"
+                  },
+                  "delegations": {
+                      "value": "[parameters('subnetDelegations')]"
+                  }
+              }
+          }
+      },
+      {
+          "apiVersion": "2021-04-01",
+          "name": "[concat('forecasting-jobs-worker-sql-firewall-rule-', parameters('utcValue'))]",
+          "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+          "type": "Microsoft.Resources/deployments",
+          "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                  "uri": "[concat(variables('deploymentUrlBase'), 'sql-server-firewall-rules.json')]",
+                  "contentVersion": "1.0.0.0"
+              },
+              "parameters": {
+                  "serverName": {
+                      "value": "[parameters('sharedSQLServerName')]"
+                  },
+                  "subnetResourceIdList": {
+                      "value": "[createArray(reference(concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))).outputs.SubnetResourceId.value)]"
+                  }
+              }
+          }
+      },
+      {
+          "apiVersion": "2020-06-01",
+          "name": "[concat('function-app-insights-', parameters('utcValue'))]",
+          "resourceGroup": "[variables('resourceGroupName')]",
+          "type": "Microsoft.Resources/deployments",
+          "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                  "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
+                  "contentVersion": "1.0.0.0"
+              },
+              "parameters": {
+                  "appInsightsName": {
+                      "value": "[variables('functionAppName')]"
+                  },
+                  "attachedService": {
+                      "value": "[variables('functionAppName')]"
+                  }
+              }
+          }
+      },
+      {
+          "apiVersion": "2020-06-01",
+          "name": "[concat('commitments-function-app-insights-', parameters('utcValue'))]",
+          "resourceGroup": "[variables('resourceGroupName')]",
+          "type": "Microsoft.Resources/deployments",
+          "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                  "uri": "[concat(variables('deploymentUrlBase'),'application-insights.json')]",
+                  "contentVersion": "1.0.0.0"
+              },
+              "parameters": {
+                  "appInsightsName": {
+                      "value": "[variables('commitmentsFunctionAppName')]"
+                  },
+                  "attachedService": {
+                      "value": "[variables('commitmentsFunctionAppName')]"
+                  }
+              }
+          }
+      },
+      {
+          "apiVersion": "2020-06-01",
+          "name": "[concat('storage-account-', parameters('utcValue'))]",
+          "resourceGroup": "[variables('resourceGroupName')]",
+          "type": "Microsoft.Resources/deployments",
+          "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                  "uri": "[concat(variables('deploymentUrlBase'),'storage-account-arm.json')]",
+                  "contentVersion": "1.0.0.0"
+              },
+              "parameters": {
+                  "storageAccountName": {
+                      "value": "[variables('storageAccountName')]"
+                  },
+                  "allowSharedKeyAccess": {
+                      "value": true
+                  },
+                  "minimumTlsVersion": {
+                      "value": "[parameters('minimumTlsVersion')]"
+                  }
+              }
+          }
+      },
+      {
+          "apiVersion": "2020-06-01",
+          "name": "[concat('app-service-plan-', parameters('utcValue'))]",
+          "resourceGroup": "[variables('resourceGroupName')]",
+          "type": "Microsoft.Resources/deployments",
+          "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                  "uri": "[concat(variables('deploymentUrlBase'),'app-service-plan.json')]",
+                  "contentVersion": "1.0.0.0"
+              },
+              "parameters": {
+                  "appServicePlanName": {
+                      "value": "[variables('appServicePlanName')]"
+                  },
+                  "aspSize": {
+                      "value": "[parameters('appServicePlanSize')]"
+                  },
+                  "aspInstances": {
+                      "value": "[parameters('appServicePlanInstances')]"
+                  },
+                  "nonASETier": {
+                      "value": "[parameters('appServicePlanTier')]"
+                  }
+              }
+          }
+      },
+      {
+          "apiVersion": "2020-06-01",
+          "name": "[concat('function-app-', parameters('utcValue'))]",
+          "resourceGroup": "[variables('resourceGroupName')]",
+          "type": "Microsoft.Resources/deployments",
+          "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                  "uri": "[concat(variables('deploymentUrlBase'),'function-app-v2.json')]",
+                  "contentVersion": "1.0.0.0"
+              },
+              "parameters": {
+                  "functionAppName": {
+                      "value": "[variables('functionAppName')]"
+                  },
+                  "appServicePlanName": {
+                      "value": "[variables('appServicePlanName')]"
+                  },
+                  "appServicePlanResourceGroup": {
+                      "value": "[variables('resourceGroupName')]"
+                  },
+                  "subnetResourceId": {
+                      "value": "[reference(concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))).outputs.subnetResourceId.value]"
+                  },
+                  "ipSecurityRestrictions": {
+                      "value": "[parameters('workerAccessRestrictions')]"
+                  },
+                  "functionAppAppSettings": {
+                      "value": {
+                          "array": [
+                              {
+                                  "name": "AzureWebJobsStorage",
+                                  "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
+                              },
+                              {
+                                  "name": "AzureWebJobsDashboard",
+                                  "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
+                              },
+                              {
+                                  "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                                  "value": "[reference(concat('function-app-insights-', parameters('utcValue'))).outputs.ConnectionString.value]"
+                              },
+                              {
+                                  "name": "FUNCTIONS_EXTENSION_VERSION",
+                                  "value": "~4"
+                              },
+                              {
+                                  "name": "FUNCTIONS_WORKER_RUNTIME",
+                                  "value": "dotnet-isolated"
+                              },                                
+                              {
+                                  "name": "NServiceBusConnectionString",
+                                  "value": "[parameters('nServiceBusConnectionString')]"
+                              },
+                              {
+                                  "name": "NServiceBusLicense",
+                                  "value": "[parameters('nServiceBusLicense')]"
+                              },
+                              {
+                                  "name": "Version",
+                                  "value": "1.0"
+                              },
+                              {
+                                  "name": "EnvironmentName",
+                                  "value": "[toUpper(parameters('environmentName'))]"
+                              },
+                              {
+                                  "name": "LoggingRedisConnectionString",
+                                  "value": "[parameters('loggingRedisConnectionString')]"
+                              },
+                              {
+                                  "name": "ConfigurationStorageConnectionString",
+                                  "value": "[parameters('configurationStorageConnectionString')]"
+                              },
+                              {
+                                  "name": "ConfigNames",
+                                  "value": "[parameters('configNames')]"
+                              },
+                              {
+                                  "name": "AzureWebJobsServiceBus__fullyQualifiedNamespace",
+                                  "value": "[parameters('sharedServiceBusFqdn')]"
+                              }
+                          ]
+                      }
+                  }
+              }
+          },
+          "dependsOn": [
+              "[concat('storage-account-', parameters('utcValue'))]",
+              "[concat('app-service-plan-', parameters('utcValue'))]"
+          ]
+      },
+      {
+          "apiVersion": "2020-06-01",
+          "name": "[concat('commitments-function-app-', parameters('utcValue'))]",
+          "resourceGroup": "[variables('resourceGroupName')]",
+          "type": "Microsoft.Resources/deployments",
+          "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                  "uri": "[concat(variables('deploymentUrlBase'),'function-app-v2.json')]",
+                  "contentVersion": "1.0.0.0"
+              },
+              "parameters": {
+                  "functionAppName": {
+                      "value": "[variables('commitmentsFunctionAppName')]"
+                  },
+                  "appServicePlanName": {
+                      "value": "[variables('appServicePlanName')]"
+                  },
+                  "appServicePlanResourceGroup": {
+                      "value": "[variables('resourceGroupName')]"
+                  },
+                  "subnetResourceId": {
+                      "value": "[reference(concat('forecasting-jobs-function-app-subnet-', parameters('utcValue'))).outputs.subnetResourceId.value]"
+                  },
+                  "ipSecurityRestrictions": {
+                      "value": "[parameters('workerAccessRestrictions')]"
+                  },
+                  "functionAppAppSettings": {
+                      "value": {
+                          "array": [
+                              {
+                                  "name": "AzureWebJobsStorage",
+                                  "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
+                              },
+                              {
+                                  "name": "AzureWebJobsDashboard",
+                                  "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
+                              },
+                              {
+                                  "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                                  "value": "[reference(concat('commitments-function-app-insights-', parameters('utcValue'))).outputs.ConnectionString.value]"
+                              },
+                              {
+                                  "name": "FUNCTIONS_EXTENSION_VERSION",
+                                  "value": "~4"
+                              },
+                              {
+                                  "name": "FUNCTIONS_WORKER_RUNTIME",
+                                  "value": "dotnet-isolated"
+                              },
+                              {
+                                  "name": "NServiceBusConnectionString",
+                                  "value": "[parameters('nServiceBusConnectionString')]"
+                              },
+                              {
+                                  "name": "NServiceBusLicense",
+                                  "value": "[parameters('nServiceBusLicense')]"
+                              },
+                              {
+                                  "name": "EnvironmentName",
+                                  "value": "[toUpper(parameters('environmentName'))]"
+                              },
+                              {
+                                  "name": "LoggingRedisConnectionString",
+                                  "value": "[parameters('loggingRedisConnectionString')]"
+                              },
+                              {
+                                  "name": "ConfigurationStorageConnectionString",
+                                  "value": "[parameters('configurationStorageConnectionString')]"
+                              },
+                              {
+                                  "name": "ConfigNames",
+                                  "value": "[parameters('commitmentsConfigNames')]"
+                              },
+                              {
+                                  "name": "AzureWebJobsServiceBus__fullyQualifiedNamespace",
+                                  "value": "[parameters('sharedServiceBusFqdn')]"
+                              }
+                          ]
+                      }
+                  }
+              }
+          },
+          "dependsOn": [
+              "[concat('app-service-plan-', parameters('utcValue'))]"
+          ]
+      },
+      {
+          "apiVersion": "2020-06-01",
+          "name": "[concat('role-assignment-commitments-function-app-', parameters('utcValue'))]",
+          "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+          "type": "Microsoft.Resources/deployments",
+          "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                  "uri": "[concat(variables('deploymentUrlBase'),'role-assignments/role-assignment-service-bus.json')]",
+                  "contentVersion": "1.0.0.0"
+              },
+              "parameters": {
+                  "principalId": {
+                      "value": "[reference(concat('commitments-function-app-', parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
+                  },
+                  "assignmentType": {
+                      "value": "ServiceBusOwner"
+                  },
+                  "resourceName": {
+                      "value": "[parameters('sharedServiceBusName')]"
+                  }
+              }
+          }
+      },
+      {
+          "apiVersion": "2020-06-01",
+          "name": "[concat('role-assignment-', variables('functionAppName'), '-', parameters('utcValue'))]",
+          "resourceGroup": "[parameters('sharedEnvResourceGroup')]",
+          "type": "Microsoft.Resources/deployments",
+          "properties": {
+              "mode": "Incremental",
+              "templateLink": {
+                  "uri": "[concat(variables('deploymentUrlBase'),'role-assignments/role-assignment-service-bus.json')]",
+                  "contentVersion": "1.0.0.0"
+              },
+              "parameters": {
+                  "principalId": {
+                      "value": "[reference(concat('function-app-', parameters('utcValue'))).outputs.managedServiceIdentityId.value]"
+                  },
+                  "assignmentType": {
+                      "value": "ServiceBusOwner"
+                  },
+                  "resourceName": {
+                      "value": "[parameters('sharedServiceBusName')]"
+                  }
+              }
+          }
+      }
+  ],
+  "outputs": {
+      "ResourceGroupName": {
+          "type": "string",
+          "value": "[variables('resourceGroupName')]"
+      },
+      "FunctionAppName": {
+          "type": "string",
+          "value": "[variables('functionAppName')]"
+      },
+      "CommitmentsFunctionAppName": {
+          "type": "string",
+          "value": "[variables('commitmentsFunctionAppName')]"
+      }
+  }
 }

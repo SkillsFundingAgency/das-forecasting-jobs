@@ -1,11 +1,11 @@
-﻿using Microsoft.Azure.Services.AppAuthentication;
+﻿using System;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SFA.DAS.Forecasting.Jobs.Infrastructure;
-using System;
 
-namespace SFA.DAS.Forecasting.Commitments.Functions.AppStart;
+namespace SFA.DAS.Forecasting.Commitments.Functions.StartupExtensions;
 
 public static class AddDatabaseExtension
 {

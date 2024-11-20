@@ -10,11 +10,12 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using FluentAssertions;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services;
 
 [TestFixture, Parallelizable]
-public class WhenTiggeringLevyForecast
+public class WhenTriggeringLevyForecast
 {
     private ForecastingJobsConfiguration _config;
     private Mock<IHttpFunctionClient<AccountLevyCompleteTrigger>> _httpClientMock;
@@ -59,7 +60,9 @@ public class WhenTiggeringLevyForecast
         // Act
 
         // Assert
-        Assert.ThrowsAsync<Exception>(() => _sut.Trigger(1, "18-19", 1));
+        var action = () => _sut.Trigger(1, "18-19", 1);
+        action.Should().ThrowAsync<Exception>();
+        
         _loggerMock.Verify(
             x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.Is<Exception>(e => e.Message == "Its Broken"),
                 (Func<object, Exception, string>)It.IsAny<object>()), Times.Once);
@@ -71,13 +74,14 @@ public class WhenTiggeringLevyForecast
     [TestCase(HttpStatusCode.Unauthorized)]
     [TestCase(HttpStatusCode.NotFound)]
     [TestCase(HttpStatusCode.ServiceUnavailable)]
-    public void If_Http_Call_Unsuccesful_Should_Log_Error(HttpStatusCode statusCode)
+    public void If_Http_Call_Unsuccessful_Should_Log_Error(HttpStatusCode statusCode)
     {
         // Arrange
         _httpClientMock.Setup(mock => mock.PostAsync(It.IsAny<string>(), It.IsAny<AccountLevyCompleteTrigger>())).ReturnsAsync(new HttpResponseMessage { StatusCode = statusCode });
 
         // Act
-        Assert.ThrowsAsync<Exception>(() => _sut.Trigger(1, "18-19", 1));
+        var action = () => _sut.Trigger(1, "18-19", 1);
+        action.Should().ThrowAsync<Exception>();
 
         // Assert
         _loggerMock.Verify(

@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFramework>net6.0</TargetFramework>
-	  <LangVersion>latestmajor</LangVersion>
+	  <TargetFramework>net8.0</TargetFramework>
+	  <LangVersion>default</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="12.0.1" />
-	  <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-	  <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="Azure.Identity" Version="1.12.0" />
+	  <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+	  <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
     <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Client" Version="7.1.0" />
     <PackageReference Include="SFA.DAS.CommitmentsV2.Api.Types" Version="100.0.30" />
     <PackageReference Include="SFA.DAS.CommitmentsV2.Messages" Version="100.0.30" />

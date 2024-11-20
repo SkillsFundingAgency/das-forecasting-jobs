@@ -3,16 +3,16 @@ using Moq;
 using NUnit.Framework;
 using SFA.DAS.EmployerFinance.Messages.Events;
 using SFA.DAS.Forecasting.Domain.Triggers;
-using SFA.DAS.Forecasting.Triggers;
 using System;
 using System.Threading.Tasks;
+using NServiceBus;
+using SFA.DAS.Forecasting.Triggers.Functions;
 
 namespace SFA.DAS.Forecasting.Functions.Triggers.UnitTests;
 
 [TestFixture, Parallelizable]
 public class WhenAccountFundsExpiredTriggered
 {
-
     [Test]
     [Category("UnitTest")]
     public async Task Then_Message_Will_Be_Handled()
@@ -21,9 +21,10 @@ public class WhenAccountFundsExpiredTriggered
         var createdDate = DateTime.Now;
         var handler = new Mock<ILevyCompleteTriggerHandler>();
         var message = new AccountFundsExpiredEvent { AccountId = 123, Created = createdDate };
+        var function = new HandleAccountFundsExpiredEvent(Mock.Of<ILogger<HandleAccountFundsExpiredEvent>>(), handler.Object);
 
         //Act
-        await HandleAccountFundsExpiredEvent.Run(message, handler.Object, Mock.Of<ILogger<AccountFundsExpiredEvent>>());
+        await function.Handle(message, Mock.Of<IMessageHandlerContext>());
 
         //Assert
         handler.Verify(

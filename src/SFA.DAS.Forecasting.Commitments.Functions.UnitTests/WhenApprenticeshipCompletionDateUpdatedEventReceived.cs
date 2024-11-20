@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using SFA.DAS.CommitmentsV2.Messages.Events;
-using SFA.DAS.Forecasting.Commitments.Functions.NServicebusTriggerFunctions;
 using SFA.DAS.Forecasting.Domain.CommitmentsFunctions;
 using System.Threading.Tasks;
+using NServiceBus;
+using SFA.DAS.Forecasting.Commitments.Functions.Functions;
 
 namespace SFA.DAS.Forecasting.Commitments.Functions.UnitTests;
 
@@ -46,10 +47,7 @@ public class ApprenticeshipCompletionDateUpdatedEventReceivedFixture
         Sut = new ApprenticeshipCompletionDateUpdatedFunction(MockpprenticeshipCompletedEventHandler.Object, MockLogger.Object);
     }
 
-    public async Task Run()
-    {
-        await Sut.Run(ApprenticeshipCompletionDateUpdatedEvent);
-    }
+    public async Task Run() => await Sut.Handle(ApprenticeshipCompletionDateUpdatedEvent, Mock.Of<IMessageHandlerContext>());
 
     internal void AssertHandler()
     {

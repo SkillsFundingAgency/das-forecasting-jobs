@@ -10,6 +10,7 @@ using SFA.DAS.Forecasting.Jobs.Application.CommitmentsFunctions.Handlers.Service
 using SFA.DAS.Forecasting.Jobs.Infrastructure.CosmosDB;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services;
 
@@ -53,7 +54,7 @@ public class WhenGettingApprenticeshipDetails
 
         var result = await fixture.GetApprenticeshipDetails();
 
-        Assert.AreEqual(fixture.ApprenticeshipCourse.Level, result.CourseLevel);
+        fixture.ApprenticeshipCourse.Level.Should().Be(result.CourseLevel);
     }
 
 
