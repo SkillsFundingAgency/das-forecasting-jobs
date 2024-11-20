@@ -52,9 +52,9 @@ jobs:
           parameters:
             ServiceConnection: ${{ parameters.ServiceConnection }}
             FunctionAppName: $(functionAppName)
-            DeploymentPackagePath: $(Pipeline.Workspace)/${{ parameters.SolutionBaseName }}/${{ parameters.SolutionBaseName }}.zip
+            DeploymentPackagePath: $(Pipeline.Workspace)/${{ parameters.SolutionBaseName }}/SFA.DAS.Forecasting.Triggers.zip
         - template: azure-pipelines-templates/deploy/step/function-deploy.yml@das-platform-building-blocks
           parameters:
             ServiceConnection: ${{ parameters.ServiceConnection }}
             FunctionAppName: $(commitmentsFunctionAppName)
-            DeploymentPackagePath: $(Pipeline.Workspace)/${{ parameters.SolutionBaseName }}/${{ parameters.SolutionBaseName }}.zip    
+            DeploymentPackagePath: $(Pipeline.Workspace)/${{ parameters.SolutionBaseName }}/SFA.DAS.Forecasting.Commitments.Functions.zip
