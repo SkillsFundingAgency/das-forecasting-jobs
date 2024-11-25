@@ -10,7 +10,7 @@ public static class DocumentSessionExtensions
 {
     public static IDocumentSession CreateDocumentSession(this IConfiguration config)
     {
-        var connectionString = config["CosmosDbConnectionString"];
+        var connectionString = config["CosmosDbReadOnlyConnectionString"];
 
         if (string.IsNullOrEmpty(connectionString))
         {
@@ -19,8 +19,8 @@ public static class DocumentSessionExtensions
 
         var documentConnectionString = new DocumentSessionConnectionString(connectionString);
 
-        var client = new DocumentClient(new Uri(documentConnectionString.AccountEndpoint),
-            documentConnectionString.AccountKey);
+        var client = new DocumentClient(new Uri(documentConnectionString.AccountEndpoint), documentConnectionString.AccountKey);
+        
         client.CreateDatabaseIfNotExistsAsync(new Database { Id = documentConnectionString.Database }).Wait();
 
         client.CreateDocumentCollectionIfNotExistsAsync(
