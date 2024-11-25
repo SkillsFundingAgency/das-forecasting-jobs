@@ -6,7 +6,7 @@ using SFA.DAS.Forecasting.Domain.Triggers;
 
 namespace SFA.DAS.Forecasting.Triggers.Functions;
 
-public sealed class HandleRefreshEmployerLevyDataCompleted(ILogger log, ILevyCompleteTriggerHandler handler) : IHandleMessages<RefreshEmployerLevyDataCompletedEvent>
+public sealed class HandleRefreshEmployerLevyDataCompleted(ILogger<HandleRefreshEmployerLevyDataCompleted> log, ILevyCompleteTriggerHandler handler) : IHandleMessages<RefreshEmployerLevyDataCompletedEvent>
 {
     public async Task Handle(RefreshEmployerLevyDataCompletedEvent @event, IMessageHandlerContext context)
     {

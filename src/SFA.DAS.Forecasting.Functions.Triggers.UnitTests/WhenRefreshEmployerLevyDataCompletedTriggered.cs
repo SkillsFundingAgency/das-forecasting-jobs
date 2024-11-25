@@ -20,7 +20,7 @@ public class WhenRefreshEmployerLevyDataCompletedTriggered
         //Arrange
         var handler = new Mock<ILevyCompleteTriggerHandler>();
         var message = new RefreshEmployerLevyDataCompletedEvent { AccountId = 123 };
-        var function = new HandleRefreshEmployerLevyDataCompleted(Mock.Of<ILogger<HandleRefreshPaymentDataCompletedEvent>>(), handler.Object);
+        var function = new HandleRefreshEmployerLevyDataCompleted(Mock.Of<ILogger<HandleRefreshEmployerLevyDataCompleted>>(), handler.Object);
 
         //Act
         await function.Handle(message, Mock.Of<IMessageHandlerContext>());
