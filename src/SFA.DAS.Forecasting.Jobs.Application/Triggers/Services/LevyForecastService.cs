@@ -39,12 +39,6 @@ public class LevyForecastService : ILevyForecastService
                 PeriodMonth = periodMonth
             };
 
-            _logger.LogWarning("LevyForecastService Trigger. Url: {Uri}.  XFunctionsKey: {Key}. Trigger message: {Message}",
-                _configuration.Value.LevyDeclarationPreLoadHttpFunctionBaseUrl,
-                _httpClient.XFunctionsKey,
-                JsonConvert.SerializeObject(triggerMessage)
-            );
-
             var response = await _httpClient.PostAsync(_configuration.Value.LevyDeclarationPreLoadHttpFunctionBaseUrl, triggerMessage);
 
             if (!response.IsSuccessStatusCode)
