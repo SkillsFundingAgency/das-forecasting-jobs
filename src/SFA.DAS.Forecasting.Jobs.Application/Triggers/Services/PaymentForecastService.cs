@@ -33,7 +33,7 @@ public class PaymentForecastService : IPaymentForecastService
         {
             var triggerMessage = new PaymentDataCompleteTrigger
             {
-                EmployerAccountIds = new List<long> { accountId },
+                EmployerAccountIds = [accountId],
                 PeriodYear = periodYear,
                 PeriodMonth = periodMonth,
                 PeriodId = periodEnd
