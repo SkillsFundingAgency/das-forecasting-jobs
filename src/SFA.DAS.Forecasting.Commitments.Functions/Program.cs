@@ -39,6 +39,9 @@ var host = new HostBuilder()
 
         var commitmentsClientApiConfig = configuration.GetCommitmentsClientApiConfiguration(services);
         var loggingFactory = serviceProvider.GetService<ILoggerFactory>();
+        var logger = loggingFactory.CreateLogger(typeof(Program));
+        logger.LogInformation("Program startup CosmosDbConnectionString: {Value}", configuration["CosmosDbConnectionString"]);
+
         services.AddSingleton<ICommitmentsApiClientFactory>(x => new CommitmentsApiClientFactory(commitmentsClientApiConfig, loggingFactory));
         services.AddTransient<ICommitmentsApiClient>(provider => provider.GetRequiredService<ICommitmentsApiClientFactory>().CreateClient());
 
