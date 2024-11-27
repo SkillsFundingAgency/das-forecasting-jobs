@@ -8,7 +8,7 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.StartupExtensions;
 
 public static class DocumentSessionExtensions
 {
-    private const string ConnectionStringName = "CosmosDbReadOnlyConnectionString";
+    private const string ConnectionStringName = "CosmosDbConnectionString";
 
     public static IDocumentSession CreateDocumentSession(this IConfiguration config)
     {
