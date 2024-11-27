@@ -8,13 +8,15 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.StartupExtensions;
 
 public static class DocumentSessionExtensions
 {
+    private const string ConnectionStringName = "CosmosDbReadOnlyConnectionString";
+
     public static IDocumentSession CreateDocumentSession(this IConfiguration config)
     {
-        var connectionString = config["CosmosDbReadOnlyConnectionString"];
+        var connectionString = config[ConnectionStringName];
 
         if (string.IsNullOrEmpty(connectionString))
         {
-            throw new InvalidOperationException("No 'DocumentConnectionString' connection string found.");
+            throw new InvalidOperationException($"No '{ConnectionStringName}' connection string found.");
         }
 
         var documentConnectionString = new DocumentSessionConnectionString(connectionString);
