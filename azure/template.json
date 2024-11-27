@@ -110,7 +110,9 @@
         "functionAppName": "[concat(variables('resourceNamePrefix'),'-fa')]",
         "commitmentsFunctionAppName": "[concat(variables('resourceNamePrefix'),'-comt-fa')]",
         "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
-        "storageAccountName": "[concat('das',toLower(parameters('resourceEnvironmentName')),toLower(parameters('serviceName')),'str')]"
+        "storageAccountName": "[concat('das',toLower(parameters('resourceEnvironmentName')),toLower(parameters('serviceName')),'str')]",
+        "configNames": "SFA.DAS.Forecasting.Jobs,SFA.DAS.Encoding:EncodingService",
+        "commitmentsConfigNames": "SFA.DAS.Forecasting.Commitments.Functions,SFA.DAS.Encoding:EncodingService"
     },
     "resources": [
         {
@@ -119,8 +121,7 @@
             "type": "Microsoft.Resources/resourceGroups",
             "location": "[parameters('resourceGroupLocation')]",
             "tags": "[parameters('tags')]",
-            "properties": {
-            }
+            "properties": {}
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -315,7 +316,7 @@
                                 {
                                     "name": "FUNCTIONS_WORKER_RUNTIME",
                                     "value": "dotnet-isolated"
-                                },                                
+                                },
                                 {
                                     "name": "NServiceBusConnectionString",
                                     "value": "[parameters('nServiceBusConnectionString')]"
@@ -508,4 +509,4 @@
             "value": "[variables('commitmentsFunctionAppName')]"
         }
     }
-  }
+}
