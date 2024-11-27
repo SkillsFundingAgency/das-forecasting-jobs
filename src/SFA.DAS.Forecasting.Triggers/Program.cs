@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using NServiceBus;
 using SFA.DAS.Encoding;
 using SFA.DAS.Forecasting.Domain.Configuration;
@@ -38,7 +39,7 @@ var host = new HostBuilder()
         services.AddSingleton(mapper);
 
         var encodingConfig = configuration.GetEncodingConfig();
-
+        
         services.AddSingleton(encodingConfig);
         services.AddSingleton<IEncodingService, EncodingService>();
 
