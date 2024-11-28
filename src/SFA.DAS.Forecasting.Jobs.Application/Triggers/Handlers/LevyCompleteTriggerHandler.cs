@@ -10,8 +10,7 @@ public class LevyCompleteTriggerHandler : ILevyCompleteTriggerHandler
 {
     private readonly ILevyForecastService _triggerLevyForecastService;
 
-    public LevyCompleteTriggerHandler(
-        ILevyForecastService triggerLevyForecastService)
+    public LevyCompleteTriggerHandler(ILevyForecastService triggerLevyForecastService)
     {
         _triggerLevyForecastService = triggerLevyForecastService;
     }
