@@ -10,9 +10,10 @@ namespace SFA.DAS.Forecasting.Commitments.Functions.Functions;
 
 public class TestFunction(ILogger<TestFunction> logger, IApprenticeshipCompletedEventHandler handler)
 {
+    [Function("TestCosmosDbFunction")]
     public async Task Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "TestCosmosDbFunction")] HttpRequestMessage req)
     {
-        logger.LogInformation("TestHttpClientFunction function executed.");
+        logger.LogInformation("TestCosmosDbFunction function executed.");
 
         await handler.Handle(new ApprenticeshipCompletedEvent
         {

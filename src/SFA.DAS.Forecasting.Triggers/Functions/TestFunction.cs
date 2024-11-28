@@ -10,6 +10,7 @@ namespace SFA.DAS.Forecasting.Triggers.Functions;
 
 public class TestFunction(ILogger<TestFunction> log, ILevyCompleteTriggerHandler handler)
 {
+    [Function("TestHttpClientFunction")]
     public async Task Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "TestHttpClientFunction")]HttpRequestMessage req)
     {
         log.LogInformation("TestHttpClientFunction function executed.");
