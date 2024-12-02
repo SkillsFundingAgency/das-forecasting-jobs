@@ -28,7 +28,6 @@
         <PackageReference Include="SFA.DAS.Encoding" Version="1.1.76" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\SFA.DAS.EmployerFinance.Messages\SFA.DAS.EmployerFinance.Messages.csproj" />
         <ProjectReference Include="..\SFA.DAS.Forecasting.Domain\SFA.DAS.Forecasting.Domain.csproj" />
         <ProjectReference Include="..\SFA.DAS.Forecasting.Jobs.Application\SFA.DAS.Forecasting.Jobs.Application.csproj" />
         <ProjectReference Include="..\SFA.DAS.Forecasting.Jobs.Infrastructure\SFA.DAS.Forecasting.Jobs.Infrastructure.csproj" />
