@@ -7,6 +7,7 @@ using SFA.DAS.Forecasting.Jobs.Application.Triggers.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.Triggers.Services;
 
@@ -33,7 +34,7 @@ public class LevyForecastService : ILevyForecastService
         {
             var triggerMessage = new AccountLevyCompleteTrigger
             {
-                EmployerAccountIds = new List<long> { accountId },
+                EmployerAccountIds = [accountId],
                 PeriodYear = periodYear,
                 PeriodMonth = periodMonth
             };

@@ -10,6 +10,7 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using FluentAssertions;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Services;
 
@@ -62,7 +63,9 @@ public class WhenTiggeringPaymentForecast
         // Act
 
         // Assert
-        Assert.ThrowsAsync<Exception>(() => _sut.Trigger(1, 19, "18-19R10", 1));
+        var action = () => _sut.Trigger(1, 19, "18-19R10", 1);
+        action.Should().ThrowAsync<Exception>();
+        
         _loggerMock.Verify(
             x => x.Log(LogLevel.Error, It.IsAny<EventId>(), It.IsAny<It.IsAnyType>(), It.Is<Exception>(e => e.Message == "Its Broken"),
                 (Func<object, Exception, string>)It.IsAny<object>()), Times.Once);
@@ -82,7 +85,8 @@ public class WhenTiggeringPaymentForecast
             .ReturnsAsync(new HttpResponseMessage { StatusCode = statusCode });
 
         // Act
-        Assert.ThrowsAsync<Exception>(() => _sut.Trigger(1, 19, "18-19R10", 1));
+        var action = () => _sut.Trigger(1, 19, "18-19R10", 1);
+        action.Should().ThrowAsync<Exception>();
 
         // Assert
         _loggerMock.Verify(

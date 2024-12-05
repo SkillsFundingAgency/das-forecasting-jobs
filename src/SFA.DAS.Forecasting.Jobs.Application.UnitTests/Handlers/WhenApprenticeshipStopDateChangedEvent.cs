@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers;
 
@@ -117,6 +118,7 @@ public class ApprenticeshipStopDateChangedEventFixture
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .EnableSensitiveDataLogging()
             .Options);
+        
         Commitment = Fixture.Create<Commitments>();
         Commitment.Id = CommitmentId = 101;
         Commitment.ActualEndDate = null;
@@ -126,11 +128,9 @@ public class ApprenticeshipStopDateChangedEventFixture
 
         ApprenticeshipStopDateChangedEvent = Fixture.Create<ApprenticeshipStopDateChangedEvent>();
         ApprenticeshipStopDateChangedEvent.ApprenticeshipId = Commitment.ApprenticeshipId;
-
-        var configuration = new MapperConfiguration(cfg => cfg.AddProfile<AutoMapperProfile>());
-        var mapper = new Mapper(configuration);
-
+        
         Sut = new ApprenticeshipStopDateChangedEventHandler(Db, MockGetApprenticeship.Object, MockLogger.Object);
+        
         Db.SaveChanges();
     }
 
@@ -166,28 +166,29 @@ public class ApprenticeshipStopDateChangedEventFixture
 
     public void RunEventWithException()
     {
-        Assert.ThrowsAsync<Exception>(() => Sut.Handle(ApprenticeshipStopDateChangedEvent));
+        var action = () => Sut.Handle(ApprenticeshipStopDateChangedEvent);
+        action.Should().ThrowAsync<Exception>();
     }
 
     public void RunEventWithCommitmentsApiModelException()
     {
-        Assert.ThrowsAsync<CommitmentsApiModelException>(() => Sut.Handle(ApprenticeshipStopDateChangedEvent));
+        var action = () => Sut.Handle(ApprenticeshipStopDateChangedEvent);
+        action.Should().ThrowAsync<CommitmentsApiModelException>();
     }
 
     internal void AssertActualEndDate()
     {
-        Assert.AreEqual(ApprenticeshipStopDateChangedEvent.StopDate, Db.Commitment.Where(x => x.Id == CommitmentId).First().ActualEndDate);
+        Db.Commitment.First(x => x.Id == CommitmentId).ActualEndDate.Should().Be(ApprenticeshipStopDateChangedEvent.StopDate);
     }
 
     internal void AssertStatus()
     {
-        Assert.AreEqual(Status.Stopped, Db.Commitment.Where(x => x.Id == CommitmentId).First().Status);
+        Db.Commitment.First(x => x.Id == CommitmentId).Status.Should().Be(Status.Stopped);
     }
 
     internal void AssertRecordCreated()
     {
-
-        Assert.AreEqual(1, Db.Commitment.Where(x => x.ApprenticeshipId == 2).Count());
+        Db.Commitment.Count(x => x.ApprenticeshipId == 2).Should().Be(1);
     }
 
     internal void VerifyExceptionLogged()

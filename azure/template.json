@@ -44,6 +44,9 @@
                 "description": "Name of the environment's shared service bus namespace"
             }
         },
+        "sharedServiceBusFqdn": {
+            "type": "string"
+        },
         "appServicePlanSize": {
             "type": "string",
             "allowedValues": [
@@ -107,7 +110,9 @@
         "functionAppName": "[concat(variables('resourceNamePrefix'),'-fa')]",
         "commitmentsFunctionAppName": "[concat(variables('resourceNamePrefix'),'-comt-fa')]",
         "appServicePlanName": "[concat(variables('resourceNamePrefix'),'-asp')]",
-        "storageAccountName": "[concat('das',toLower(parameters('resourceEnvironmentName')),toLower(parameters('serviceName')),'str')]"
+        "storageAccountName": "[concat('das',toLower(parameters('resourceEnvironmentName')),toLower(parameters('serviceName')),'str')]",
+        "configNames": "SFA.DAS.Forecasting.Jobs,SFA.DAS.Encoding:EncodingService",
+        "commitmentsConfigNames": "SFA.DAS.Forecasting.Commitments.Functions,SFA.DAS.Encoding:EncodingService"
     },
     "resources": [
         {
@@ -116,8 +121,7 @@
             "type": "Microsoft.Resources/resourceGroups",
             "location": "[parameters('resourceGroupLocation')]",
             "tags": "[parameters('tags')]",
-            "properties": {
-            }
+            "properties": {}
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -302,12 +306,16 @@
                                     "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
                                 },
                                 {
-                                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                    "value": "[reference(concat('function-app-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
+                                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                                    "value": "[reference(concat('function-app-insights-', parameters('utcValue'))).outputs.ConnectionString.value]"
                                 },
                                 {
                                     "name": "FUNCTIONS_EXTENSION_VERSION",
                                     "value": "~4"
+                                },
+                                {
+                                    "name": "FUNCTIONS_WORKER_RUNTIME",
+                                    "value": "dotnet-isolated"
                                 },
                                 {
                                     "name": "NServiceBusConnectionString",
@@ -316,10 +324,6 @@
                                 {
                                     "name": "NServiceBusLicense",
                                     "value": "[parameters('nServiceBusLicense')]"
-                                },
-                                {
-                                    "name": "FUNCTIONS_WORKER_RUNTIME",
-                                    "value": "dotnet"
                                 },
                                 {
                                     "name": "Version",
@@ -340,6 +344,10 @@
                                 {
                                     "name": "ConfigNames",
                                     "value": "[parameters('configNames')]"
+                                },
+                                {
+                                    "name": "AzureWebJobsServiceBus__fullyQualifiedNamespace",
+                                    "value": "[parameters('sharedServiceBusFqdn')]"
                                 }
                             ]
                         }
@@ -390,12 +398,16 @@
                                     "value": "[reference(concat('storage-account-', parameters('utcValue'))).outputs.storageConnectionString.value]"
                                 },
                                 {
-                                    "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
-                                    "value": "[reference(concat('commitments-function-app-insights-', parameters('utcValue'))).outputs.InstrumentationKey.value]"
+                                    "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                                    "value": "[reference(concat('commitments-function-app-insights-', parameters('utcValue'))).outputs.ConnectionString.value]"
                                 },
                                 {
                                     "name": "FUNCTIONS_EXTENSION_VERSION",
                                     "value": "~4"
+                                },
+                                {
+                                    "name": "FUNCTIONS_WORKER_RUNTIME",
+                                    "value": "dotnet-isolated"
                                 },
                                 {
                                     "name": "NServiceBusConnectionString",
@@ -420,6 +432,10 @@
                                 {
                                     "name": "ConfigNames",
                                     "value": "[parameters('commitmentsConfigNames')]"
+                                },
+                                {
+                                    "name": "AzureWebJobsServiceBus__fullyQualifiedNamespace",
+                                    "value": "[parameters('sharedServiceBusFqdn')]"
                                 }
                             ]
                         }

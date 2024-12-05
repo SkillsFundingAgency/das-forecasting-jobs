@@ -53,9 +53,7 @@ public class WhenHandlingPaymentDataRefreshComplete
         // Arrange 
         _event.PeriodEnd = periodEnd;
         short actualPeriodMonth = 0;
-
-        PaymentDataCompleteTrigger res = new PaymentDataCompleteTrigger();
-
+        
         _paymentForecastServiceMock
             .Setup(mock => mock.Trigger(It.IsAny<short>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<long>()))
             .Callback((short periodMonth, int periodYear, string callbackPeriodEnd, long accountId) =>
@@ -82,9 +80,7 @@ public class WhenHandlingPaymentDataRefreshComplete
     {
         // Arrange 
         _event.PeriodEnd = periodEnd;
-        int actualPeriodYear = 0;
-
-        PaymentDataCompleteTrigger res = new PaymentDataCompleteTrigger();
+        var actualPeriodYear = 0;
 
         _paymentForecastServiceMock
             .Setup(mock => mock.Trigger(It.IsAny<short>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<long>()))

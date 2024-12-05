@@ -17,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentAssertions;
 
 namespace SFA.DAS.Forecasting.Jobs.Application.UnitTests.Handlers;
 
@@ -114,6 +115,7 @@ public class ApprenticeshipStoppedEventTestsFixture
             .UseInMemoryDatabase(Guid.NewGuid().ToString())
             .EnableSensitiveDataLogging()
             .Options);
+        
         Commitment = Fixture.Create<Commitments>();
         Commitment.Id = CommitmentId = 101;
         Commitment.ActualEndDate = null;
@@ -123,9 +125,6 @@ public class ApprenticeshipStoppedEventTestsFixture
 
         ApprenticeshipStoppedEvent = Fixture.Create<ApprenticeshipStoppedEvent>();
         ApprenticeshipStoppedEvent.ApprenticeshipId = Commitment.ApprenticeshipId;
-
-        var configuration = new MapperConfiguration(cfg => cfg.AddProfile<AutoMapperProfile>());
-        var mapper = new Mapper(configuration);
 
         Sut = new ApprenticeshipStoppedEventHandler(Db, MockGetApprenticeship.Object, MockLogger.Object);
         Db.SaveChanges();
@@ -138,13 +137,14 @@ public class ApprenticeshipStoppedEventTestsFixture
         Commitment.Id = 0;
         Commitment.ApprenticeshipId = 2;
         MockGetApprenticeship.Setup(x => x.GetApprenticeshipDetails(It.IsAny<long>())).ReturnsAsync(Commitment);
+        
         return this;
     }
 
     public ApprenticeshipStoppedEventTestsFixture SetCommitmentsApiModelException()
     {
         MockGetApprenticeship.Setup(s => s.GetApprenticeshipDetails(It.IsAny<long>()))
-            .Throws(new CommitmentsApiModelException(new List<ErrorDetail>()));
+            .Throws(new CommitmentsApiModelException([]));
 
         return this;
     }
@@ -163,28 +163,29 @@ public class ApprenticeshipStoppedEventTestsFixture
 
     public void RunEventWithException()
     {
-        Assert.ThrowsAsync<Exception>(() => Sut.Handle(ApprenticeshipStoppedEvent));
+        var action = () => Sut.Handle(ApprenticeshipStoppedEvent);
+        action.Should().ThrowAsync<Exception>();
     }
 
     public void RunEventWithCommitmentsApiModelException()
     {
-        Assert.ThrowsAsync<CommitmentsApiModelException>(() => Sut.Handle(ApprenticeshipStoppedEvent));
+        var action = () => Sut.Handle(ApprenticeshipStoppedEvent);
+        action.Should().ThrowAsync<CommitmentsApiModelException>();
     }
 
     internal void AssertActualEndDate()
     {
-        Assert.AreEqual(ApprenticeshipStoppedEvent.StopDate, Db.Commitment.Where(x => x.Id == CommitmentId).First().ActualEndDate);
+        Db.Commitment.First(x => x.Id == CommitmentId).ActualEndDate.Should().Be(ApprenticeshipStoppedEvent.StopDate);
     }
 
     internal void AssertStatus()
     {
-        Assert.AreEqual(Status.Stopped, Db.Commitment.Where(x => x.Id == CommitmentId).First().Status);
+        Db.Commitment.First(x => x.Id == CommitmentId).Status.Should().Be(Status.Stopped);
     }
 
     internal void AssertRecordCreated()
     {
-
-        Assert.AreEqual(1, Db.Commitment.Where(x => x.ApprenticeshipId == 2).Count());
+        Db.Commitment.Count(x => x.ApprenticeshipId == 2).Should().Be(1);
     }
 
     internal void VerifyExceptionLogged()
