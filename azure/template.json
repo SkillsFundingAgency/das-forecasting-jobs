@@ -345,7 +345,7 @@
         {
             "condition": "[equals(parameters('enableFailedRequestAlert'), true())]",
             "apiVersion": "2021-04-01",
-            "name": "[concat('application-insights-', variables('functionAppName'), '-alert-', parameters('utcValue'))]",
+            "name": "[concat('app-insights-', variables('functionAppName'), '-alert-', parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
@@ -457,7 +457,7 @@
         {
             "condition": "[equals(parameters('enableFailedRequestAlert'), true())]",
             "apiVersion": "2021-04-01",
-            "name": "[concat('application-insights-', variables('commitmentsFunctionAppName'), '-alert-', parameters('utcValue'))]",
+            "name": "[concat('app-insights-', variables('commitmentsFunctionAppName'), '-alert-', parameters('utcValue'))]",
             "type": "Microsoft.Resources/deployments",
             "resourceGroup": "[variables('resourceGroupName')]",
             "properties": {
